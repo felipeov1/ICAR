@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import Card from "./Card";
+import BookingCard from "./BookingCard";
 
-const ITEMS_PER_PAGE = 3; 
 
-const TimeBooking = () => {
+const Bookings = () => {
   const [activeTab, setActiveTab] = useState("agendados");
   const [notification, setNotification] = useState<{ message: string; type: string } | null>(null);
+  const ITEMS_PER_PAGE = 3; 
   const [visibleItems, setVisibleItems] = useState(ITEMS_PER_PAGE);
   const [loading, setLoading] = useState(false);
   const observerRef = useRef<HTMLDivElement | null>(null);
@@ -102,7 +102,7 @@ const TimeBooking = () => {
 
         {displayedServices.length > 0 ? (
           displayedServices.map((service) => (
-            <Card
+            <BookingCard
               key={service.id}
               service={service}
               onCancel={activeTab === "agendados" ? () => showNotification({ message: "Agendamento cancelado!", type: "sucess" }) : undefined}
@@ -122,4 +122,4 @@ const TimeBooking = () => {
   );
 };
 
-export default TimeBooking;
+export default Bookings;

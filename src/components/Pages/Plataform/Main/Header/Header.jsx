@@ -22,6 +22,16 @@ const Header = ({ className }) => {
     };
   }, []);
 
+    const getGreeting = () => {
+      const hour = new Date().getHours();
+      if (hour >= 5 && hour < 12) return "Bom dia";
+      if (hour >= 12 && hour < 18) return "Boa tarde";
+      return "Boa noite";
+    };
+  
+    
+
+
   return (
     <header
       className={`${
@@ -31,7 +41,7 @@ const Header = ({ className }) => {
       style={{ flexWrap: "wrap", alignItems: "start" }}
     >
       <div className="flex-1 flex flex-col items-start">
-        <span>Olá,</span>
+        <span>{getGreeting()},</span>
         <span>Felipe Ferreira</span>
       </div>
 

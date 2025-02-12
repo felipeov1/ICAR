@@ -20,6 +20,7 @@ import Icar from "./components/Pages/Plataform/Main/Index.jsx";
 import CompanyView from "./components/Pages/Plataform/CompanyView/index.jsx";
 import BookingSummary from "./components/Pages/Plataform/CompanyView/BookingSummary/BookingSummary.jsx";
 import Bookings from "./components/Pages/Plataform/Bookings/index.jsx"
+import MyAccount from "./components/Pages/Plataform/MyAccount/index.jsx"
 
 function App() {
   return (
@@ -107,6 +108,15 @@ function AppContent() {
           element={
             <div>
               <Bookings />
+            </div>
+          }
+        />
+
+        <Route
+          path="/icar/minha-conta"
+          element={
+            <div>
+              <MyAccount />
             </div>
           }
         />

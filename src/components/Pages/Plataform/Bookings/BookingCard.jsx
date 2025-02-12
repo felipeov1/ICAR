@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import EditBooking from "./EditBooking";
 
-const Card = ({ service, onCancel, onEdit }) => {
+const BookingCard = ({ service, onCancel, onEdit }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
@@ -42,4 +42,4 @@ const Card = ({ service, onCancel, onEdit }) => {
   );
 };
 
-export default Card;
+export default BookingCard;

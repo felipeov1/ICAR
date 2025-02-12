@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 
 const CompanyList = () => {
   const allCompanies = [
@@ -26,28 +26,83 @@ const CompanyList = () => {
       image: "/src/images/icar-blue.jpeg",
       link: "/icar/empresa",  
     },
-
+    {
+      name: "Lava-Rápido ICAR",
+      rating: 4.5,
+      description: "Lavagem rápida e eficiente para seu veículo.",
+      distance: 2.3,
+      image: "/src/images/icar-blue.jpeg",
+      link: "/icar/empresa",  
+    },
+    {
+      name: "Lava-Rápido ICAR",
+      rating: 4.5,
+      description: "Lavagem rápida e eficiente para seu veículo.",
+      distance: 2.3,
+      image: "/src/images/icar-blue.jpeg",
+      link: "/icar/empresa",  
+    },
+    {
+      name: "Lava-Rápido ICAR",
+      rating: 4.5,
+      description: "Lavagem rápida e eficiente para seu veículo.",
+      distance: 2.3,
+      image: "/src/images/icar-blue.jpeg",
+      link: "/icar/empresa",  
+    },
+    {
+      name: "Lava-Rápido ICAR",
+      rating: 4.5,
+      description: "Lavagem rápida e eficiente para seu veículo.",
+      distance: 2.3,
+      image: "/src/images/icar-blue.jpeg",
+      link: "/icar/empresa",  
+    },
+    {
+      name: "Lava-Rápido ICAR",
+      rating: 4.5,
+      description: "Lavagem rápida e eficiente para seu veículo.",
+      distance: 2.3,
+      image: "/src/images/icar-blue.jpeg",
+      link: "/icar/empresa",  
+    },
   ];
 
-  const [visibleCompanies, setVisibleCompanies] = useState(5);
+  const ITEMS_PER_PAGE = 3; 
+  const [visibleCompanies, setVisibleCompanies] = useState(ITEMS_PER_PAGE);
+  const [loading, setLoading] = useState(false);
+  const observerRef = useRef(null);
 
-  const loadMoreCompanies = () => {
-    setVisibleCompanies((prev) => Math.min(prev + 5, allCompanies.length));
-  };
+  const loadMoreCompanies = useCallback(() => {
+    if (!loading && visibleCompanies < allCompanies.length) {
+      setLoading(true);
+      setTimeout(() => {
+        setVisibleCompanies((prev) => prev + ITEMS_PER_PAGE);
+        setLoading(false);
+      }, 1000); 
+    }
+  }, [loading, visibleCompanies, allCompanies.length]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (
-        window.innerHeight + window.scrollY >=
-        document.body.offsetHeight - 100
-      ) {
-        loadMoreCompanies();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMoreCompanies();
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) {
+        observer.unobserve(observerRef.current);
       }
     };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [loadMoreCompanies]);
 
   return (
     <section className="p-4 pb-24">
@@ -100,6 +155,13 @@ const CompanyList = () => {
           </li>
         ))}
       </ul>
+
+
+      <div ref={observerRef} className="w-full flex justify-center items-center py-4">
+        {loading && (
+          <div className="animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+        )}
+      </div>
     </section>
   );
 };

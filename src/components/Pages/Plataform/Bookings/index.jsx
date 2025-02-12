@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "../Main/Header/Header";
 import Footer from "../Main/Footer/Footer";
-import Bookings from "./BookingsList/ListCards";
+import Bookings from "./Bookings";
 
 
 const index = () => {

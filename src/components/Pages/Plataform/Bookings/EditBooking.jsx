@@ -9,25 +9,20 @@ const EditBooking = ({ onClose, onCancel, onEdit }) => {
   const [vehicle, setVehicle] = useState("Ford Ka");
   const [paymentMethod] = useState("Cartão de Crédito");
   
-
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-
 
   const handleSave = () => {
     onEdit();
     onClose();
   };
 
-
   const openConfirmModal = () => {
     setIsConfirmModalOpen(true);
   };
 
-
   const closeConfirmModal = () => {
     setIsConfirmModalOpen(false);
   };
-
 
   const confirmCancelBooking = () => {
     onCancel(); 
