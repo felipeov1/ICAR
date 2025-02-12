@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../Main/Header/Header";
-import ServiceDetails from "../Main/ServiceDetails/ServiceDetails";
+import ServiceDetails from "../Main/NextService/NextService";
 import Highlights from "./Ads/Ads";
 import NearbyOptions from "./HighlightsOptions/HighlightsOptions";
 import CompanyList from "../Main/CompanyList/CompanyList";

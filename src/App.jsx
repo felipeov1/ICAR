@@ -19,6 +19,7 @@ import CriarConta from "./components/Pages/CreateAccount/index.jsx";
 import Icar from "./components/Pages/Plataform/Main/Index.jsx";
 import CompanyView from "./components/Pages/Plataform/CompanyView/index.jsx";
 import BookingSummary from "./components/Pages/Plataform/CompanyView/BookingSummary/BookingSummary.jsx";
+import Bookings from "./components/Pages/Plataform/Bookings/index.jsx"
 
 function App() {
   return (
@@ -101,12 +102,21 @@ function AppContent() {
           }
         />
 
+        <Route
+          path="/icar/agendamentos"
+          element={
+            <div>
+              <Bookings />
+            </div>
+          }
+        />
+
+
       </Routes>
 
       {!location.pathname.includes("/icar") && <Footer />}
       {!location.pathname.includes("/icar") && <CookieConsent />}
       {!location.pathname.includes("/icar") && <BackToTopButton />}
-      
     </div>
   );
 }

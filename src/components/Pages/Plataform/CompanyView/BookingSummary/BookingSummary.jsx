@@ -8,29 +8,24 @@ const BookingSummary = () => {
   const [washType, setWashType] = useState("");
   const [carType, setCarType] = useState("");
   const [locationType, setLocationType] = useState("");
-  const [total, setTotal] = useState(0); 
+  const [total, setTotal] = useState(0);
 
   const navigate = useNavigate();
-
 
   const calculateTotal = () => {
     let washCost = 0;
     let carSizeMultiplier = 1;
 
-
     if (washType === "Simples") washCost = 30;
     if (washType === "Completa") washCost = 50;
     if (washType === "Premium") washCost = 70;
-
 
     if (carType === "Carro Pequeno") carSizeMultiplier = 1;
     if (carType === "SUV") carSizeMultiplier = 1.5;
     if (carType === "Caminhonete") carSizeMultiplier = 2;
 
-
     setTotal(washCost * carSizeMultiplier);
   };
-
 
   React.useEffect(() => {
     if (washType && carType) {
@@ -47,7 +42,7 @@ const BookingSummary = () => {
           washType,
           carType,
           locationType,
-          total, 
+          total,
         },
       });
     }
@@ -120,20 +115,31 @@ const BookingSummary = () => {
         <div className="mb-4">
           <h3 className="font-semibold mb-2">Local do Serviço</h3>
           <div className="flex flex-wrap gap-2">
-            {["Minha Casa - Rua xxx, 23", "Trabalho  - Rua xxx, 244"].map((type) => (
+            {[
+              "Lava-rápido",
+              "Minha Casa - Rua xxx, 23",
+              "Trabalho  - Rua xxx, 244",
+            ].map((type) => (
               <button
                 key={type}
                 className={`px-4 py-2 rounded-xl border ${
-                  locationType === type ? "bg-blue-600 text-white" : "bg-gray-200"
+                  locationType === type
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200"
                 }`}
                 onClick={() => setLocationType(type)}
               >
                 {type}
               </button>
             ))}
+
+            {/* // Open modal to edit */}
+
+            <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold text-md py-1 px-2 rounded-xl border">
+              Adicionar Endereço
+            </button> 
           </div>
         </div>
-
 
         <div className="mt-6 mb-4">
           <h3 className="font-semibold mb-2">Total</h3>

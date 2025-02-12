@@ -2,8 +2,8 @@ import React, { useRef } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 const HighlightsOptions = () => {
-  const optionsRef1 = useRef(null); 
-  const optionsRef2 = useRef(null); 
+  const optionsRef1 = useRef(null);
+  const optionsRef2 = useRef(null);
 
   const scrollLeft = (ref) => {
     ref.current.scrollBy({
@@ -20,22 +20,56 @@ const HighlightsOptions = () => {
   };
 
   const nearbyCompanies = [
-    { name: "FastCar", image: "/src/images/icar-blue.jpeg", link: "/icar/empresa" },
-    { name: "Lava Rápido VIP", image: "/src/images/icar-blue.jpeg", link: "/icar/empresa" },
-    { name: "Guará", image: "/src/images/icar-blue.jpeg", link: "/icar/empresa" },
-    { name: "Lava Bem", image: "/src/images/icar-blue.jpeg", link: "/icar/empresa" },
+    {
+      name: "FastCar",
+      image: "/src/images/icar-blue.jpeg",
+      link: "/icar/empresa",
+    },
+    {
+      name: "Lava Rápido VIP",
+      image: "/src/images/icar-blue.jpeg",
+      link: "/icar/empresa",
+    },
+    {
+      name: "Guará",
+      image: "/src/images/icar-blue.jpeg",
+      link: "/icar/empresa",
+    },
+    {
+      name: "Lava Bem",
+      image: "/src/images/icar-blue.jpeg",
+      link: "/icar/empresa",
+    },
   ];
 
   const domicilieDeliveryCompanies = [
-    { name: "FastCar", image: "/src/images/icar-blue.jpeg", link: "/icar/empresa" },
-    { name: "Lava Rápido VIP", image: "/src/images/icar-blue.jpeg", link: "/icar/empresa" },
-    { name: "Guará", image: "/src/images/icar-blue.jpeg", link: "/icar/empresa" },
-    { name: "Lava Bem", image: "/src/images/icar-blue.jpeg", link: "/icar/empresa" },
+    {
+      name: "FastCar",
+      image: "/src/images/icar-blue.jpeg",
+      link: "/icar/empresa",
+    },
+    {
+      name: "Lava Rápido VIP",
+      image: "/src/images/icar-blue.jpeg",
+      link: "/icar/empresa",
+    },
+    {
+      name: "Guará",
+      image: "/src/images/icar-blue.jpeg",
+      link: "/icar/empresa",
+    },
+    {
+      name: "Lava Bem",
+      image: "/src/images/icar-blue.jpeg",
+      link: "/icar/empresa",
+    },
   ];
 
   return (
     <section className="p-4">
-      <h2 className="text-lg font-bold mb-4">Lavagem a Domicílio ou Retirada e Entrega</h2>
+      <h2 className="text-lg font-bold mb-4">
+        Lavagem a Domicílio ou Retirada e Entrega
+      </h2>
       <div className="relative mb-12">
         <button
           className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-[#ffffff8a] p-2 rounded-full shadow-md z-10"
@@ -73,12 +107,13 @@ const HighlightsOptions = () => {
           <ChevronRightIcon className="w-6 h-6 text-gray-800" />
         </button>
       </div>
+      
 
       <h2 className="text-lg font-bold mb-4">A 5 km de você</h2>
       <div className="relative mb-6">
         <button
           className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-[#ffffff8a] p-2 rounded-full shadow-md z-10"
-          onClick={() => scrollLeft(optionsRef2)}
+          onClick={() => scrollLeft(optionsRef1)}
           style={{ display: "block" }}
         >
           <ChevronLeftIcon className="w-6 h-6 text-gray-800" />
@@ -105,7 +140,7 @@ const HighlightsOptions = () => {
         </div>
 
         <button
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#ffffff8a] p-2 rounded-full shadow-md z-10"
+          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#ffffff8a] p-2 rounded-full shadow-md"
           onClick={() => scrollRight(optionsRef2)}
           style={{ display: "block" }}
         >

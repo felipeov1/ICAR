@@ -48,7 +48,7 @@ const Hero = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <button className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors">
-              Agendar Lavagem
+              Agendar Serviço
             </button>
             <button className="bg-transparent text-black px-6 py-3 rounded-lg text-lg font-semibold hover:bg-orange-600 hover:text-white transition-colors flex justify-center sm:justify-start items-center group">
               <CirclePlay className="text-orange-500 mr-2 text-xl group-hover:text-white" />
