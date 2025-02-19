@@ -21,6 +21,8 @@ import CompanyView from "./components/Pages/Plataform/CompanyView/index.jsx";
 import BookingSummary from "./components/Pages/Plataform/CompanyView/BookingSummary/BookingSummary.jsx";
 import Bookings from "./components/Pages/Plataform/Bookings/index.jsx"
 import MyAccount from "./components/Pages/Plataform/MyAccount/index.jsx"
+import PersonalInformations from "./components/Pages/Plataform/MyAccount/PersonalInformation/index.jsx"
+import Credentials from "./components/Pages/Plataform/MyAccount/Credentials/index.jsx";
 
 function App() {
   return (
@@ -117,6 +119,24 @@ function AppContent() {
           element={
             <div>
               <MyAccount />
+            </div>
+          }
+        />
+
+        <Route
+          path="/icar/minha-conta/informacoes-pessoais"
+          element={
+            <div>
+              <PersonalInformations />
+            </div>
+          }
+        />
+
+        <Route
+          path="/icar/minha-conta/dados-de-acesso"
+          element={
+            <div>
+              <Credentials />
             </div>
           }
         />

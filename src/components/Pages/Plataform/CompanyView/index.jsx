@@ -1,13 +1,13 @@
 import React from "react";
-import Header from "./Header/Header";
-import Description from "./Description/Description";
+import HeaderMain from "./Header/Header";
+import Description from "./ClientsTab/Description/Description";
 import LocationMap from "./LocationMap/LocationMap";
 import Tabs from "./Tabs/Tabs";
 import Footer from "../Main/Footer/Footer";
 
 const App = () => (
   <div className="w-full h-screen flex flex-col">
-    <Header />
+    <HeaderMain />
 
     <div className="flex-grow flex flex-col lg:flex-row pb-24">
       <div className="flex-grow p-4 lg:w-2/3 bg-gray-100 overflow-auto">

@@ -1,11 +1,11 @@
 import React from "react";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 
-const Header = () => (
+const HeaderMain = () => (
   <div className="relative">
     <a href="/icar" className="absolute top-4 left-2 text-white text-3xl">
       <div className="bg-[#0000003d] rounded-full p-1">
-        <ChevronLeftIcon width={30}  />
+        <ChevronLeftIcon width={30} />
       </div>
     </a>
 
@@ -25,4 +25,4 @@ const Header = () => (
   </div>
 );
 
-export default Header;
+export default HeaderMain;

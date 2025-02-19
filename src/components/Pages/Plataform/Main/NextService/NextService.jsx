@@ -8,14 +8,14 @@ const NextService = () => {
         <p>
           <strong>Serviço:</strong> Lavagem completa
         </p>
-        <p className="mt-1">
+        <p className="mt-2">
           <strong>Data do Serviço:</strong> 11/11/2024 11:00
         </p>
-        <p className="mt-1">
+        <p className="mt-2">
           <strong>Valor:</strong> R$50,00
         </p>
-        <p className="mt-1">
-          <strong>Veículo:</strong> Ford Ka
+        <p className="mt-2">
+          <strong>Tipo do Veículo:</strong> Sedan
         </p>
       </div>
 

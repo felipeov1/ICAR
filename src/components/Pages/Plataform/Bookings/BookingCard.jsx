@@ -21,7 +21,7 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
             <strong>Valor:</strong> {service.value}
           </p>
           <p className="mt-2">
-            <strong>Veículo:</strong> {service.vehicle}
+            <strong>Tipo do Veículo:</strong> {service.vehicle}
           </p>
         </div>
 

@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
+
 const Ads = () => {
   const images = [
-    "https://via.placeholder.com/600x200?text=Imagem+1",
-    "https://via.placeholder.com/600x200?text=Imagem+2",
-    "https://via.placeholder.com/600x200?text=Imagem+3",
-    "https://via.placeholder.com/600x200?text=Imagem+4",
-    "https://via.placeholder.com/600x200?text=Imagem+5",
-    "https://via.placeholder.com/600x200?text=Imagem+6",
+    "/src/images/icar-blue.jpeg",
+    "/src/images/icar-blue.jpeg",
+    "/src/images/icar-blue.jpeg",
+    "/src/images/icar-blue.jpeg",
+    "/src/images/icar-blue.jpeg",
+    "/src/images/icar-blue.jpeg",
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -33,7 +34,7 @@ const Ads = () => {
 
   return (
     <section>
-      <h2 className="text-lg font-bold mb-4 pl-4">Lava Rápidos em Destaque</h2>
+      <h2 className="text-lg font-bold mb-2 pl-4">Destaques</h2>
 
       <div className="relative">
         <img
