@@ -9,7 +9,7 @@ const Tabs = () => {
   return (
     <div className="p-4">
       <div className="flex justify-around border-b">
-        {["agendamento", "clientes", "fotos"].map((tab) => (
+        {["agendamento", "feedbacks", "fotos"].map((tab) => (
           <button
             key={tab}
             className={`pb-2 text-lg ${
@@ -23,7 +23,7 @@ const Tabs = () => {
       </div>
       <div className="mt-4">
         {activeTab === "agendamento" && <BookingTab />}
-        {activeTab === "clientes" && <ClientsTab />}
+        {activeTab === "feedbacks" && <ClientsTab />}
         {activeTab === "fotos" && <PhotosTab />}
       </div>
     </div>

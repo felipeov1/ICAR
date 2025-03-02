@@ -2,7 +2,7 @@ import React from "react";
 
 const NextService = () => {
   return (
-    <section className="lg:hidden md:hidden  p-4 bg-white shadow-md rounded-md m-4 mt-[-80px] flex flex-row justify-between items-end">
+    <section className="lg:hidden md:hidden  p-4 bg-white shadow-md rounded-md m-4 mt-[-100px] flex flex-row justify-between items-end">
       <div>
         <h2 className="text-lg font-bold mb-2">Próximo Serviço</h2>
         <p>

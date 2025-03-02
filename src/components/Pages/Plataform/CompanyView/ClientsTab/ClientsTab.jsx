@@ -9,30 +9,14 @@ const ClientsTab = () => {
       name: "João Silva",
       stars: 5,
       comment: "Excelente serviço! Recomendo a todos.",
-      photos: [
-        "/src/images/icar-blue.jpeg",
-        "/src/images/icar-blue.jpeg",
-        "/src/images/icar-blue.jpeg",
-        "/src/images/icar-blue.jpeg",
-      ],
     },
     {
       name: "Maria Oliveira",
       stars: 4,
       comment: "Ótima experiência, atendimento impecável.",
-      photos: [
-        "/src/images/icar-blue.jpeg",
-        "/src/images/icar-blue.jpeg",
-        "/src/images/icar-blue.jpeg",
-        "/src/images/icar-blue.jpeg",
-      ],
     },
   ];
 
-  const handleImageClick = (photo) => {
-    setModalImage(photo);
-    setIsModalOpen(true);
-  };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -41,8 +25,10 @@ const ClientsTab = () => {
 
   return (
     <div>
-      <h3 className="text-lg font-semibold">Clientes</h3>
-      <p className="text-gray-700 mt-2">Veja os depoimentos dos nossos clientes.</p>
+      <h3 className="text-lg font-semibold">Feedbacks</h3>
+      <p className="text-gray-700 mt-2">
+        Veja os depoimentos dos nossos clientes.
+      </p>
       <ul className="mt-4 space-y-4">
         {clients.map((client, index) => (
           <li key={index} className="border-b pb-4">
@@ -68,39 +54,9 @@ const ClientsTab = () => {
               ))}
             </div>
             <p className="text-gray-600 mt-2">{client.comment}</p>
-            <div className="mt-4 flex space-x-2 overflow-x-auto">
-              {client.photos.map((photo, i) => (
-                <img
-                  key={i}
-                  src={photo}
-                  alt={`Foto ${i + 1} do cliente`}
-                  className="w-16 h-16 object-cover rounded-lg cursor-pointer"
-                  onClick={() => handleImageClick(photo)}
-                />
-              ))}
-            </div>
           </li>
         ))}
       </ul>
-
-      {/* Modal para expandir imagem */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-          <div className="relative">
-            <button
-              onClick={handleCloseModal}
-              className="absolute top-2 left-2 bg-black text-white rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
-            >
-              X
-            </button>
-            <img
-              src={modalImage}
-              alt="Imagem expandida"
-              className="max-w-full max-h-full object-contain p-4"
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

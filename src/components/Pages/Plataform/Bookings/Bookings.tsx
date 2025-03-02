@@ -1,22 +1,21 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import BookingCard from "./BookingCard";
+import PastBookingCard from "./PastBookingCard";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-
-const formatDate = (dateString: string) => {
+const formatDate = (dateString) => {
   const [day, month, year] = dateString.split("-");
   return new Date(`${year}-${month}-${day}`);
 };
 
 const Bookings = () => {
   const [activeTab, setActiveTab] = useState("agendados");
-  const [notification, setNotification] = useState<{
-    message: string;
-    type: string;
-  } | null>(null);
   const ITEMS_PER_PAGE = 3;
   const [visibleItems, setVisibleItems] = useState(ITEMS_PER_PAGE);
   const [loading, setLoading] = useState(false);
-  const observerRef = useRef<HTMLDivElement | null>(null);
+  const observerRef = useRef(null);
+  const [ratings, setRatings] = useState({}); // Estado para armazenar as avaliações
 
   const services = [
     {
@@ -29,7 +28,7 @@ const Bookings = () => {
     {
       id: 2,
       service: "Higienização interna",
-      scheduledDate: "10-07-2025 15:30",
+      scheduledDate: "10-07-2023 15:30",
       value: "R$80,00",
       vehicle: "Hatch",
     },
@@ -78,15 +77,14 @@ const Bookings = () => {
   ];
 
   const today = new Date();
-  const agendados = services.filter((s) => formatDate(s.scheduledDate.split(" ")[0]) >= today);
-  const anteriores = services.filter((s) => formatDate(s.scheduledDate.split(" ")[0]) < today);
+  const agendados = services.filter(
+    (s) => formatDate(s.scheduledDate.split(" ")[0]) >= today
+  );
+  const anteriores = services.filter(
+    (s) => formatDate(s.scheduledDate.split(" ")[0]) < today
+  );
   const filteredServices = activeTab === "agendados" ? agendados : anteriores;
   const displayedServices = filteredServices.slice(0, visibleItems);
-
-  const showNotification = (notification: { message: string; type: string }) => {
-    setNotification(notification);
-    setTimeout(() => setNotification(null), 900);
-  };
 
   const loadMore = useCallback(() => {
     if (!loading && visibleItems < filteredServices.length) {
@@ -97,6 +95,29 @@ const Bookings = () => {
       }, 1000);
     }
   }, [loading, visibleItems, filteredServices.length]);
+
+  const handleCancel = (serviceId) => {
+    toast.success("Agendamento cancelado com sucesso!", {
+      autoClose: 2000,
+    });
+    // Lógica para cancelar o agendamento
+  };
+
+  const handleRate = (serviceId, rating, comment) => {
+    setRatings((prev) => ({
+      ...prev,
+      [serviceId]: { rating, comment },
+    }));
+    toast.success("Avaliação enviada com sucesso!", {
+      autoClose: 100,
+    });
+  };
+
+  const handleEdit = () => {
+    toast.success("Edição feita com sucesso!", {
+      autoClose: 2000,
+    });
+  };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -121,14 +142,8 @@ const Bookings = () => {
 
   return (
     <div className="pt-2 w-full p-4">
-      {notification && (
-        <div
-          className={`fixed top-16 left-1/2 transform -translate-x-1/2 text-white px-4 py-2 rounded shadow-lg w-80 
-          ${notification.type === "sucess" ? "bg-green-500" : "bg-red-500"}`}
-        >
-          {notification.message}
-        </div>
-      )}
+      {/* ToastContainer para exibir as notificações */}
+      <ToastContainer />
 
       <div className="flex border-b">
         <button
@@ -166,35 +181,31 @@ const Bookings = () => {
         </h2>
 
         {displayedServices.length > 0 ? (
-          displayedServices.map((service) => (
-            <BookingCard
-              key={service.id}
-              service={service}
-              onCancel={
-                activeTab === "agendados"
-                  ? () =>
-                      showNotification({
-                        message: "Agendamento cancelado!",
-                        type: "sucess",
-                      })
-                  : undefined
-              }
-              onEdit={
-                activeTab === "agendados"
-                  ? () =>
-                      showNotification({
-                        message: "Edição feita!",
-                        type: "sucess",
-                      })
-                  : undefined
-              }
-            />
-          ))
+          displayedServices.map((service) =>
+            activeTab === "agendados" ? (
+              <BookingCard
+                key={service.id}
+                service={service}
+                onCancel={() => handleCancel(service.id)}
+                onEdit={handleEdit}
+              />
+            ) : (
+              <PastBookingCard
+                key={service.id}
+                service={service}
+                onCancel={() => handleCancel(service.id)}
+                onRate={handleRate}
+              />
+            )
+          )
         ) : (
           <p className="text-gray-500">Nenhum serviço encontrado.</p>
         )}
 
-        <div ref={observerRef} className="w-full flex justify-center items-center py-4">
+        <div
+          ref={observerRef}
+          className="w-full flex justify-center items-center py-4"
+        >
           {loading && (
             <div className="animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full"></div>
           )}

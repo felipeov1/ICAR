@@ -4,14 +4,13 @@ const PhotosTab = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState("");
 
-
   const photos = [
-    "/src/images/icar-blue.jpeg",
-    "/src/images/icar-blue.jpeg",
-    "/src/images/icar-blue.jpeg",
-    "/src/images/icar-blue.jpeg",
-    "/src/images/icar-blue.jpeg",
-    "/src/images/icar-blue.jpeg",
+    "/src/images/icar-logo-blue.jpg",
+    "/src/images/icar-logo-blue.jpg",
+    "/src/images/icar-logo-blue.jpg",
+    "/src/images/icar-logo-blue.jpg",
+    "/src/images/icar-logo-blue.jpg",
+    "/src/images/icar-logo-blue.jpg",
   ];
 
   const handleImageClick = (photo) => {
@@ -22,6 +21,13 @@ const PhotosTab = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setModalImage("");
+  };
+
+  // Fechar o modal ao clicar fora da imagem
+  const handleOverlayClick = (e) => {
+    if (e.target === e.currentTarget) {
+      handleCloseModal();
+    }
   };
 
   return (
@@ -44,20 +50,25 @@ const PhotosTab = () => {
         ))}
       </div>
 
-
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+          onClick={handleOverlayClick} // Fechar ao clicar fora da imagem
+        >
           <div className="relative">
+            {/* Botão de Fechar */}
             <button
               onClick={handleCloseModal}
-              className="absolute top-2 left-2 bg-black text-white rounded-full p-2 opacity-75 hover:opacity-100 transition-opacity"
+              className="absolute top-4 left-4 bg-black text-white p-2 opacity-75 hover:opacity-100 transition-opacity"
             >
               X
             </button>
+
+            {/* Imagem Expandida */}
             <img
               src={modalImage}
               alt="Imagem expandida"
-              className="max-w-full max-h-full object-contain p-4"
+              className="max-w-full max-h-[90vh] object-contain p-4"
             />
           </div>
         </div>

@@ -58,7 +58,7 @@ const Navbar = () => {
                 <img
                   src="/src/images/icar-logo-transparent.png"
                   alt="Logo"
-                  width={120}
+                  width={180}
                 />
               </a>
             </div>

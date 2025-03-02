@@ -11,8 +11,8 @@ const FAQSection = () => {
 
   const faqs = [
     {
-      question: "Como faço para me cadastrar?",
-      answer: "Para se cadastrar, clique no botão de cadastro e preencha as informações solicitadas. Cadastar Agora"
+      question: "O que é a iCar?",
+      answer: "A iCar é uma plataforma de agendamentos de lavagens de veículos. Funciona como um marketplace, conectando usuários a lava-rápidos e serviços de lavagem a domicílio, proporcionando mais praticidade e conveniência."
     },
     {
       question: "Como funciona a lavagem a domicílio?",
@@ -21,10 +21,6 @@ const FAQSection = () => {
     {
       question: "Criar uma conta na plataforma é gratuito?",
       answer: "Sim! Criar uma conta é 100% gratuito. Você só paga pela avaliação, e mais nada!"
-    },
-    {
-      question: "Como posso fazer uma alteração no meu cadastro?",
-      answer: "Você pode alterar as informações do seu cadastro acessando a seção 'Editar Perfil' na sua conta."
     },
     {
       question: "Quais formas de pagamento são aceitas?",

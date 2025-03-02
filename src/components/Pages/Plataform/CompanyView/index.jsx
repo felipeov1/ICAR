@@ -9,13 +9,15 @@ const App = () => (
   <div className="w-full h-screen flex flex-col">
     <HeaderMain />
 
-    <div className="flex-grow flex flex-col lg:flex-row pb-24">
-      <div className="flex-grow p-4 lg:w-2/3 bg-gray-100 overflow-auto">
+    <div className="flex-grow flex flex-col lg:flex-row pb-24 lg:pb-0 lg:px-0 lg:pt-2">
+      {/* Conteúdo Principal (Descrição e Mapa) */}
+      <div className="flex-grow p-4 lg:w-2/3 bg-gray-100 overflow-auto lg:rounded-lg lg:shadow-lg lg:mr-4">
         <Description />
         <LocationMap />
       </div>
 
-      <div className="lg:w-1/3 bg-white shadow-lg overflow-auto">
+      {/* Tabs (Lado Direito) */}
+      <div className="lg:w-1/3 bg-white shadow-lg overflow-auto lg:rounded-lg lg:shadow-lg">
         <Tabs />
       </div>
     </div>

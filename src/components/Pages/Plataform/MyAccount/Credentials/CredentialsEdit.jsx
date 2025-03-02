@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowLeft, FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CredentialsEdit = () => {
   const [email, setEmail] = useState("");
@@ -52,20 +54,29 @@ const CredentialsEdit = () => {
 
   const handleSave = () => {
     if (password !== confirmPassword) {
-      alert("As senhas não coincidem!");
+      toast.error("As senhas não coincidem!", {
+        autoClose: 2000, // Fecha automaticamente após 2 segundos
+      });
       return;
     }
 
     if (passwordStrength < 4) {
-      alert("A senha não atende aos critérios de segurança!");
+      toast.error("A senha não atende aos critérios de segurança!", {
+        autoClose: 2000,
+      });
       return;
     }
 
-    alert("Informações salvas com sucesso!");
+    toast.success("Informações salvas com sucesso!", {
+      autoClose: 2000,
+    });
   };
 
   return (
     <div className="flex flex-col p-6 max-w-md mx-auto">
+      {/* ToastContainer para exibir as notificações */}
+      <ToastContainer />
+
       <div className="flex align-center justify-stretch">
         <span className="mb-6">
           <Link
@@ -135,21 +146,21 @@ const CredentialsEdit = () => {
             Nova Senha
           </label>
           <div className="flex relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                value={password}
-                onChange={handlePasswordChange}
-                className="mt-2 mb-2 p-3 w-full border border-gray-300 rounded-lg pr-10"
-                placeholder="Digite sua nova senha"
-              />
-              <button
-                type="button"
-                className="absolute right-3 top-6 text-gray-600"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              value={password}
+              onChange={handlePasswordChange}
+              className="mt-2 mb-2 p-3 w-full border border-gray-300 rounded-lg pr-10"
+              placeholder="Digite sua nova senha"
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-6 text-gray-600"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
           </div>
 
           <div className="w-full h-2 bg-gray-300 rounded-lg overflow-hidden mt-2">

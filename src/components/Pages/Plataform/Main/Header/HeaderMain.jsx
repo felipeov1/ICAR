@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
-import { UserCircleIcon } from "@heroicons/react/24/outline";
+import {
+  HomeIcon,
+  CalendarDaysIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
 
 const HeaderMain = ({ className }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
-
-  const toggleMenu = () => {
-    setIsMenuOpen((prev) => !prev);
-  };
 
   const closeMenu = (e) => {
     if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -22,69 +22,69 @@ const HeaderMain = ({ className }) => {
     };
   }, []);
 
-    const getGreeting = () => {
-      const hour = new Date().getHours();
-      if (hour >= 5 && hour < 12) return "Bom dia";
-      if (hour >= 12 && hour < 18) return "Boa tarde";
-      return "Boa noite";
-    };
-  
-    
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return "Bom dia";
+    if (hour >= 12 && hour < 18) return "Boa tarde";
+    return "Boa noite";
+  };
 
+  const buttons = [
+    { icon: <HomeIcon className="w-6 h-6" />, label: "Início", path: "/icar" },
+    {
+      icon: <CalendarDaysIcon className="w-6 h-6" />,
+      label: "Agendamentos",
+      path: "/icar/agendamentos",
+    },
+    {
+      icon: <UserIcon className="w-6 h-6" />,
+      label: "Minha Conta",
+      path: "/icar/minha-conta",
+    },
+  ];
+
+  // Verifica a rota atual
+  const currentPath = window.location.pathname;
 
   return (
     <header
       className={`${
         className ||
-        "bg-[#170d72] text-white flex h-52 lg:h-24 md:h-24 p-6 rounded-bl-lg rounded-br-lg"
+        "bg-[#170d72] text-white flex h-52 lg:h-20 md:h-20 lg:p-4 p-6 rounded-bl-lg rounded-br-lg"
       }`}
       style={{ flexWrap: "wrap", alignItems: "start" }}
     >
-      <div className="flex-1 flex flex-col items-start">
+      <div className="flex-[5%] flex flex-col text-sm lg:hidden ">
         <span>{getGreeting()},</span>
         <span>Felipe Ferreira</span>
       </div>
 
-      <div className="flex-1 flex justify-center">
-        <img
-          src="/src/images/icar-logo-transparent.png"
-          alt="Logo do Icar"
-          width={100}
-        />
-      </div>
+      <div className="lg:flex-[90%] lg:flex lg:justify-between lg:items-center">
+        <div className="lg:flex-1 lg:flex lg:justify-start">
+          <a href="/icar">
+            <img
+              src="/src/images/icar-logo-transparent.png"
+              alt="Logo do Icar"
+              width={100}
+            />
+          </a>
+        </div>
 
-      <div className="flex-1 flex justify-end relative" ref={menuRef}>
-        <UserCircleIcon
-          width={50}
-          className="cursor-pointer"
-          onClick={toggleMenu}
-        />
-        {isMenuOpen && (
-          <div className="absolute right-0 mt-14 w-48 bg-white text-black rounded-lg shadow-lg">
-            <div className="absolute top-[-5px] right-4 w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-white"></div>
-
-            <ul className="py-2">
-              <li
-                className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Perfil
-              </li>
-              <li
-                className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Configurações
-              </li>
-              <li
-                className="px-4 py-2 hover:bg-gray-200 cursor-pointer"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Sair
-              </li>
-            </ul>
-          </div>
-        )}
+        {/* Navegação para dispositivos não móveis */}
+        <div className="hidden lg:flex items-center space-x-4">
+          {buttons.map((button, index) => (
+            <a
+              key={index}
+              href={button.path}
+              className={`flex items-center space-x-2 hover:text-orange-800 ${
+                currentPath === button.path ? "text-orange-500 font-bold" : ""
+              }`}
+            >
+              {button.icon}
+              <span>{button.label}</span>
+            </a>
+          ))}
+        </div>
       </div>
     </header>
   );

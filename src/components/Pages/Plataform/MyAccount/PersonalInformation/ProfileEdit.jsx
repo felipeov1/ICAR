@@ -1,7 +1,9 @@
 import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FaArrowLeft, FaPencilAlt } from "react-icons/fa";
-import ProfileImage from "../../../../../images/icar-blue.jpeg";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ProfileImage from "../../../../../images/icar-logo-blue.jpg";
 
 const ProfileEdit = () => {
   const [name, setName] = useState("");
@@ -11,7 +13,10 @@ const ProfileEdit = () => {
   const fileInputRef = useRef(null);
 
   const handleSave = () => {
-    alert("Informações salvas!");
+    // Exibe uma notificação de sucesso
+    toast.success("Informações salvas com sucesso!", {
+      autoClose: 2000, // Fecha automaticamente após 2 segundos
+    });
   };
 
   const handleEditImage = () => {
@@ -29,19 +34,19 @@ const ProfileEdit = () => {
     }
   };
 
-
   const formatPhone = (value) => {
-
     const cleaned = value.replace(/\D/g, "");
-
 
     const limited = cleaned.slice(0, 11);
 
-
     if (limited.length > 10) {
-      return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7)}`;
+      return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(
+        7
+      )}`;
     } else if (limited.length > 6) {
-      return `(${limited.slice(0, 2)}) ${limited.slice(2, 6)}-${limited.slice(6)}`;
+      return `(${limited.slice(0, 2)}) ${limited.slice(2, 6)}-${limited.slice(
+        6
+      )}`;
     } else if (limited.length > 2) {
       return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
     } else {
@@ -56,6 +61,9 @@ const ProfileEdit = () => {
 
   return (
     <div className="flex flex-col p-6">
+      {/* ToastContainer para exibir as notificações */}
+      <ToastContainer />
+
       <div className="flex align-center justify-stretch">
         <span className="mb-6">
           <Link
@@ -132,10 +140,10 @@ const ProfileEdit = () => {
             type="text"
             id="phone"
             value={phone}
-            onChange={handlePhoneChange} 
+            onChange={handlePhoneChange}
             className="mt-2 p-3 w-full border border-gray-300 rounded-lg"
             placeholder="(DD) XXXXX-XXXX"
-            maxLength={15} 
+            maxLength={15}
           />
         </div>
 

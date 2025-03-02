@@ -23,6 +23,8 @@ import Bookings from "./components/Pages/Plataform/Bookings/index.jsx"
 import MyAccount from "./components/Pages/Plataform/MyAccount/index.jsx"
 import PersonalInformations from "./components/Pages/Plataform/MyAccount/PersonalInformation/index.jsx"
 import Credentials from "./components/Pages/Plataform/MyAccount/Credentials/index.jsx";
+import Address from "./components/Pages/Plataform/MyAccount/Address/index.jsx";
+import HelpSupport from "./components/Pages/Plataform/MyAccount/HelpSupport/index.jsx";
 
 function App() {
   return (
@@ -140,6 +142,26 @@ function AppContent() {
             </div>
           }
         />
+
+        <Route
+          path="/icar/minha-conta/enderecos"
+          element={
+            <div>
+              <Address />
+            </div>
+          }
+        />
+
+        <Route
+          path="/icar/minha-conta/suporte"
+          element={
+            <div>
+              <HelpSupport />
+            </div>
+          }
+        />
+
+     
 
 
       </Routes>
