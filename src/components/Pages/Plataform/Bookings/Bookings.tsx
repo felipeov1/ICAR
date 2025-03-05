@@ -141,10 +141,11 @@ const Bookings = () => {
   }, [loadMore]);
 
   return (
-    <div className="pt-2 w-full p-4">
+    <div className="pt-2 w-full p-4 lg:p-8 lg:max-w-6xl lg:mx-auto">
       {/* ToastContainer para exibir as notificações */}
       <ToastContainer />
 
+      {/* Abas */}
       <div className="flex border-b">
         <button
           className={`py-2 px-4 ${
@@ -175,33 +176,37 @@ const Bookings = () => {
         </button>
       </div>
 
-      <div className="mt-4 h-[40rem] overflow-y-auto p-2">
-        <h2 className="text-lg font-bold mb-2">
+      {/* Lista de Agendamentos */}
+      <div className="mt-4 h-[40rem] overflow-y-auto p-2 lg:h-[50rem] lg:p-4">
+        <h2 className="text-lg font-bold mb-2 lg:text-xl">
           {activeTab === "agendados" ? "Agendados" : "Anteriores"}
         </h2>
 
         {displayedServices.length > 0 ? (
-          displayedServices.map((service) =>
-            activeTab === "agendados" ? (
-              <BookingCard
-                key={service.id}
-                service={service}
-                onCancel={() => handleCancel(service.id)}
-                onEdit={handleEdit}
-              />
-            ) : (
-              <PastBookingCard
-                key={service.id}
-                service={service}
-                onCancel={() => handleCancel(service.id)}
-                onRate={handleRate}
-              />
-            )
-          )
+          <div className="space-y-4">
+            {displayedServices.map((service) =>
+              activeTab === "agendados" ? (
+                <BookingCard
+                  key={service.id}
+                  service={service}
+                  onCancel={() => handleCancel(service.id)}
+                  onEdit={handleEdit}
+                />
+              ) : (
+                <PastBookingCard
+                  key={service.id}
+                  service={service}
+                  onCancel={() => handleCancel(service.id)}
+                  onRate={handleRate}
+                />
+              )
+            )}
+          </div>
         ) : (
           <p className="text-gray-500">Nenhum serviço encontrado.</p>
         )}
 
+        {/* Carregar Mais */}
         <div
           ref={observerRef}
           className="w-full flex justify-center items-center py-4"

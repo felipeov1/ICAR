@@ -54,7 +54,7 @@ function Login() {
               Acesse sua conta no iCar
             </h1>
           </div>
-         
+
           <form className="space-y-4 w-full">
             <div>
               <label
@@ -94,20 +94,27 @@ function Login() {
                 </button>
               </div>
             </div>
-
-            <div className="flex items-center">
-              <input
-                id="remember"
-                type="checkbox"
-                className="h-4 w-4 bg-blue-900 border-gray-300 rounded focus:ring-blue-900"
-              />
-              <label
-                htmlFor="remember"
-                className="ml-2 block text-sm lg:text-blue-900 text-white"
-              >
-                Manter logado
-              </label>
+            <div className="inline-flex items-center justify-between w-full">
+              <div className="flex items-center">
+                <input
+                  id="remember"
+                  type="checkbox"
+                  className="h-4 w-4 bg-blue-900 border-gray-300 rounded focus:ring-blue-900"
+                />
+                <label
+                  htmlFor="remember"
+                  className="ml-2 block text-sm lg:text-blue-900 text-white"
+                >
+                  Manter logado
+                </label>
+              </div>
+              <div>
+                <a href="" className="text-sm text-orange-600 underline">
+                  Esqueci minha senha
+                </a>
+              </div>
             </div>
+
             <button
               type="submit"
               className="w-full py-2 px-4 bg-blue-900 text-white font-bold rounded-lg hover:bg-blue-950 focus:ring-2 focus:ring-blue-900"

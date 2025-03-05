@@ -8,6 +8,7 @@ const EditBooking = ({ onClose, onCancel, onEdit }) => {
   const [value, setValue] = useState("50.00");
   const [vehicleType, setVehicleType] = useState("SUV");
   const [paymentMethod] = useState("Cartão de Crédito");
+  const [serviceType] = useState("A domicilio"); // Adicionei o tipo de serviço
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
@@ -54,7 +55,7 @@ const EditBooking = ({ onClose, onCancel, onEdit }) => {
     <div>
       {/* Modal de Edição */}
       <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-        <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+        <div className="bg-white p-6 rounded-lg shadow-lg w-full lg:w-1/3">
           <div className="flex justify-end">
             <button onClick={onClose}>
               <X color="gray" size={18} />
@@ -63,6 +64,7 @@ const EditBooking = ({ onClose, onCancel, onEdit }) => {
           <h2 className="text-xl font-bold mb-4">Agendamento</h2>
 
           <div className="space-y-4">
+            {/* Data e Horário */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Data do Serviço
@@ -100,6 +102,7 @@ const EditBooking = ({ onClose, onCancel, onEdit }) => {
               </select>
             </div>
 
+            {/* Informações do Serviço */}
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Serviço
@@ -108,7 +111,19 @@ const EditBooking = ({ onClose, onCancel, onEdit }) => {
                 type="text"
                 value={service}
                 onChange={(e) => setService(e.target.value)}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md cursor-not-allowed opacity-40 bg-gray-300"
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md cursor-not-allowed bg-gray-100"
+                readOnly
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Tipo de Serviço
+              </label>
+              <input
+                type="text"
+                value={serviceType}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md cursor-not-allowed bg-gray-100"
                 readOnly
               />
             </div>
@@ -121,7 +136,7 @@ const EditBooking = ({ onClose, onCancel, onEdit }) => {
                 type="number"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md cursor-not-allowed opacity-40 bg-gray-300"
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md cursor-not-allowed bg-gray-100"
                 readOnly
               />
             </div>
@@ -134,7 +149,7 @@ const EditBooking = ({ onClose, onCancel, onEdit }) => {
                 type="text"
                 value={vehicleType}
                 onChange={(e) => setVehicleType(e.target.value)}
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md cursor-not-allowed opacity-40 bg-gray-300"
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md cursor-not-allowed bg-gray-100"
                 readOnly
               />
             </div>
@@ -147,21 +162,22 @@ const EditBooking = ({ onClose, onCancel, onEdit }) => {
                 type="text"
                 value={paymentMethod}
                 readOnly
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md cursor-not-allowed opacity-40 bg-gray-300"
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md cursor-not-allowed bg-gray-100"
               />
             </div>
           </div>
 
+          {/* Botões de Ação */}
           <div className="flex justify-start mt-6 space-x-2">
             <button
               onClick={handleSave}
-              className="px-4 py-2 bg-orange-600 text-white rounded"
+              className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors duration-200"
             >
               Salvar
             </button>
             <button
               onClick={openConfirmModal}
-              className="px-4 py-2 border rounded"
+              className="px-4 py-2 border rounded hover:bg-gray-100 transition-colors duration-200"
             >
               Cancelar Agendamento
             </button>

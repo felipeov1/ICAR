@@ -7,7 +7,7 @@ const LocationMap = () => {
 ////// !!!!! TROCAR PARA https://www.mapbox.com/  !!!!! //////
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyB631EO10ylEKxrhfRf4wPv_0G-FXGBTWE&callback=initMap&libraries=&v=weekly`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDJgrv22z-Od0HF4ED3f0xwho9xACxe-w0&callback=initMap&libraries=&v=weekly`;
     script.async = true;
     script.defer = true;
     document.body.appendChild(script);

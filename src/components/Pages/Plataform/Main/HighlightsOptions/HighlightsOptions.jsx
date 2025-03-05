@@ -83,7 +83,7 @@ const HighlightsOptions = () => {
         {/* Cards */}
         <div
           ref={optionsRef1}
-          className="flex gap-4 overflow-x-auto scrollbar-hide sm:overflow-x-visible sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6"
+          className="flex gap-4 overflow-x-hidden scrollbar-hide  sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6"
         >
           {domicilieDeliveryCompanies.map((company, index) => (
             <div
@@ -128,7 +128,7 @@ const HighlightsOptions = () => {
         {/* Cards */}
         <div
           ref={optionsRef2}
-          className="flex gap-4 overflow-x-auto scrollbar-hide sm:overflow-x-visible sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6"
+          className="flex gap-4 overflow-x-hidden scrollbar-hide sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6"
         >
           {nearbyCompanies.map((company, index) => (
             <div

@@ -60,7 +60,7 @@ const ProfileEdit = () => {
   };
 
   return (
-    <div className="flex flex-col p-6">
+    <div className="flex flex-col p-6 lg:w-1/2 lg:mx-auto">
       {/* ToastContainer para exibir as notificações */}
       <ToastContainer />
 
