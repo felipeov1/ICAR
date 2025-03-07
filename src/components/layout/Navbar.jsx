@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import NavLink from "./NavLink";
+import logo from "../../public/assets/images/logo/icar-logo-transparent.png";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -56,9 +57,9 @@ const Navbar = () => {
 
               <a href="/" className="text-2xl font-bold text-blue-600">
                 <img
-                  src="/src/images/icar-logo-transparent.png"
+                  src={logo}
                   alt="Logo"
-                  width={180}
+                  width={140}
                 />
               </a>
             </div>
