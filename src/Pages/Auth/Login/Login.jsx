@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import banner from "../../../public/assets/images/art/auth-banner.png";
 import bannerMobile from "../../../public/assets/images/art/auth-banner-mobile.png";
+import logo from "../../../public/assets/images/logo/icar-logo-transparent.png";
 
 function Login() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -42,7 +43,7 @@ function Login() {
       >
         <div className="lg:hidden mt-16">
           <img
-            src="/src/images/icar-logo-transparent.png"
+            src={logo}
             alt="logo Icar"
             width={150}
           />
@@ -51,7 +52,7 @@ function Login() {
         <div className="w-11/12 sm:max-w-md p-6 bg-transparent backdrop-blur-sm rounded-lg flex flex-col items-center mt-auto md:mt-0">
           <div className="hidden sm:block mb-10">
             <h1 className="text-3xl font-bold lg:text-blue-900 text-white">
-              Acesse sua conta no iCar
+              Acesse sua conta na icar
             </h1>
           </div>
 

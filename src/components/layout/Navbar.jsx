@@ -1,20 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import NavLink from "./NavLink";
+import NavLink from "./NavLink"; // Importe o NavLink atualizado
 import logo from "../../public/assets/images/logo/icar-logo-transparent.png";
+import { useLocation } from "react-router-dom";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
 
+  // Rola para o topo ao carregar a página
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.scrollTo(0, 0); // Sempre começa no topo ao recarregar
   }, []);
+
+  // Rola até a seção após o redirecionamento
+  useEffect(() => {
+    if (location.state?.scrollTo) {
+      const section = document.querySelector(location.state.scrollTo);
+      if (section) {
+        const offset = -100; // Ajuste o offset conforme necessário
+        const topPosition =
+          section.getBoundingClientRect().top + window.scrollY + offset;
+
+        window.scrollTo({
+          top: topPosition,
+          behavior: "smooth",
+        });
+      }
+    }
+  }, [location.state]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -22,18 +37,14 @@ const Navbar = () => {
 
   return (
     <>
-
       <motion.nav
         className={`fixed w-full z-50 transition-all duration-300 ${
           isScrolled ? "bg-[#170d72] py-1" : "bg-[#170d72] py-2"
         }`}
       >
-
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
-
             <div className="flex items-center space-x-4">
-
               <button
                 className="text-white md:hidden focus:outline-none"
                 onClick={toggleMenu}
@@ -54,16 +65,10 @@ const Navbar = () => {
                 </svg>
               </button>
 
-
               <a href="/" className="text-2xl font-bold text-blue-600">
-                <img
-                  src={logo}
-                  alt="Logo"
-                  width={140}
-                />
+                <img src={logo} alt="Logo" width={140} />
               </a>
             </div>
-
 
             <div className="md:hidden">
               <a
@@ -73,7 +78,6 @@ const Navbar = () => {
                 Agendar
               </a>
             </div>
-
 
             <div className="hidden md:flex flex-grow justify-center space-x-8 text-white">
               <NavLink href="#inicio">
@@ -94,7 +98,6 @@ const Navbar = () => {
               </NavLink>
             </div>
 
-
             <div className="hidden md:flex space-x-4">
               <a
                 href="/entrar"
@@ -114,7 +117,6 @@ const Navbar = () => {
           </div>
         </div>
       </motion.nav>
-
 
       <motion.div
         initial={{ y: "-100%" }}
@@ -143,7 +145,6 @@ const Navbar = () => {
               />
             </svg>
           </button>
-
 
           <nav className="flex flex-col space-y-6 pt-4">
             <NavLink href="#inicio">

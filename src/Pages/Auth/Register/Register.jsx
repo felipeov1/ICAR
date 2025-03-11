@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import banner from "../../../public/assets/images/art/auth-banner.png";
 import bannerMobile from "../../../public/assets/images/art/auth-banner-mobile.png";
+import logo from "../../../public/assets/images/logo/icar-logo-transparent.png";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -14,6 +15,7 @@ function CriarConta() {
   const [hasUpperCase, setHasUpperCase] = useState(false);
   const [hasNumber, setHasNumber] = useState(false);
   const [hasSpecialChar, setHasSpecialChar] = useState(false);
+  const [celular, setcelular] = useState("");
 
   useEffect(() => {
     const handleResize = () => {
@@ -63,6 +65,21 @@ function CriarConta() {
     }
   };
 
+  const formatPhone = (value) => {
+    let phone = value.replace(/\D/g, "");
+    if (phone.length <= 10) {
+      phone = phone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+    } else {
+      phone = phone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+    }
+    return phone;
+  };
+
+  const handlecelularChange = (e) => {
+    const formattedPhone = formatPhone(e.target.value);
+    setcelular(formattedPhone);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -83,8 +100,6 @@ function CriarConta() {
     toast.success("Cadastro realizado com sucesso!", {
       autoClose: 2000,
     });
-
-    // Aqui você pode adicionar a lógica para enviar os dados do formulário para o backend
   };
 
   return (
@@ -109,11 +124,7 @@ function CriarConta() {
         }}
       >
         <div className="lg:hidden mt-16">
-          <img
-            src="/src/images/icar-logo-transparent.png"
-            alt="logo Icar"
-            width={150}
-          />
+          <img src={logo} alt="logo Icar" width={150} />
         </div>
 
         <div className="w-11/12 sm:max-w-md p-6 bg-transparent backdrop-blur-sm rounded-lg flex flex-col items-center mt-auto md:mt-0">
@@ -121,7 +132,7 @@ function CriarConta() {
 
           <div className="hidden sm:block mb-10">
             <h1 className="text-3xl font-bold text-blue-900">
-              Faça Seu Cadastro No iCar
+              Faça Seu Cadastro na icar
             </h1>
           </div>
 
@@ -160,6 +171,60 @@ function CriarConta() {
 
             <div>
               <label
+                htmlFor="celular"
+                className="block text-sm font-medium lg:text-blue-900 text-white"
+              >
+                Celular
+              </label>
+              <input
+                id="celular"
+                type="text"
+                value={celular}
+                onChange={handlecelularChange}
+                className="mt-1 block w-full px-4 py-2 border border-blue-900 md:bg-white text-blue-900 rounded-lg focus:ring-blue-900 focus:border-blue-900"
+                placeholder="(xx) xxxxx-xxxx"
+                required
+              />
+            </div>
+
+                {/* Componente de validação de senha */}
+                <div className="mb-3 p-3 bg-gray-100 rounded-lg text-gray-700 text-sm">
+                🔐 Sua senha deve conter:
+                <ul className="list-disc ml-5 mt-1">
+                  <li
+                    className={
+                      hasMinLength ? "text-green-600 font-semibold" : "text-red-500"
+                    }
+                  >
+                    No mínimo <strong>8 caracteres</strong>
+                  </li>
+                  <li
+                    className={
+                      hasUpperCase ? "text-green-600 font-semibold" : "text-red-500"
+                    }
+                  >
+                    Pelo menos <strong>uma letra maiúscula</strong>
+                  </li>
+                  <li
+                    className={
+                      hasNumber ? "text-green-600 font-semibold" : "text-red-500"
+                    }
+                  >
+                    Pelo menos <strong>um número</strong>
+                  </li>
+                  <li
+                    className={
+                      hasSpecialChar ? "text-green-600 font-semibold" : "text-red-500"
+                    }
+                  >
+                    Pelo menos <strong>um caractere especial (!@#$%^&*)</strong>
+                  </li>
+                </ul>
+              </div>
+
+
+            <div>
+              <label
                 htmlFor="password"
                 className="block text-sm font-medium lg:text-blue-900 text-white"
               >
@@ -184,6 +249,7 @@ function CriarConta() {
                 </button>
               </div>
 
+          
               <div className="w-full h-2 bg-gray-300 rounded-lg overflow-hidden mt-2">
                 <div
                   className={`h-full ${getProgressColor()} transition-all duration-300`}

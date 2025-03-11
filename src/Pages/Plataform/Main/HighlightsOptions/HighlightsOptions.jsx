@@ -115,7 +115,7 @@ const HighlightsOptions = () => {
       </div>
 
       {/* Seção de A 5 km de você */}
-      <h2 className="text-lg font-bold mb-4">A 5 km de você</h2>
+      <h2 className="text-lg font-bold mb-4">Pertos de você</h2>
       <div className="relative mb-6">
         {/* Botões de navegação (visíveis apenas em telas pequenas) */}
         <button

@@ -134,7 +134,7 @@ const BookingSummary = () => {
 
         {/* Seleção de Data e Horário */}
         <div className="mb-8">
-          <h3 className="font-semibold mb-4 text-lg">Data e Horário</h3>
+          <h3 className="font-semibold mb-4 text-lg">Selecione a data e o horário</h3>
           <div className="grid grid-cols-7 gap-2 mb-2">
             {weekDays.map((day) => (
               <div key={day} className="text-center font-sans text-[#8f8f8f62]">

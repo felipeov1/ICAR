@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
+import logo from "../../../public/assets/images/logo/icar-logo-transparent.png";
 
 const Footer = () => {
   useEffect(() => {
@@ -33,7 +34,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           <div>
             <img
-              src="/src/images/icar-logo-transparent.png"
+              src={logo}
               className="mb-2"
               alt="logo-icar"
               width={150}
@@ -86,8 +87,8 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Contato</h4>
             <ul className="text-gray-400">
-              <li className="mb-2">contato@icar.com</li>
-              <li className="mb-2">(11) 99999-9999</li>
+              <li className="mb-2">comercial@icarplus.com.br</li>
+              <li className="mb-2">(43) 99999-9999</li>
               <li>Londrina, PR</li>
             </ul>
           </div>
@@ -108,7 +109,7 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#nossas-politicas" className="hover:text-white">
+                <a href="/nossas-politicas" className="hover:text-white">
                   Privacidade
                 </a>
               </li>
@@ -117,14 +118,11 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Redes Sociais</h4>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-white">
+              <a href="https://www.instagram.com/icar.br" className="text-gray-400 hover:text-white">
                 <FaInstagram size={24} />
               </a>
               <a href="#" className="text-gray-400 hover:text-white">
                 <FaFacebook size={24} />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white">
-                <FaTwitter size={24} />
               </a>
               <a href="#" className="text-gray-400 hover:text-white">
                 <FaLinkedin size={24} />

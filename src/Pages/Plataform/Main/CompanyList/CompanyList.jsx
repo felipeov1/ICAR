@@ -204,7 +204,7 @@ const CompanyList = () => {
       {/* Filtros */}
       <h2 className="text-lg font-bold mb-4">Empresas</h2>
       <div className="flex flex-row sm:flex-row gap-2 mb-6">
-
+        <h6>Filtrar</h6>
         <button
           onClick={() => handleFilterChange("Todas Empresas")}
           className={`px-4 py-2 rounded-xl border shadow-sm transition-colors duration-200 ${
@@ -225,7 +225,7 @@ const CompanyList = () => {
         >
           A Domicilio
         </button>
-        <button
+        {/* <button
           onClick={() => handleFilterChange("Busca e Entrega")}
           className={`px-4 py-2 rounded-xl border shadow-sm transition-colors duration-200 ${
             selectedServiceType === "Busca e Entrega"
@@ -233,8 +233,8 @@ const CompanyList = () => {
               : "bg-gray-200 hover:bg-[#1e3a8a] hover:text-white"
           }`}
         >
-          Busca e Entrega
-        </button>
+          No estabelecimento 
+        </button> */}
       </div>
 
       {/* Lista de Empresas */}
