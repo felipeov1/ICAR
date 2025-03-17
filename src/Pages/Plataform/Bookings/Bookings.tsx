@@ -1,13 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { toast } from "react-toastify";
 import BookingCard from "./BookingCard";
 import PastBookingCard from "./PastBookingCard";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
-const formatDate = (dateString) => {
-  const [day, month, year] = dateString.split("-");
-  return new Date(`${year}-${month}-${day}`);
-};
 
 const Bookings = () => {
   const [activeTab, setActiveTab] = useState("agendados");
@@ -15,75 +10,47 @@ const Bookings = () => {
   const [visibleItems, setVisibleItems] = useState(ITEMS_PER_PAGE);
   const [loading, setLoading] = useState(false);
   const observerRef = useRef(null);
-  const [ratings, setRatings] = useState({}); // Estado para armazenar as avaliações
 
   const services = [
     {
       id: 1,
-      service: "Lavagem completa",
-      scheduledDate: "11-11-2024 11:00",
-      value: "R$50,00",
-      vehicle: "Hatch",
+      service_name: "Lavagem completa",
+      modality: "Domiciliar",
+      vehicle_type: "Hatch",
+      date_time: "2025-11-11 11:00:00",
+      amount_paid: "50.0",
+      payment_method: "Cartão de Crédito",
+      status: "pending", 
     },
     {
       id: 2,
-      service: "Higienização interna",
-      scheduledDate: "10-07-2023 15:30",
-      value: "R$80,00",
-      vehicle: "Hatch",
+      service_name: "Higienização interna",
+      modality: "Local",
+      vehicle_type: "Sedan",
+      date_time: "2023-07-10 15:30:00",
+      amount_paid: "80.0",
+      payment_method: "Pix",
+      status: "completed", 
     },
     {
       id: 3,
-      service: "Lavagem de motor",
-      scheduledDate: "20-09-2025 14:00",
-      value: "R$70,00",
-      vehicle: "Hatch",
-    },
-    {
-      id: 4,
-      service: "Lavagem a seco",
-      scheduledDate: "05-12-2024 10:00",
-      value: "R$60,00",
-      vehicle: "Sedan",
-    },
-    {
-      id: 5,
-      service: "Limpeza de bancos",
-      scheduledDate: "15-03-2025 09:00",
-      value: "R$90,00",
-      vehicle: "SUV",
-    },
-    {
-      id: 6,
-      service: "Lavagem de tapetes",
-      scheduledDate: "22-06-2024 12:00",
-      value: "R$40,00",
-      vehicle: "Hatch",
-    },
-    {
-      id: 7,
-      service: "Limpeza de vidros",
-      scheduledDate: "30-08-2025 16:00",
-      value: "R$30,00",
-      vehicle: "Sedan",
-    },
-    {
-      id: 8,
-      service: "Higienização de ar-condicionado",
-      scheduledDate: "10-10-2024 08:00",
-      value: "R$100,00",
-      vehicle: "SUV",
+      service_name: "Lavagem de motor",
+      modality: "Local",
+      vehicle_type: "SUV",
+      date_time: "2023-09-20 14:00:00",
+      amount_paid: "70.0",
+      payment_method: "credit_card",
+      status: "canceled", 
     },
   ];
 
-  const today = new Date();
-  const agendados = services.filter(
-    (s) => formatDate(s.scheduledDate.split(" ")[0]) >= today
-  );
-  const anteriores = services.filter(
-    (s) => formatDate(s.scheduledDate.split(" ")[0]) < today
-  );
-  const filteredServices = activeTab === "agendados" ? agendados : anteriores;
+  const filteredServices =
+    activeTab === "agendados"
+      ? services.filter((s) => s.status === "pending") 
+      : services.filter(
+          (s) => s.status === "completed" || s.status === "canceled"
+        ); 
+
   const displayedServices = filteredServices.slice(0, visibleItems);
 
   const loadMore = useCallback(() => {
@@ -97,23 +64,21 @@ const Bookings = () => {
   }, [loading, visibleItems, filteredServices.length]);
 
   const handleCancel = (serviceId) => {
+
     toast.success("Agendamento cancelado com sucesso!", {
       autoClose: 2000,
     });
-    // Lógica para cancelar o agendamento
   };
 
   const handleRate = (serviceId, rating, comment) => {
-    setRatings((prev) => ({
-      ...prev,
-      [serviceId]: { rating, comment },
-    }));
+
     toast.success("Avaliação enviada com sucesso!", {
-      autoClose: 100,
+      autoClose: 1000,
     });
   };
 
-  const handleEdit = () => {
+  const handleEdit = (serviceId, newDateTime) => {
+
     toast.success("Edição feita com sucesso!", {
       autoClose: 2000,
     });
@@ -142,10 +107,6 @@ const Bookings = () => {
 
   return (
     <div className="pt-2 w-full p-4 lg:p-8 lg:max-w-6xl lg:mx-auto">
-      {/* ToastContainer para exibir as notificações */}
-      <ToastContainer />
-
-      {/* Abas */}
       <div className="flex border-b">
         <button
           className={`py-2 px-4 ${
@@ -176,10 +137,9 @@ const Bookings = () => {
         </button>
       </div>
 
-      {/* Lista de Agendamentos */}
       <div className="mt-4 h-[40rem] overflow-y-auto p-2 lg:h-[50rem] lg:p-4">
-        <h2 className="text-lg font-bold mb-2 lg:text-xl">
-          {activeTab === "agendados" ? "Agendados" : "Anteriores"}
+        <h2 className="text-md font-bold mb-2 lg:text-xl">
+          {activeTab === "agendados" ? "Agendamentos Ativos" : "Agendamentos Finalizados ou Cancelados"}
         </h2>
 
         {displayedServices.length > 0 ? (
@@ -189,14 +149,14 @@ const Bookings = () => {
                 <BookingCard
                   key={service.id}
                   service={service}
-                  onCancel={() => handleCancel(service.id)}
+                  onCancel={handleCancel}
                   onEdit={handleEdit}
                 />
               ) : (
                 <PastBookingCard
                   key={service.id}
                   service={service}
-                  onCancel={() => handleCancel(service.id)}
+                  onCancel={handleCancel}
                   onRate={handleRate}
                 />
               )
@@ -206,7 +166,6 @@ const Bookings = () => {
           <p className="text-gray-500">Nenhum serviço encontrado.</p>
         )}
 
-        {/* Carregar Mais */}
         <div
           ref={observerRef}
           className="w-full flex justify-center items-center py-4"

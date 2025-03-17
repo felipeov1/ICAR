@@ -42,11 +42,7 @@ function Login() {
         }}
       >
         <div className="lg:hidden mt-16">
-          <img
-            src={logo}
-            alt="logo Icar"
-            width={150}
-          />
+          <img src={logo} alt="logo Icar" width={150} />
         </div>
 
         <div className="w-11/12 sm:max-w-md p-6 bg-transparent backdrop-blur-sm rounded-lg flex flex-col items-center mt-auto md:mt-0">

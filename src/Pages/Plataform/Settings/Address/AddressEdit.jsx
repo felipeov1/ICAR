@@ -141,12 +141,12 @@ const AddressEdit = () => {
       <ToastContainer />
 
       <div className="flex items-center justify-between mb-6">
-        <Link to="/icar/minha-conta" className="text-gray-500">
+        <Link to="/app/minha-conta" className="text-gray-500">
           <FaArrowLeft className="text-xl" />
         </Link>
 
         <h2 className="flex-1 text-center text-xl font-medium text-gray-700">
-        Endereços Cadastrados
+          Endereços Cadastrados
         </h2>
       </div>
 
@@ -243,7 +243,7 @@ const AddressEdit = () => {
               className="w-full p-2 border rounded mb-2 bg-gray-200"
             />
           </div>
-          <div className=" lg:w-1/2 lg:gap-3" >
+          <div className=" lg:w-1/2 lg:gap-3">
             <label className="block">Estado</label>
             <input
               type="text"

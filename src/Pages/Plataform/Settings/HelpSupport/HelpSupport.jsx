@@ -56,14 +56,12 @@ const HelpSupport = () => {
       <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-8">
         {/* Botão de Voltar */}
         <Link
-          to="/icar/minha-conta"
+          to="/app/minha-conta"
           className="flex items-center text-blue-500 hover:text-blue-700 mb-8"
         >
           <FaArrowLeft className="mr-2" />
           Voltar
         </Link>
-
-        
 
         {/* Título da Página */}
         <div className="text-center mb-8">

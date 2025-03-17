@@ -23,22 +23,22 @@ const HighlightsOptions = () => {
     {
       name: "FastCar",
       image: "/src/images/icar-logo-blue.jpg",
-      link: "/icar/empresa",
+      link: "/app/empresa",
     },
     {
       name: "Lava Rápido VIP",
       image: "/src/images/icar-logo-blue.jpg",
-      link: "/icar/empresa",
+      link: "/app/empresa",
     },
     {
       name: "Guará",
       image: "/src/images/icar-logo-blue.jpg",
-      link: "/icar/empresa",
+      link: "/app/empresa",
     },
     {
       name: "Lava Bem",
       image: "/src/images/icar-logo-blue.jpg",
-      link: "/icar/empresa",
+      link: "/app/empresa",
     },
   ];
 
@@ -46,22 +46,22 @@ const HighlightsOptions = () => {
     {
       name: "FastCar",
       image: "/src/images/icar-logo-blue.jpg",
-      link: "/icar/empresa",
+      link: "/app/empresa",
     },
     {
       name: "Lava Rápido VIP",
       image: "/src/images/icar-logo-blue.jpg",
-      link: "/icar/empresa",
+      link: "/app/empresa",
     },
     {
       name: "Guará",
       image: "/src/images/icar-logo-blue.jpg",
-      link: "/icar/empresa",
+      link: "/app/empresa",
     },
     {
       name: "Lava Bem",
       image: "/src/images/icar-logo-blue.jpg",
-      link: "/icar/empresa",
+      link: "/app/empresa",
     },
   ];
 
@@ -135,7 +135,7 @@ const HighlightsOptions = () => {
               key={index}
               className="flex-shrink-0 w-52 h-36 rounded-lg shadow-md relative hover:shadow-lg transition-shadow duration-200 sm:w-full sm:h-48 sm:flex-shrink"
             >
-              <a href={company.link} target="_blank" rel="noopener noreferrer">
+              <a href={company.link} rel="noopener noreferrer">
                 <img
                   src={company.image}
                   alt={company.name}

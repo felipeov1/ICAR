@@ -5,7 +5,6 @@ const ServicesAvaiables = () => {
   const [selectedService, setSelectedService] = useState(""); // Serviço selecionado
   const [selectedOption, setSelectedOption] = useState(""); // Opção de atendimento
 
-
   const navigate = useNavigate();
 
   // Simulando os serviços disponíveis com valores e opções de atendimento
@@ -18,10 +17,10 @@ const ServicesAvaiables = () => {
 
   // Simulando locais de atendimento (lava-rápido ou domicilio)
   const serviceLocations = {
-    "Lavagem Completa": ["Lava Rápido", "Busca e Entrega"],
-    Polimento: ["Lava Rápido", "Busca e Entrega"],
+    "Lavagem Completa": ["Lava Rápido", "Domiciliar"],
+    Polimento: ["Lava Rápido", "Domiciliar"],
     "Higienização Interna": [], // Serviço sem opções (atendimento na empresa)
-    "Troca de Óleo": ["Busca e Entrega"],
+    "Troca de Óleo": ["Domiciliar"],
   };
 
   const handleServiceSelect = (service) => {
@@ -44,7 +43,7 @@ const ServicesAvaiables = () => {
       const service = availableServices.find(
         (service) => service.name === selectedService
       );
-      navigate("/icar/empresa/agendamento", {
+      navigate("/app/empresa/agendamento", {
         state: {
           selectedService,
           selectedOption: selectedOption || "Na Empresa", // Se não houver opção, assume "Na Empresa"
@@ -97,7 +96,9 @@ const ServicesAvaiables = () => {
                   >
                     <h5 className="font-semibold">{location}</h5>
                     <p className="text-sm">
-                      {location === "Lava Rápido" ? "No local" : "Endereço Particular"}
+                      {location === "Lava Rápido"
+                        ? "No local"
+                        : "Endereço Particular"}
                     </p>
                   </div>
                 ))}

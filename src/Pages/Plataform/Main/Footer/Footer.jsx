@@ -1,15 +1,27 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { HomeIcon, UserIcon, CalendarDaysIcon } from "@heroicons/react/24/outline";
+import {
+  HomeIcon,
+  UserIcon,
+  CalendarDaysIcon,
+} from "@heroicons/react/24/outline";
 
 const MobileNavigation = () => {
   const location = useLocation();
   const [active, setActive] = useState(location.pathname);
 
   const buttons = [
-    { icon: <HomeIcon className="w-6 h-6" />, label: "Início", path: "/icar" },
-    { icon: <CalendarDaysIcon className="w-6 h-6" />, label: "Agendamentos", path: "/icar/agendamentos" },
-    { icon: <UserIcon className="w-6 h-6" />, label: "Minha Conta", path: "/icar/minha-conta" },
+    { icon: <HomeIcon className="w-6 h-6" />, label: "Início", path: "/app" },
+    {
+      icon: <CalendarDaysIcon className="w-6 h-6" />,
+      label: "Agendamentos",
+      path: "/app/agendamentos",
+    },
+    {
+      icon: <UserIcon className="w-6 h-6" />,
+      label: "Minha Conta",
+      path: "/app/minha-conta",
+    },
   ];
 
   const handleClick = (path) => {

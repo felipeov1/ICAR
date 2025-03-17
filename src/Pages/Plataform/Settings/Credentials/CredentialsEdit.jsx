@@ -77,9 +77,8 @@ const CredentialsEdit = () => {
       {/* ToastContainer para exibir as notificações */}
       <ToastContainer />
 
-   
       <div className="flex items-center justify-between mb-6">
-        <Link to="/icar/minha-conta" className="text-gray-500">
+        <Link to="/app/minha-conta" className="text-gray-500">
           <FaArrowLeft className="text-xl" />
         </Link>
 
@@ -103,44 +102,48 @@ const CredentialsEdit = () => {
           />
         </div>
 
-        <div className="mb-3 p-3 bg-gray-100 rounded-lg text-gray-700 text-sm">
-          🔐 Sua senha deve conter:
-          <ul className="list-disc ml-5 mt-1">
-            <li
-              className={
-                hasMinLength ? "text-green-600 font-semibold" : "text-red-500"
-              }
-            >
-              No mínimo <strong>8 caracteres</strong>
-            </li>
-            <li
-              className={
-                hasUpperCase ? "text-green-600 font-semibold" : "text-red-500"
-              }
-            >
-              Pelo menos <strong>uma letra maiúscula</strong>
-            </li>
-            <li
-              className={
-                hasNumber ? "text-green-600 font-semibold" : "text-red-500"
-              }
-            >
-              Pelo menos <strong>um número</strong>
-            </li>
-            <li
-              className={
-                hasSpecialChar ? "text-green-600 font-semibold" : "text-red-500"
-              }
-            >
-              Pelo menos <strong>um caractere especial (!@#$%^&*)</strong>
-            </li>
-          </ul>
-        </div>
-
-        <div className="mb-6 relative">
+        <div>
           <label htmlFor="password" className="block text-gray-700">
             Nova Senha
           </label>
+          <div className="mb-3 p-3 mt-1 bg-gray-100 rounded-lg text-gray-700 text-sm">
+            🔐 Sua senha deve conter:
+            <ul className="list-disc ml-5 mt-1">
+              <li
+                className={
+                  hasMinLength ? "text-green-600 font-semibold" : "text-red-500"
+                }
+              >
+                No mínimo <strong>8 caracteres</strong>
+              </li>
+              <li
+                className={
+                  hasUpperCase ? "text-green-600 font-semibold" : "text-red-500"
+                }
+              >
+                Pelo menos <strong>uma letra maiúscula</strong>
+              </li>
+              <li
+                className={
+                  hasNumber ? "text-green-600 font-semibold" : "text-red-500"
+                }
+              >
+                Pelo menos <strong>um número</strong>
+              </li>
+              <li
+                className={
+                  hasSpecialChar
+                    ? "text-green-600 font-semibold"
+                    : "text-red-500"
+                }
+              >
+                Pelo menos <strong>um caractere especial (!@#$%^&*)</strong>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mb-6 relative">
           <div className="flex relative">
             <input
               type={showPassword ? "text" : "password"}

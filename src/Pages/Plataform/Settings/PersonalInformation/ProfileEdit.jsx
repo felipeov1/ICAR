@@ -65,7 +65,7 @@ const ProfileEdit = () => {
       <ToastContainer />
 
       <div className="flex items-center justify-between mb-6">
-        <Link to="/icar/minha-conta" className="text-gray-500">
+        <Link to="/app/minha-conta" className="text-gray-500">
           <FaArrowLeft className="text-xl" />
         </Link>
 

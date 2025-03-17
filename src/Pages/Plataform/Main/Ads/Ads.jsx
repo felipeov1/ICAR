@@ -55,7 +55,11 @@ const Ads = () => {
 
       <div className="relative">
         {/* Link na imagem atual */}
-        <a href={images[currentIndex].link} target="_blank" rel="noopener noreferrer">
+        <a
+          href={images[currentIndex].link}
+          
+          rel="noopener noreferrer"
+        >
           <img
             src={images[currentIndex].src}
             alt={`Imagem ${currentIndex + 1}`}

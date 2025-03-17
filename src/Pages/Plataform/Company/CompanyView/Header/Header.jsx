@@ -4,7 +4,7 @@ import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 const HeaderMain = () => (
   <div className="relative">
     {/* Botão de Voltar */}
-    <a href="/icar" className="absolute top-4 left-2 text-white text-3xl">
+    <a href="/app" className="absolute top-4 left-2 text-white text-3xl">
       <div className="bg-[#0000003d] rounded-full p-1">
         <ChevronLeftIcon width={30} />
       </div>

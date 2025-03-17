@@ -7,145 +7,145 @@ const CompanyList = () => {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
+
+      image: { logoicar },
+      link: "/app/empresa",
       serviceType: "A Domicilio",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
-      serviceType: "Busca e Entrega",
+
+      image: { logoicar },
+      link: "/app/empresa",
+      serviceType: "Domiciliar",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
+
+      image: { logoicar },
+      link: "/app/empresa",
       serviceType: "A Domicilio",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
-      serviceType: "Busca e Entrega",
+
+      image: { logoicar },
+      link: "/app/empresa",
+      serviceType: "Domiciliar",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
+
+      image: { logoicar },
+      link: "/app/empresa",
       serviceType: "A Domicilio",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
-      serviceType: "Busca e Entrega",
+
+      image: { logoicar },
+      link: "/app/empresa",
+      serviceType: "Domiciliar",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
+
+      image: { logoicar },
+      link: "/app/empresa",
       serviceType: "A Domicilio",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
-      serviceType: "Busca e Entrega",
+
+      image: { logoicar },
+      link: "/app/empresa",
+      serviceType: "Domiciliar",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
+
+      image: { logoicar },
+      link: "/app/empresa",
       serviceType: "A Domicilio",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
-      serviceType: "Busca e Entrega",
+
+      image: { logoicar },
+      link: "/app/empresa",
+      serviceType: "Domiciliar",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
+
+      image: { logoicar },
+      link: "/app/empresa",
       serviceType: "A Domicilio",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
-      serviceType: "Busca e Entrega",
+
+      image: { logoicar },
+      link: "/app/empresa",
+      serviceType: "Domiciliar",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
+
+      image: { logoicar },
+      link: "/app/empresa",
       serviceType: "A Domicilio",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
-      serviceType: "Busca e Entrega",
+
+      image: { logoicar },
+      link: "/app/empresa",
+      serviceType: "Domiciliar",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
+
+      image: { logoicar },
+      link: "/app/empresa",
       serviceType: "A Domicilio",
     },
     {
       name: "Lava-Rápido ICAR",
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
-      distance: 2.3,
-      image: {logoicar},
-      link: "/icar/empresa",
-      serviceType: "Busca e Entrega",
+
+      image: { logoicar },
+      link: "/app/empresa",
+      serviceType: "Domiciliar",
     },
     // Adicione mais empresas aqui...
   ];
@@ -154,7 +154,8 @@ const CompanyList = () => {
   const [visibleCompanies, setVisibleCompanies] = useState(ITEMS_PER_PAGE);
   const [loading, setLoading] = useState(false);
   const [filteredCompanies, setFilteredCompanies] = useState(allCompanies);
-  const [selectedServiceType, setSelectedServiceType] = useState("Todas Empresas");
+  const [selectedServiceType, setSelectedServiceType] =
+    useState("Todas Empresas");
 
   const observerRef = useRef(null);
 
@@ -189,14 +190,17 @@ const CompanyList = () => {
     };
   }, [loadMoreCompanies]);
 
-  const handleFilterChange = (serviceType) => {
+  const handleFilterChange = (event) => {
+    const serviceType = event.target.value;
     setSelectedServiceType(serviceType);
     if (serviceType === "Todas Empresas") {
       setFilteredCompanies(allCompanies);
     } else {
-      setFilteredCompanies(allCompanies.filter((company) => company.serviceType === serviceType));
+      setFilteredCompanies(
+        allCompanies.filter((company) => company.serviceType === serviceType)
+      );
     }
-    setVisibleCompanies(ITEMS_PER_PAGE); // Resetar a lista de empresas visíveis
+    setVisibleCompanies(ITEMS_PER_PAGE);
   };
 
   return (
@@ -204,37 +208,15 @@ const CompanyList = () => {
       {/* Filtros */}
       <h2 className="text-lg font-bold mb-4">Empresas</h2>
       <div className="flex flex-row sm:flex-row gap-2 mb-6">
-        <h6>Filtrar</h6>
-        <button
-          onClick={() => handleFilterChange("Todas Empresas")}
-          className={`px-4 py-2 rounded-xl border shadow-sm transition-colors duration-200 ${
-            selectedServiceType === "Todas Empresas"
-              ? "bg-[#1e3a8a] text-white"
-              : "bg-gray-200 hover:bg-[#1e3a8a] hover:text-white"
-          }`}
+        <select
+          value={selectedServiceType}
+          onChange={handleFilterChange}
+          className="px-4 py-2 rounded-xl border shadow-sm bg-gray-200 hover:bg-[#1e3a8a] hover:text-white"
         >
-          Todas Empresas
-        </button>
-        <button
-          onClick={() => handleFilterChange("A Domicilio")}
-          className={`px-4 py-2 rounded-xl border shadow-sm transition-colors duration-200 ${
-            selectedServiceType === "A Domicilio"
-              ? "bg-[#1e3a8a] text-white"
-              : "bg-gray-200 hover:bg-[#1e3a8a] hover:text-white"
-          }`}
-        >
-          A Domicilio
-        </button>
-        {/* <button
-          onClick={() => handleFilterChange("Busca e Entrega")}
-          className={`px-4 py-2 rounded-xl border shadow-sm transition-colors duration-200 ${
-            selectedServiceType === "Busca e Entrega"
-              ? "bg-[#1e3a8a] text-white"
-              : "bg-gray-200 hover:bg-[#1e3a8a] hover:text-white"
-          }`}
-        >
-          No estabelecimento 
-        </button> */}
+          <option value="Todas Empresas">Todas Empresas</option>
+          <option value="A Domicilio">A Domicilio</option>
+          <option value="Domiciliar">Domiciliar</option>
+        </select>
       </div>
 
       {/* Lista de Empresas */}
@@ -255,7 +237,9 @@ const CompanyList = () => {
 
               <div className="flex-1 ml-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-blue-500 font-bold text-lg">{company.name}</h3>
+                  <h3 className="text-blue-500 font-bold text-lg">
+                    {company.name}
+                  </h3>
                   <div className="flex items-center space-x-1">
                     <span className="text-yellow-500 text-lg">★</span>
                     <span className="text-gray-700 font-bold">
@@ -266,14 +250,8 @@ const CompanyList = () => {
                     </span>
                   </div>
                 </div>
-                <p className="text-gray-500 text-sm mt-1">{company.description}</p>
-                <p className="text-gray-400 text-xs mt-2">
-                  Distância:{" "}
-                  {company.distance.toLocaleString("pt-BR", {
-                    minimumFractionDigits: 1,
-                    maximumFractionDigits: 1,
-                  })}{" "}
-                  km
+                <p className="text-gray-500 text-sm mt-1">
+                  {company.description}
                 </p>
               </div>
             </a>
@@ -282,8 +260,13 @@ const CompanyList = () => {
       </ul>
 
       {/* Carregar Mais */}
-      <div ref={observerRef} className="w-full flex justify-center items-center py-4">
-        {loading && <div className="animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full"></div>}
+      <div
+        ref={observerRef}
+        className="w-full flex justify-center items-center py-4"
+      >
+        {loading && (
+          <div className="animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+        )}
       </div>
     </section>
   );

@@ -70,7 +70,7 @@ const FAQSection = () => {
               Ficou com alguma dúvida? Entre em contato com a gente!
             </p>
             <a
-              href="https://wa.me/5599999999999"
+               href="https://wa.me/5543 999702073?text=Ol%C3%A1,%20gostaria%20de%20agendar%20lavagens,%20mas%20tenho%20d%C3%BAvidas%20sobre%20a%20plataforma."
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block bg-green-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-600 transition duration-300"

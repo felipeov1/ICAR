@@ -15,7 +15,7 @@ function CriarConta() {
   const [hasUpperCase, setHasUpperCase] = useState(false);
   const [hasNumber, setHasNumber] = useState(false);
   const [hasSpecialChar, setHasSpecialChar] = useState(false);
-  const [celular, setcelular] = useState("");
+  const [phone, setPhone] = useState("");
 
   useEffect(() => {
     const handleResize = () => {
@@ -66,18 +66,29 @@ function CriarConta() {
   };
 
   const formatPhone = (value) => {
-    let phone = value.replace(/\D/g, "");
-    if (phone.length <= 10) {
-      phone = phone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+    const cleaned = value.replace(/\D/g, "");
+
+    const limited = cleaned.slice(0, 11);
+
+    if (limited.length > 10) {
+      return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(
+        7
+      )}`;
+    } else if (limited.length > 6) {
+      return `(${limited.slice(0, 2)}) ${limited.slice(2, 6)}-${limited.slice(
+        6
+      )}`;
+    } else if (limited.length > 2) {
+      phone;
+      return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
     } else {
-      phone = phone.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+      return limited;
     }
-    return phone;
   };
 
-  const handlecelularChange = (e) => {
+  const handlePhoneChange = (e) => {
     const formattedPhone = formatPhone(e.target.value);
-    setcelular(formattedPhone);
+    setPhone(formattedPhone);
   };
 
   const handleSubmit = (e) => {
@@ -171,57 +182,21 @@ function CriarConta() {
 
             <div>
               <label
-                htmlFor="celular"
+                htmlFor="phone"
                 className="block text-sm font-medium lg:text-blue-900 text-white"
               >
                 Celular
               </label>
               <input
-                id="celular"
                 type="text"
-                value={celular}
-                onChange={handlecelularChange}
-                className="mt-1 block w-full px-4 py-2 border border-blue-900 md:bg-white text-blue-900 rounded-lg focus:ring-blue-900 focus:border-blue-900"
-                placeholder="(xx) xxxxx-xxxx"
-                required
+                id="phone"
+                value={phone}
+                onChange={handlePhoneChange}
+                className="mt-2 p-3 w-full border border-gray-300 rounded-lg"
+                placeholder="(DD) XXXXX-XXXX"
+                maxLength={15}
               />
             </div>
-
-                {/* Componente de validação de senha */}
-                <div className="mb-3 p-3 bg-gray-100 rounded-lg text-gray-700 text-sm">
-                🔐 Sua senha deve conter:
-                <ul className="list-disc ml-5 mt-1">
-                  <li
-                    className={
-                      hasMinLength ? "text-green-600 font-semibold" : "text-red-500"
-                    }
-                  >
-                    No mínimo <strong>8 caracteres</strong>
-                  </li>
-                  <li
-                    className={
-                      hasUpperCase ? "text-green-600 font-semibold" : "text-red-500"
-                    }
-                  >
-                    Pelo menos <strong>uma letra maiúscula</strong>
-                  </li>
-                  <li
-                    className={
-                      hasNumber ? "text-green-600 font-semibold" : "text-red-500"
-                    }
-                  >
-                    Pelo menos <strong>um número</strong>
-                  </li>
-                  <li
-                    className={
-                      hasSpecialChar ? "text-green-600 font-semibold" : "text-red-500"
-                    }
-                  >
-                    Pelo menos <strong>um caractere especial (!@#$%^&*)</strong>
-                  </li>
-                </ul>
-              </div>
-
 
             <div>
               <label
@@ -230,6 +205,49 @@ function CriarConta() {
               >
                 Senha
               </label>
+              <div className="mb-3 p-3 mt-1 bg-gray-100 rounded-lg text-gray-700 text-sm">
+                🔐 Sua senha deve conter:
+                <ul className="list-disc ml-5 mt-1">
+                  <li
+                    className={
+                      hasMinLength
+                        ? "text-green-600 font-semibold"
+                        : "text-red-500"
+                    }
+                  >
+                    No mínimo <strong>8 caracteres</strong>
+                  </li>
+                  <li
+                    className={
+                      hasUpperCase
+                        ? "text-green-600 font-semibold"
+                        : "text-red-500"
+                    }
+                  >
+                    Pelo menos <strong>uma letra maiúscula</strong>
+                  </li>
+                  <li
+                    className={
+                      hasNumber
+                        ? "text-green-600 font-semibold"
+                        : "text-red-500"
+                    }
+                  >
+                    Pelo menos <strong>um número</strong>
+                  </li>
+                  <li
+                    className={
+                      hasSpecialChar
+                        ? "text-green-600 font-semibold"
+                        : "text-red-500"
+                    }
+                  >
+                    Pelo menos <strong>um caractere especial (!@#$%^&*)</strong>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div>
               <div className="relative">
                 <input
                   id="password"
@@ -249,7 +267,6 @@ function CriarConta() {
                 </button>
               </div>
 
-          
               <div className="w-full h-2 bg-gray-300 rounded-lg overflow-hidden mt-2">
                 <div
                   className={`h-full ${getProgressColor()} transition-all duration-300`}

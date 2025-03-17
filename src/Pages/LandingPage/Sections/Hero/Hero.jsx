@@ -30,7 +30,7 @@ const Hero = () => {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8 }}
-          className={`max-w-full lg:max-w-[650px] md:ml-5 p-6 lg:ml-48 ${
+          className={`max-w-full lg:max-w-[650px] md:ml-5 p-6 lg:ml-24 ${
             isSmallScreen ? "pb-20" : ""
           }`}
         >

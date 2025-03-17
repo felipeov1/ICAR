@@ -81,7 +81,9 @@ const Navbar = () => {
 
             <div className="hidden md:flex flex-grow justify-center space-x-8 text-white">
               <NavLink href="#inicio">
-                <span className="text-white hover:text-[#e6e6e644]">Início</span>
+                <span className="text-white hover:text-[#e6e6e644]">
+                  Início
+                </span>
               </NavLink>
               <NavLink href="#funcionalidades">
                 <span className="text-white hover:text-[#e6e6e644]">
@@ -94,7 +96,9 @@ const Navbar = () => {
                 </span>
               </NavLink>
               <NavLink href="#duvidas">
-                <span className="text-white hover:text-[#e6e6e644]">Dúvidas</span>
+                <span className="text-white hover:text-[#e6e6e644]">
+                  Dúvidas
+                </span>
               </NavLink>
             </div>
 

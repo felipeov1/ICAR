@@ -8,16 +8,16 @@ import logoIcar from "../../../../public/assets/images/logo/icar-logo-transparen
 
 const Header = ({ className }) => {
   const buttons = [
-    { icon: <HomeIcon className="w-6 h-6" />, label: "Início", path: "/icar" },
+    { icon: <HomeIcon className="w-6 h-6" />, label: "Início", path: "/app" },
     {
       icon: <CalendarDaysIcon className="w-6 h-6" />,
       label: "Agendamentos",
-      path: "/icar/agendamentos",
+      path: "/app/agendamentos",
     },
     {
       icon: <UserIcon className="w-6 h-6" />,
       label: "Minha Conta",
-      path: "/icar/minha-conta",
+      path: "/app/minha-conta",
     },
   ];
 
@@ -34,12 +34,8 @@ const Header = ({ className }) => {
     >
       <div className="lg:flex-[90%] lg:flex lg:justify-between lg:items-center">
         <div className="flex-1 flex">
-          <a href="/icar">
-            <img
-              src={logoIcar}
-              alt="Logo do Icar"
-              width={100}
-            />
+          <a href="/app">
+            <img src={logoIcar} alt="Logo do Icar" width={100} />
           </a>
         </div>
 

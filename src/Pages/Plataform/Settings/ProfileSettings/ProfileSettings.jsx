@@ -36,22 +36,22 @@ const ProfileSettings = () => {
           <SettingItem
             icon={<FaUser />}
             text="Informações Pessoais"
-            path="/icar/minha-conta/informacoes-pessoais"
+            path="/app/minha-conta/informacoes-pessoais"
           />
           <SettingItem
             icon={<FaLock />}
             text="Dados de Acesso"
-            path="/icar/minha-conta/dados-de-acesso"
+            path="/app/minha-conta/dados-de-acesso"
           />
           <SettingItem
             icon={<FaMap />}
             text="Endereços"
-            path="/icar/minha-conta/enderecos"
+            path="/app/minha-conta/enderecos"
           />
           <SettingItem
             icon={<FaQuestionCircle />}
             text="Ajuda e Suporte"
-            path="/icar/minha-conta/suporte"
+            path="/app/minha-conta/suporte"
           />
 
           {/* Botão de Sair */}
