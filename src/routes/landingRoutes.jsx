@@ -15,7 +15,7 @@ const landingRoutes = [
       <>
         <Hero />
         <Features />
-        <Testimonials />
+        {/* <Testimonials /> */}
         <FAQSection />
       </>
     ),

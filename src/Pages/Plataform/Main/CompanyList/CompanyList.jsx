@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import logoicar from "../../../../public/assets/images/logo/icar-logo-transparent.png";
+import carWashImage from "../../../../public/assets/images/logo/icar-logo-blue.jpg";
 
 const CompanyList = () => {
   const allCompanies = [
@@ -8,7 +9,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "A Domicilio",
     },
@@ -17,7 +18,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "Domiciliar",
     },
@@ -26,7 +27,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "A Domicilio",
     },
@@ -35,7 +36,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "Domiciliar",
     },
@@ -44,7 +45,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "A Domicilio",
     },
@@ -53,7 +54,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "Domiciliar",
     },
@@ -62,7 +63,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "A Domicilio",
     },
@@ -71,7 +72,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "Domiciliar",
     },
@@ -80,7 +81,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "A Domicilio",
     },
@@ -89,7 +90,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "Domiciliar",
     },
@@ -98,7 +99,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "A Domicilio",
     },
@@ -107,7 +108,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "Domiciliar",
     },
@@ -116,7 +117,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "A Domicilio",
     },
@@ -125,7 +126,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "Domiciliar",
     },
@@ -134,7 +135,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "A Domicilio",
     },
@@ -143,7 +144,7 @@ const CompanyList = () => {
       rating: 4.5,
       description: "Lavagem rápida e eficiente para seu veículo.",
 
-      image: { logoicar },
+      image: carWashImage,
       link: "/app/empresa",
       serviceType: "Domiciliar",
     },

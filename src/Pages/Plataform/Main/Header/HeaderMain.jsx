@@ -58,6 +58,7 @@ const HeaderMain = ({ className }) => {
       <div className="flex-[5%] flex flex-col text-sm lg:hidden ">
         <span>{getGreeting()},</span>
         <span>Felipe Ferreira</span>
+        
       </div>
 
       <div className="lg:flex-[90%] lg:flex lg:justify-between lg:items-center">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Modal from "react-modal";
+import Calendar from "../components/Calendar";
 
 Modal.setAppElement("#root");
 
@@ -35,57 +36,11 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
   const [currentMonth] = useState(new Date().getMonth());
   const [currentYear] = useState(new Date().getFullYear());
 
-  const getMonthDays = (month, year) => {
-    const date = new Date(year, month, 1);
-    const days = [];
-    while (date.getMonth() === month) {
-      days.push(date.getDate());
-      date.setDate(date.getDate() + 1);
-    }
-    return days;
-  };
-
-  const isDisabled = (day) => {
-    const today = new Date();
-    const selectedDate = new Date(currentYear, currentMonth, day);
-    const todayMidnight = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate()
-    );
-    const isPast = selectedDate < todayMidnight;
-    const currentDayOfWeek = selectedDate.getDay();
-    return isPast || dailyAvailableTimes[currentDayOfWeek].length === 0;
-  };
-
   const handleDateClick = (day) => {
     const newDate = new Date(currentYear, currentMonth, day);
     setSelectedDate(newDate);
     setSelectedTime("");
-    setAvailableTimes(dailyAvailableTimes[newDate.getDay()]);
   };
-
-  const findNearestAvailableDay = () => {
-    const today = new Date();
-    const days = getMonthDays(currentMonth, currentYear);
-
-    for (let day of days) {
-      const date = new Date(currentYear, currentMonth, day);
-      if (date > today && !isDisabled(day)) {
-        return day;
-      }
-    }
-    return null;
-  };
-
-  useEffect(() => {
-    if (isModalOpen) {
-      const nearestDay = findNearestAvailableDay();
-      if (nearestDay) {
-        handleDateClick(nearestDay);
-      }
-    }
-  }, [isModalOpen]);
 
   const openModal = () => {
     if (isWithin12Hours(service.date_time)) {
@@ -135,9 +90,6 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
     closeConfirmationModal();
     closeModal();
   };
-
-  const monthDays = getMonthDays(currentMonth, currentYear);
-  const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
   return (
     <>
@@ -216,67 +168,42 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
 
         <div className="mb-4">
           <h3 className="font-semibold mb-4">Selecione a data</h3>
-          <div className="grid grid-cols-7 gap-2 mb-2">
-            {weekDays.map((day) => (
-              <div key={day} className="text-center text-gray-500">
-                {day}
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7 gap-2">
-            {monthDays.map((day) => {
-              const currentDayOfWeek = new Date(
-                currentYear,
-                currentMonth,
-                day
-              ).getDay();
-              const isSelected = selectedDate?.getDate() === day;
-              const disabled =
-                isDisabled(day) ||
-                dailyAvailableTimes[currentDayOfWeek].length === 0;
-
-              return (
-                <button
-                  key={day}
-                  className={`p-2 rounded-2xl text-center transition duration-200 ease-in-out ${
-                    isSelected
-                      ? "bg-[#1e3a8a] text-white"
-                      : disabled
-                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      : "bg-gray-200 hover:bg-[#1e3a8a] hover:text-white"
-                  }`}
-                  onClick={() => !disabled && handleDateClick(day)}
-                  disabled={disabled}
-                >
-                  {day}
-                </button>
-              );
-            })}
-          </div>
+          <Calendar
+            onDateClick={handleDateClick}
+            selectedDate={selectedDate}
+            dailyAvailableTimes={dailyAvailableTimes}
+          />
         </div>
 
         {selectedDate && (
-          <div className="mb-4">
-            <h3 className="font-semibold mb-4">Selecione o horário</h3>
+          <div className="mt-6">
+            <p className="text-gray-700 text-lg mb-4">
+              Horários disponíveis para{" "}
+              <span className="font-bold">
+                {selectedDate.toLocaleDateString("pt-BR")}
+              </span>
+            </p>
             <div className="flex flex-wrap gap-2">
-              {availableTimes.map((time) => (
-                <button
-                  key={time}
-                  className={`px-4 py-2 rounded-xl border shadow-sm transition duration-200 ease-in-out ${
-                    selectedTime === time
-                      ? "bg-[#1e3a8a] text-white"
-                      : "bg-gray-200 hover:bg-gray-300"
-                  }`}
-                  onClick={() => setSelectedTime(time)}
-                >
-                  {time}
-                </button>
-              ))}
+              {dailyAvailableTimes[new Date(selectedDate).getDay()].map(
+                (time) => (
+                  <button
+                    key={time}
+                    className={`px-4 py-2 rounded-xl  border shadow-sm transition duration-200 ease-in-out ${
+                      selectedTime === time
+                        ? "bg-[#1e3a8a] text-white"
+                        : "bg-gray-200 hover:bg-gray-300"
+                    }`}
+                    onClick={() => setSelectedTime(time)}
+                  >
+                    {time}
+                  </button>
+                )
+              )}
             </div>
           </div>
         )}
 
-        <div className="flex justify-end space-x-2">
+        <div className="flex relative justify-start space-x-4 mt-6">
           <button
             onClick={handleSave}
             className="bg-blue-800 text-white px-4 py-2 rounded hover:bg-blue-900 transition duration-300"

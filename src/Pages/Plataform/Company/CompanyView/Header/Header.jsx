@@ -1,5 +1,6 @@
 import React from "react";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
+import carWashImage from "../../../../../public/assets/images/logo/icar-logo-blue.jpg";
 
 const HeaderMain = () => (
   <div className="relative">
@@ -13,7 +14,7 @@ const HeaderMain = () => (
     {/* Imagem de Capa */}
     <div className="w-full h-56 lg:h-96 overflow-hidden">
       <img
-        src="/src/images/7359-lava-rapido-kf-3.jpg"
+        src={carWashImage}
         alt="Lava-Rápido ICAR"
         className="w-full h-full object-cover"
       />

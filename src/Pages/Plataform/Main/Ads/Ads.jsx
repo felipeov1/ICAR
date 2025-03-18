@@ -1,30 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import adsBanner from "../../../../public/assets/images/logo/icar-logo-blue.jpg";
 
 const Ads = () => {
   const images = [
     {
-      src: "/src/images/icar-logo-blue.jpg",
+      src: adsBanner,
       link: "/link1", // Link para a primeira imagem
     },
     {
-      src: "/src/images/icar-logo-blue.jpg",
+      src: adsBanner,
       link: "/link2", // Link para a segunda imagem
     },
     {
-      src: "/src/images/icar-logo-blue.jpg",
+      src: adsBanner,
       link: "/link3", // Link para a terceira imagem
     },
     {
-      src: "/src/images/icar-logo-blue.jpg",
+      src: adsBanner,
       link: "/link4", // Link para a quarta imagem
     },
     {
-      src: "/src/images/icar-logo-blue.jpg",
+      src: adsBanner,
       link: "/link5", // Link para a quinta imagem
     },
     {
-      src: "/src/images/icar-logo-blue.jpg",
+      src: adsBanner,
       link: "/link6", // Link para a sexta imagem
     },
   ];

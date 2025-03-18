@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import carWashImage from "../../../../public/assets/images/logo/icar-logo-blue.jpg";
 
 const HighlightsOptions = () => {
   const optionsRef1 = useRef(null);
@@ -22,22 +23,22 @@ const HighlightsOptions = () => {
   const nearbyCompanies = [
     {
       name: "FastCar",
-      image: "/src/images/icar-logo-blue.jpg",
+      image: carWashImage,
       link: "/app/empresa",
     },
     {
       name: "Lava Rápido VIP",
-      image: "/src/images/icar-logo-blue.jpg",
+      image: carWashImage,
       link: "/app/empresa",
     },
     {
       name: "Guará",
-      image: "/src/images/icar-logo-blue.jpg",
+      image: carWashImage,
       link: "/app/empresa",
     },
     {
       name: "Lava Bem",
-      image: "/src/images/icar-logo-blue.jpg",
+      image: carWashImage,
       link: "/app/empresa",
     },
   ];
@@ -45,31 +46,31 @@ const HighlightsOptions = () => {
   const domicilieDeliveryCompanies = [
     {
       name: "FastCar",
-      image: "/src/images/icar-logo-blue.jpg",
+      image: carWashImage,
       link: "/app/empresa",
     },
     {
       name: "Lava Rápido VIP",
-      image: "/src/images/icar-logo-blue.jpg",
+      image: carWashImage,
       link: "/app/empresa",
     },
     {
       name: "Guará",
-      image: "/src/images/icar-logo-blue.jpg",
+      image: carWashImage,
       link: "/app/empresa",
     },
     {
       name: "Lava Bem",
-      image: "/src/images/icar-logo-blue.jpg",
+      image: carWashImage,
       link: "/app/empresa",
     },
   ];
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
       {/* Seção de Lavagem a Domicílio ou Retirada e Entrega */}
       <h2 className="text-lg font-bold mb-4">
-        Lavagem a Domicílio ou Retirada e Entrega
+        Lavagem a Domicílio
       </h2>
       <div className="relative mb-8">
         {/* Botões de navegação (visíveis apenas em telas pequenas) */}
