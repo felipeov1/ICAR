@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import Modal from "react-modal";
@@ -11,6 +11,7 @@ import ModalAddress from "../../../components/ModalAddress";
 Modal.setAppElement("#root");
 
 const BookingSummary = () => {
+  
   const location = useLocation();
   const { selectedService, selectedOption, price } = location.state || {};
   const [selectedDate, setSelectedDate] = useState(null);

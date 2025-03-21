@@ -6,72 +6,17 @@ import "react-toastify/dist/ReactToastify.css";
 
 Modal.setAppElement("#root");
 
-const ModalAddress = ({
+const EditAddressModal = ({
   isOpen,
   onClose,
   onSave,
-  addresses,
-  setAddresses,
-  editingAddress,
-  setEditingAddress,
   form,
-  setForm,
   handleChange,
+  handleZipBlur,
+  isLoading,
+  isDisabled,
+  setIsDisabled,
 }) => {
-  const handleSaveAddress = () => {
-    if (editingAddress !== null) {
-      setAddresses(
-        addresses.map((addr) =>
-          addr.id === editingAddress ? { ...form, id: editingAddress } : addr
-        )
-      );
-      toast.success("Endereço atualizado com sucesso!", { autoClose: 2000 });
-    } else {
-      setAddresses([...addresses, { ...form, id: Date.now() }]);
-      toast.success("Endereço adicionado com sucesso!", { autoClose: 2000 });
-    }
-    onClose();
-  };
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [isDisabled, setIsDisabled] = useState(false);
-
-  const handleDeleteAddress = (id) => {
-    setAddresses(addresses.filter((addr) => addr.id !== id));
-    toast.success("Endereço excluído com sucesso!", { autoClose: 2000 });
-  };
-
-  const handleZipBlur = async () => {
-    let cleanZip = form.zip.replace("-", "");
-
-    if (cleanZip.length === 8) {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `https://brasilapi.com.br/api/cep/v1/${cleanZip}`
-        );
-        const data = await response.json();
-
-        if (!data.errors) {
-          setForm({
-            ...form,
-            address: data.street || "",
-            neighborhood: data.neighborhood || "",
-            city: data.city || "",
-            state: data.state || "",
-          });
-        } else {
-          toast.error("CEP não encontrado!", { autoClose: 2000 });
-        }
-      } catch (error) {
-        console.error("Erro ao buscar CEP:", error);
-        toast.error("Erro ao buscar CEP. Tente novamente.", { autoClose: 2000 });
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-
   return (
     <Modal
       isOpen={isOpen}
@@ -79,19 +24,19 @@ const ModalAddress = ({
       className="bg-white p-4 mx-2 rounded-lg shadow-lg overflow-y-auto md:max-w-lg md:p-8"
       style={{
         content: {
-          maxHeight: "90vh",
-          margin: "auto", 
-          position: "relative", 
+          maxHeight: "90vh", // Altura máxima do modal
+          margin: "auto", // Centraliza o modal
+          position: "relative", // Para posicionar o botão de fechar
         },
         overlay: {
-          backgroundColor: "rgba(0, 0, 0, 0.5)", 
+          backgroundColor: "rgba(0, 0, 0, 0.5)", // Overlay escuro
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         },
       }}
     >
-
+      {/* Botão de fechar ("X") */}
       <button
         onClick={onClose}
         className="absolute top-2 right-2 p-2 text-gray-600 hover:text-gray-900"
@@ -100,10 +45,10 @@ const ModalAddress = ({
       </button>
 
       <div className="flex flex-col">
-
+        {/* ToastContainer para exibir as notificações */}
         <ToastContainer />
 
-        <h3 className="text-lg font-medium mb-4">Adicionar Novo Endereço</h3>
+        <h3 className="text-lg font-medium mb-4">Editar Endereço</h3>
 
         <div className="flex flex-col gap-3">
           <div className="w-full">
@@ -198,6 +143,7 @@ const ModalAddress = ({
             Instruções adicionais (Observações sobre o local)
           </label>
 
+          {/* Checkbox Personalizado */}
           <div className="flex items-center mb-3">
             <button
               onClick={() => setIsDisabled(!isDisabled)}
@@ -253,10 +199,10 @@ const ModalAddress = ({
 
         <div className="flex justify-start space-x-2 mt-4 mb-16">
           <button
-            onClick={handleSaveAddress}
+            onClick={onSave}
             className="px-4 py-2 bg-orange-600 text-white rounded"
           >
-            Salvar Endereço
+            Salvar Alterações
           </button>
           <button onClick={onClose} className="px-4 py-2 border rounded">
             Cancelar
@@ -267,4 +213,4 @@ const ModalAddress = ({
   );
 };
 
-export default ModalAddress;
+export default EditAddressModal;

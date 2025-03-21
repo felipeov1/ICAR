@@ -23,12 +23,7 @@ const HeaderMain = ({ className }) => {
     };
   }, []);
 
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour >= 5 && hour < 12) return "Bom dia";
-    if (hour >= 12 && hour < 18) return "Boa tarde";
-    return "Boa noite";
-  };
+ 
 
   const buttons = [
     { icon: <HomeIcon className="w-6 h-6" />, label: "Início", path: "/app" },
@@ -55,19 +50,13 @@ const HeaderMain = ({ className }) => {
       }`}
       style={{ flexWrap: "wrap", alignItems: "start" }}
     >
-      <div className="flex-[5%] flex flex-col text-sm lg:hidden ">
-        <span>{getGreeting()},</span>
-        <span>Felipe Ferreira</span>
-        
+      <div className="flex-[5%] flex flex-col text-sm lg:hidden  ">
+        <a href="/app">
+          <img src={logoIcar} alt="Logo do Icar" width={100} />
+        </a>
       </div>
-
       <div className="lg:flex-[90%] lg:flex lg:justify-between lg:items-center">
-        <div className="lg:flex-1 lg:flex lg:justify-start">
-          <a href="/app">
-            <img src={logoIcar} alt="Logo do Icar" width={100} />
-          </a>
-        </div>
-
+     
         {/* Navegação para dispositivos não móveis */}
         <div className="hidden lg:flex items-center space-x-4">
           {buttons.map((button, index) => (

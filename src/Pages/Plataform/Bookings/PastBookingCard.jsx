@@ -34,6 +34,10 @@ const PastBookingCard = ({ service, onCancel, onRate }) => {
           </h2>
           <div className="mt-4 space-y-2">
             <div>
+              <span className="text-gray-600">Empresa: </span>
+              <span className="font-medium">{service.company}</span>
+            </div>
+            <div>
               <span className="text-gray-600">Modalidade: </span>
               <span className="font-medium">{service.modality}</span>
             </div>
@@ -64,7 +68,9 @@ const PastBookingCard = ({ service, onCancel, onRate }) => {
           </div>
         </div>
 
-        <div className="mt-4 sm:mt-0 sm:ml-4">
+        <div className="mt-4 sm:mt-0 sm:ml-4 flex gap-2">
+          {" "}
+          {/* Adicionado flex e gap para espaçamento */}
           {service.status === "canceled" ? (
             <button
               onClick={handleContactSupport}
@@ -73,12 +79,23 @@ const PastBookingCard = ({ service, onCancel, onRate }) => {
               Falar com Suporte
             </button>
           ) : (
-            <button
-              onClick={openModal}
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold text-sm sm:text-md py-2 px-2 rounded whitespace-nowrap"
-            >
-              Avaliar Serviço
-            </button>
+            <>
+              {/* Botão "Avaliar Serviço" */}
+              <button
+                onClick={openModal}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold text-sm sm:text-md py-2 px-2 rounded whitespace-nowrap"
+              >
+                Avaliar Serviço
+              </button>
+
+              {/* Botão "Refazer Serviço" */}
+              <button
+                // onClick={handleRefazerServico} // Função para refazer o serviço
+                className="bg-green-500 hover:bg-green-700 text-white font-bold text-sm sm:text-md py-2 px-2 rounded whitespace-nowrap"
+              >
+                Refazer Serviço
+              </button>
+            </>
           )}
         </div>
       </section>

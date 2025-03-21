@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { useSwipeable } from "react-swipeable"; // Importe o hook useSwipeable
 import adsBanner from "../../../../public/assets/images/logo/icar-logo-blue.jpg";
 
 const Ads = () => {
@@ -32,6 +33,14 @@ const Ads = () => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Configuração do swipe
+  const handlers = useSwipeable({
+    onSwipedLeft: () => handleNext(), // Passa para a próxima imagem ao deslizar para a esquerda
+    onSwipedRight: () => handlePrevious(), // Volta para a imagem anterior ao deslizar para a direita
+    preventDefaultTouchmoveEvent: true, // Evita comportamento padrão do touch
+    trackMouse: true, // Permite usar o mouse para simular o swipe
+  });
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -52,13 +61,12 @@ const Ads = () => {
 
   return (
     <section className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 lg:mt-10">
-      <h2 className="text-lg font-bold mb-2 pl-2">Destaques</h2>
+      <p className="mb-2">Destaques</p>
 
-      <div className="relative">
+      <div className="relative" {...handlers}> {/* Adicione os handlers aqui */}
         {/* Link na imagem atual */}
         <a
           href={images[currentIndex].link}
-          
           rel="noopener noreferrer"
         >
           <img
@@ -85,7 +93,7 @@ const Ads = () => {
         </button>
 
         {/* Indicadores de progresso */}
-        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2 lg:w-80 w-3/4 ">
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2 lg:w-80 w-3/4">
           {images.map((_, index) => (
             <div
               key={index}

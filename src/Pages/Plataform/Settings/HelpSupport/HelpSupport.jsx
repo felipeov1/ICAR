@@ -52,15 +52,14 @@ const HelpSupport = () => {
   ];
 
   return (
-    <div className=" flex flex-col items-center justify-center bg-gray-50 pb-20 ">
-      <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-8">
+    <div className=" flex flex-col items-center justify-center bg-gray-50 ">
+      <div className="w-full max-w-4xl bg-white rounded-lg  p-8">
         {/* Botão de Voltar */}
         <Link
           to="/app/minha-conta"
           className="flex items-center text-blue-500 hover:text-blue-700 mb-8"
         >
           <FaArrowLeft className="mr-2" />
-          Voltar
         </Link>
 
         {/* Título da Página */}

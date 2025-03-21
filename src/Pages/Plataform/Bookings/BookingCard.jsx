@@ -101,6 +101,10 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
           </h2>
           <div className="mt-4 space-y-2">
             <div>
+              <span className="text-gray-600">Empresa: </span>
+              <span className="font-medium">{service.company}</span>
+            </div>
+            <div>
               <span className="text-gray-600">Modalidade: </span>
               <span className="font-medium">{service.modality}</span>
             </div>

@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
@@ -18,17 +18,21 @@ function App() {
 function AppContent() {
   const location = useLocation();
   const isAppRoute = location.pathname.startsWith("/app");
+  const isAuthPage = ["/entrar", "/criar-conta"].includes(location.pathname); 
+
+  useEffect(() => {
+    window.scrollTo(0, 0); 
+  }, [location.pathname]); 
 
   return (
     <div className="min-h-screen">
-
-      {!isAppRoute && <Navbar />}
+      {!isAppRoute && !isAuthPage && <Navbar />} 
 
       <Suspense fallback={<Loading />}>
         <AppRoutes /> 
       </Suspense>
 
-      {!isAppRoute && (
+      {!isAppRoute && !isAuthPage && ( 
         <>
           <Footer />
           <CookieConsent />

@@ -14,6 +14,7 @@ const Bookings = () => {
   const services = [
     {
       id: 1,
+      company: "Lava Icar",
       service_name: "Lavagem completa",
       modality: "Domiciliar",
       vehicle_type: "Hatch",
@@ -24,6 +25,7 @@ const Bookings = () => {
     },
     {
       id: 2,
+      company: "Lava Icar",
       service_name: "Higienização interna",
       modality: "Local",
       vehicle_type: "Sedan",
@@ -34,6 +36,7 @@ const Bookings = () => {
     },
     {
       id: 3,
+      company: "Lava Icar",
       service_name: "Lavagem de motor",
       modality: "Local",
       vehicle_type: "SUV",
@@ -137,7 +140,7 @@ const Bookings = () => {
         </button>
       </div>
 
-      <div className="mt-4 h-[40rem] overflow-y-auto p-2 lg:h-[50rem] lg:p-4">
+      <div className="mt-4 overflow-y-auto p-2 lg:h-[50rem] lg:p-4">
         <h2 className="text-md font-bold mb-2 lg:text-xl">
           {activeTab === "agendados" ? "Agendamentos Ativos" : "Agendamentos Finalizados ou Cancelados"}
         </h2>
