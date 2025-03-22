@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaRedo, FaCommentDots, FaHeadset } from "react-icons/fa";
 import { toast } from "react-toastify";
 
 const PastBookingCard = ({ service, onCancel, onRate }) => {
@@ -68,31 +68,31 @@ const PastBookingCard = ({ service, onCancel, onRate }) => {
           </div>
         </div>
 
-        <div className="mt-4 sm:mt-0 sm:ml-4 flex gap-2">
-          {" "}
-          {/* Adicionado flex e gap para espaçamento */}
+        <div className="mt-4 md:mt-0 md:ml-4 flex flex-col gap-2">
           {service.status === "canceled" ? (
             <button
               onClick={handleContactSupport}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold text-sm sm:text-md py-2 px-2 rounded whitespace-nowrap"
+              className="bg-red-500 hover:bg-red-700 text-white font-bold text-sm sm:text-md py-2 px-4 rounded flex items-center justify-center gap-2 transition duration-300"
             >
+              <FaHeadset />
               Falar com Suporte
             </button>
           ) : (
             <>
-              {/* Botão "Avaliar Serviço" */}
               <button
                 onClick={openModal}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold text-sm sm:text-md py-2 px-2 rounded whitespace-nowrap"
+                disabled={service.rated} // Desabilita se já foi avaliado
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold text-sm sm:text-md py-2 px-4 rounded flex items-center justify-center gap-2 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                <FaCommentDots />
                 Avaliar Serviço
               </button>
 
-              {/* Botão "Refazer Serviço" */}
               <button
-                // onClick={handleRefazerServico} // Função para refazer o serviço
-                className="bg-green-500 hover:bg-green-700 text-white font-bold text-sm sm:text-md py-2 px-2 rounded whitespace-nowrap"
+                // onClick={handleRefazerServico} 
+                className="bg-green-500 hover:bg-green-700 text-white font-bold text-sm sm:text-md py-2 px-4 rounded flex items-center justify-center gap-2 transition duration-300"
               >
+                <FaRedo />
                 Refazer Serviço
               </button>
             </>
@@ -114,7 +114,7 @@ const PastBookingCard = ({ service, onCancel, onRate }) => {
                     onClick={() => setRating(index + 1)}
                     className={`text-2xl ${
                       index + 1 <= rating ? "text-yellow-500" : "text-gray-300"
-                    }`}
+                    } hover:text-yellow-500 transition duration-300`}
                   >
                     <FaStar />
                   </button>
@@ -163,6 +163,7 @@ PastBookingCard.propTypes = {
     modality: PropTypes.string.isRequired,
     payment_method: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
+    rated: PropTypes.bool, // Adicionado para controlar se o serviço já foi avaliado
   }).isRequired,
   onCancel: PropTypes.func.isRequired,
   onRate: PropTypes.func.isRequired,

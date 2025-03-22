@@ -23,8 +23,6 @@ const HeaderMain = ({ className }) => {
     };
   }, []);
 
- 
-
   const buttons = [
     { icon: <HomeIcon className="w-6 h-6" />, label: "Início", path: "/app" },
     {
@@ -50,20 +48,29 @@ const HeaderMain = ({ className }) => {
       }`}
       style={{ flexWrap: "wrap", alignItems: "start" }}
     >
-      <div className="flex-[5%] flex flex-col text-sm lg:hidden  ">
+      {/* Logo (visível apenas em dispositivos móveis) */}
+      <div className="flex-[5%] flex flex-col text-sm lg:hidden">
         <a href="/app">
           <img src={logoIcar} alt="Logo do Icar" width={100} />
         </a>
       </div>
+
+      {/* Conteúdo do cabeçalho para dispositivos não móveis */}
       <div className="lg:flex-[90%] lg:flex lg:justify-between lg:items-center">
-     
+        {/* Logo (visível apenas em dispositivos não móveis) */}
+        <div className="hidden lg:flex lg:items-center lg:flex-[20%]">
+          <a href="/app">
+            <img src={logoIcar} alt="Logo do Icar" width={120} />
+          </a>
+        </div>
+
         {/* Navegação para dispositivos não móveis */}
-        <div className="hidden lg:flex items-center space-x-4">
+        <div className="hidden lg:flex lg:items-center lg:flex-[80%] lg:justify-end lg:space-x-8">
           {buttons.map((button, index) => (
             <a
               key={index}
               href={button.path}
-              className={`flex items-center space-x-2 hover:text-orange-800 ${
+              className={`flex items-center space-x-2 hover:text-orange-800 transition-colors duration-200 ${
                 currentPath === button.path ? "text-orange-500 font-bold" : ""
               }`}
             >

@@ -3,13 +3,32 @@ import { toast } from "react-toastify";
 import BookingCard from "./BookingCard";
 import PastBookingCard from "./PastBookingCard";
 
-
 const Bookings = () => {
   const [activeTab, setActiveTab] = useState("agendados");
   const ITEMS_PER_PAGE = 3;
   const [visibleItems, setVisibleItems] = useState(ITEMS_PER_PAGE);
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false); // Estado para verificar se é mobile
   const observerRef = useRef(null);
+
+  // Função para verificar se o dispositivo é móvel
+  const checkIsMobile = () => {
+    return window.innerWidth <= 768; // Consideramos mobile se a largura for <= 768px
+  };
+
+  // Atualiza o estado de isMobile ao carregar e redimensionar a tela
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(checkIsMobile());
+    };
+
+    handleResize(); // Verifica no carregamento inicial
+    window.addEventListener("resize", handleResize); // Verifica ao redimensionar
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const services = [
     {
@@ -35,6 +54,17 @@ const Bookings = () => {
       status: "completed", 
     },
     {
+      id: 5,
+      company: "Lava Icar",
+      service_name: "Higienização interna",
+      modality: "Local",
+      vehicle_type: "Sedan",
+      date_time: "2023-07-10 15:30:00",
+      amount_paid: "80.0",
+      payment_method: "Pix",
+      status: "completed", 
+    },
+    {
       id: 3,
       company: "Lava Icar",
       service_name: "Lavagem de motor",
@@ -49,10 +79,10 @@ const Bookings = () => {
 
   const filteredServices =
     activeTab === "agendados"
-      ? services.filter((s) => s.status === "pending") 
+      ? services.filter((s) => s.status === "pending")
       : services.filter(
           (s) => s.status === "completed" || s.status === "canceled"
-        ); 
+        );
 
   const displayedServices = filteredServices.slice(0, visibleItems);
 
@@ -67,21 +97,18 @@ const Bookings = () => {
   }, [loading, visibleItems, filteredServices.length]);
 
   const handleCancel = (serviceId) => {
-
     toast.success("Agendamento cancelado com sucesso!", {
       autoClose: 2000,
     });
   };
 
   const handleRate = (serviceId, rating, comment) => {
-
     toast.success("Avaliação enviada com sucesso!", {
       autoClose: 1000,
     });
   };
 
   const handleEdit = (serviceId, newDateTime) => {
-
     toast.success("Edição feita com sucesso!", {
       autoClose: 2000,
     });
@@ -140,9 +167,17 @@ const Bookings = () => {
         </button>
       </div>
 
-      <div className="mt-4 overflow-y-auto p-2 lg:h-[50rem] lg:p-4">
+      {/* Ajuste condicional do overflow */}
+      <div
+        className={`mt-4 p-2 lg:p-4 ${
+          isMobile ? "overflow-y-auto" : "overflow-y-hidden"
+        }`}
+        style={{ height: isMobile ? "50rem" : "auto" }} // Altura fixa apenas para mobile
+      >
         <h2 className="text-md font-bold mb-2 lg:text-xl">
-          {activeTab === "agendados" ? "Agendamentos Ativos" : "Agendamentos Finalizados ou Cancelados"}
+          {activeTab === "agendados"
+            ? "Agendamentos Ativos"
+            : "Agendamentos Finalizados ou Cancelados"}
         </h2>
 
         {displayedServices.length > 0 ? (
