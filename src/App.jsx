@@ -2,37 +2,41 @@ import React, { Suspense, useEffect } from "react";
 import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
-import Loading from "./components/layout/loading"; 
+import Loading from "./components/layout/Loading.jsx";
 import CookieConsent from "./Pages/LandingPage/PopUpCookie/index.jsx";
 import BackToTopButton from "./components/layout/BackToTopButton";
-import AppRoutes from "./routes/routes"; 
+import AppRoutes from "./routes/routes";
+import { LoadingProvider, useLoading } from "./context/LoadingContext.jsx";
 
 function App() {
   return (
     <Router>
-      <AppContent />
+      <LoadingProvider>
+        <AppContent />
+      </LoadingProvider>
     </Router>
   );
 }
 
 function AppContent() {
   const location = useLocation();
+  const { loading } = useLoading();
   const isAppRoute = location.pathname.startsWith("/app");
-  const isAuthPage = ["/entrar", "/criar-conta"].includes(location.pathname); 
+  const isAuthPage = ["/entrar", "/criar-conta"].includes(location.pathname);
 
   useEffect(() => {
-    window.scrollTo(0, 0); 
-  }, [location.pathname]); 
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen">
-      {!isAppRoute && !isAuthPage && <Navbar />} 
+      {!isAppRoute && !isAuthPage && <Navbar />}
 
       <Suspense fallback={<Loading />}>
-        <AppRoutes /> 
+        <AppRoutes />
       </Suspense>
 
-      {!isAppRoute && !isAuthPage && ( 
+      {!isAppRoute && !isAuthPage && (
         <>
           <Footer />
           <CookieConsent />

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
-import { FaTimes } from "react-icons/fa"; // Ícone de "X" para fechar
+import { FaTimes } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -10,65 +10,100 @@ const ModalAddress = ({
   isOpen,
   onClose,
   onSave,
-  addresses,
-  setAddresses,
-  editingAddress,
-  setEditingAddress,
-  form,
-  setForm,
-  handleChange,
+  initialData, // Dados iniciais para edição
 }) => {
-  const handleSaveAddress = () => {
-    if (editingAddress !== null) {
-      setAddresses(
-        addresses.map((addr) =>
-          addr.id === editingAddress ? { ...form, id: editingAddress } : addr
-        )
-      );
-      toast.success("Endereço atualizado com sucesso!", { autoClose: 2000 });
-    } else {
-      setAddresses([...addresses, { ...form, id: Date.now() }]);
-      toast.success("Endereço adicionado com sucesso!", { autoClose: 2000 });
-    }
-    onClose();
-  };
+  const [form, setForm] = useState({
+    label: "",
+    address: "",
+    zip: "",
+    state: "",
+    city: "",
+    number: "",
+    complement: "",
+  });
 
   const [isLoading, setIsLoading] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
 
-  const handleDeleteAddress = (id) => {
-    setAddresses(addresses.filter((addr) => addr.id !== id));
-    toast.success("Endereço excluído com sucesso!", { autoClose: 2000 });
+  // Preenche o formulário com os dados iniciais quando o modal é aberto
+  useEffect(() => {
+    if (initialData) {
+      setForm(initialData);
+    } else {
+      setForm({
+        label: "",
+        address: "",
+        zip: "",
+        state: "",
+        city: "",
+        number: "",
+        complement: "",
+      });
+    }
+  }, [initialData]);
+
+  // Função para salvar o endereço
+  const handleSaveAddress = () => {
+    // Validação dos campos obrigatórios
+    if (!form.zip || !form.address || !form.city || !form.state || !form.number) {
+      toast.error("Preencha todos os campos obrigatórios.", { autoClose: 2000 });
+      return;
+    }
+
+    onSave(form); // Passa os dados do formulário para a função onSave
+    onClose(); // Fecha o modal
   };
 
+  // Função para buscar o endereço pelo CEP
   const handleZipBlur = async () => {
-    let cleanZip = form.zip.replace("-", "");
+    const cleanZip = form.zip.replace(/\D/g, ""); // Remove tudo que não for dígito
+    if (cleanZip.length !== 8) {
+      toast.error("CEP deve conter 8 dígitos.", { autoClose: 2000 });
+      return;
+    }
 
-    if (cleanZip.length === 8) {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `https://brasilapi.com.br/api/cep/v1/${cleanZip}`
-        );
-        const data = await response.json();
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `https://brasilapi.com.br/api/cep/v1/${cleanZip}`
+      );
 
-        if (!data.errors) {
-          setForm({
-            ...form,
-            address: data.street || "",
-            neighborhood: data.neighborhood || "",
-            city: data.city || "",
-            state: data.state || "",
-          });
-        } else {
-          toast.error("CEP não encontrado!", { autoClose: 2000 });
-        }
-      } catch (error) {
-        console.error("Erro ao buscar CEP:", error);
-        toast.error("Erro ao buscar CEP. Tente novamente.", { autoClose: 2000 });
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        throw new Error("Erro ao buscar CEP.");
       }
+
+      const data = await response.json();
+
+      if (data.erro) {
+        toast.error("CEP não encontrado!", { autoClose: 2000 });
+      } else {
+        setForm({
+          ...form,
+          address: data.street || "",
+          neighborhood: data.neighborhood || "",
+          city: data.city || "",
+          state: data.state || "",
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao buscar CEP:", error);
+      toast.error("Erro ao buscar CEP. Tente novamente.", { autoClose: 2000 });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Função para formatar o CEP (adicionar traço)
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "zip") {
+      // Formata o CEP (12345-678)
+      const cleanValue = value.replace(/\D/g, ""); // Remove tudo que não for número
+      const formattedValue = cleanValue.replace(/^(\d{5})(\d{0,3})/, "$1-$2"); // Adiciona traço
+      setForm({ ...form, [name]: formattedValue });
+    } else {
+      setForm({ ...form, [name]: value });
     }
   };
 
@@ -80,18 +115,17 @@ const ModalAddress = ({
       style={{
         content: {
           maxHeight: "90vh",
-          margin: "auto", 
-          position: "relative", 
+          margin: "auto",
+          position: "relative",
         },
         overlay: {
-          backgroundColor: "rgba(0, 0, 0, 0.5)", 
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         },
       }}
     >
-
       <button
         onClick={onClose}
         className="absolute top-2 right-2 p-2 text-gray-600 hover:text-gray-900"
@@ -100,10 +134,11 @@ const ModalAddress = ({
       </button>
 
       <div className="flex flex-col">
-
         <ToastContainer />
 
-        <h3 className="text-lg font-medium mb-4">Adicionar Novo Endereço</h3>
+        <h3 className="text-lg font-medium mb-4">
+          {initialData ? "Editar Endereço" : "Adicionar Novo Endereço"}
+        </h3>
 
         <div className="flex flex-col gap-3">
           <div className="w-full">
@@ -125,18 +160,19 @@ const ModalAddress = ({
                 name="zip"
                 value={form.zip}
                 onChange={handleChange}
+                onBlur={handleZipBlur}
                 className="p-2 border rounded mb-2 flex-1"
                 maxLength={9}
               />
               <button
                 type="button"
                 onClick={handleZipBlur}
-                disabled={isLoading || form.zip.replace("-", "").length !== 8}
+                disabled={isLoading || form.zip.replace(/\D/g, "").length !== 8}
                 className="p-2 w-32 bg-orange-600 text-white rounded cursor-pointer disabled:bg-orange-300 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
-                    <div className="animate-spin h-full w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                    <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
                   </div>
                 ) : (
                   "Buscar"
@@ -153,8 +189,9 @@ const ModalAddress = ({
               type="text"
               name="city"
               value={form.city}
-              readOnly
-              className="w-full p-2 border rounded mb-2 bg-gray-200"
+              onChange={handleChange}
+              className="w-full p-2 border rounded mb-2"
+              placeholder="Ex: São Paulo"
             />
           </div>
           <div className="w-full md:w-1/2">
@@ -163,8 +200,9 @@ const ModalAddress = ({
               type="text"
               name="state"
               value={form.state}
-              readOnly
-              className="w-full p-2 border rounded mb-2 bg-gray-200"
+              onChange={handleChange}
+              className="w-full p-2 border rounded mb-2"
+              placeholder="Ex: SP"
             />
           </div>
         </div>
@@ -189,6 +227,7 @@ const ModalAddress = ({
               onChange={handleChange}
               className="w-full p-2 border rounded mb-2"
               placeholder="Ex: 123"
+              required
             />
           </div>
         </div>
@@ -232,7 +271,6 @@ const ModalAddress = ({
             </label>
           </div>
 
-          {/* Textarea com Feedback Visual */}
           <div className="relative">
             <textarea
               name="complement"

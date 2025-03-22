@@ -69,7 +69,7 @@ const PastBookingCard = ({ service, onCancel, onRate }) => {
         </div>
 
         <div className="mt-4 md:mt-0 md:ml-4 flex flex-col gap-2">
-          {service.status === "canceled" ? (
+          {service.status === "Cancelado" ? (
             <button
               onClick={handleContactSupport}
               className="bg-red-500 hover:bg-red-700 text-white font-bold text-sm sm:text-md py-2 px-4 rounded flex items-center justify-center gap-2 transition duration-300"

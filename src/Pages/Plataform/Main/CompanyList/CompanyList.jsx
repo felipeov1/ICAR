@@ -206,7 +206,7 @@ const CompanyList = () => {
 
   return (
     <section className="lg:max-w-7xl lg:mx-auto lg:px-4 lg:py-6 p-4 pb-24">
-      {/* Filtros */}
+
       <h2 className="text-lg font-bold mb-4">Empresas</h2>
       <div className="flex flex-row sm:flex-row gap-2 mb-6">
         <select
@@ -220,7 +220,7 @@ const CompanyList = () => {
         </select>
       </div>
 
-      {/* Lista de Empresas */}
+
       <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCompanies.slice(0, visibleCompanies).map((company, index) => (
           <li
@@ -260,7 +260,7 @@ const CompanyList = () => {
         ))}
       </ul>
 
-      {/* Carregar Mais */}
+
       <div
         ref={observerRef}
         className="w-full flex justify-center items-center py-4"

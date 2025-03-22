@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import Modal from "react-modal";
+import { FaTimes } from "react-icons/fa";
 import Calendar from "../components/Calendar";
 
 Modal.setAppElement("#root");
@@ -20,7 +21,6 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
   const [selectedTime, setSelectedTime] = useState(
     service.date_time.split(" ")[1]
   );
-  const [availableTimes, setAvailableTimes] = useState([]);
   const [actionType, setActionType] = useState(null);
 
   const dailyAvailableTimes = {
@@ -94,7 +94,7 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
   return (
     <>
       <section className="w-full flex flex-col md:flex-row justify-between p-6 bg-white shadow-lg border rounded-md mt-4">
-        {/* Informações do Serviço */}
+
         <div className="flex-1">
           <h2 className="text-xl font-bold text-blue-800">
             {service.service_name}
@@ -131,7 +131,6 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
           </div>
         </div>
 
-        {/* Botão de Ação */}
         <div className="mt-4 md:mt-0 flex items-end justify-end">
           <button
             onClick={openModal}
@@ -141,31 +140,33 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
           </button>
         </div>
       </section>
-
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
-        className="bg-white p-6 rounded-lg shadow-lg w-11/12 sm:w-96 relative"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        className="bg-white p-4 mx-2 rounded-lg shadow-lg overflow-y-auto md:max-w-lg md:p-8"
+        style={{
+          content: {
+            maxHeight: "86vh",
+            margin: "auto",
+            position: "relative",
+            top: "5%", 
+            transform: "translateY(-10%)", 
+            paddingBottom: "2rem", 
+          },
+          overlay: {
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "flex-start", 
+            justifyContent: "center",
+            paddingTop: "2rem", 
+          },
+        }}
       >
         <button
           onClick={closeModal}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+          className="absolute top-2 right-2 p-2 text-gray-600 hover:text-gray-900"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
+          <FaTimes className="w-6 h-6" />
         </button>
 
         <h2 className="text-xl font-bold mb-4">Editar Agendamento</h2>
@@ -192,7 +193,7 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
                 (time) => (
                   <button
                     key={time}
-                    className={`px-4 py-2 rounded-xl  border shadow-sm transition duration-200 ease-in-out ${
+                    className={`px-4 py-2 rounded-xl border shadow-sm transition duration-200 ease-in-out ${
                       selectedTime === time
                         ? "bg-[#1e3a8a] text-white"
                         : "bg-gray-200 hover:bg-gray-300"
@@ -207,27 +208,41 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
           </div>
         )}
 
-        <div className="flex relative justify-start space-x-4 mt-6">
+        <div className="flex flex-row md:flex-row   md:space-y-0 md:space-x-4 mt-6">
           <button
             onClick={handleSave}
-            className="bg-blue-800 text-white px-4 py-2 rounded hover:bg-blue-900 transition duration-300"
+            className="px-4 py-2 bg-orange-600 text-white rounded"
           >
             Editar
           </button>
+
           <button
             onClick={handleCancelService}
-            className="bg-slate-200  px-4 py-2 rounded hover:bg-slate-400 transition duration-300"
+            className="px-4 py-2 border rounded"
           >
             Cancelar Serviço
           </button>
         </div>
       </Modal>
 
+      {/* Modal de Aviso */}
       <Modal
         isOpen={isWarningModalOpen}
         onRequestClose={closeWarningModal}
-        className="bg-white p-6 rounded-lg shadow-lg w-11/12 sm:w-96"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        className="bg-white p-4 mx-2 rounded-lg shadow-lg overflow-y-auto md:max-w-lg md:p-8"
+        style={{
+          content: {
+            maxHeight: "90vh",
+            margin: "auto",
+            position: "relative",
+          },
+          overlay: {
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          },
+        }}
       >
         <h2 className="text-xl font-bold mb-4">Aviso</h2>
         <p className="mb-4">
@@ -237,18 +252,31 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
         <div className="flex justify-end">
           <button
             onClick={closeWarningModal}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+            className="px-4 py-2 bg-orange-600 text-white rounded"
           >
             Fechar
           </button>
         </div>
       </Modal>
 
+      {/* Modal de Confirmação */}
       <Modal
         isOpen={isConfirmationModalOpen}
         onRequestClose={closeConfirmationModal}
-        className="bg-white p-6 rounded-lg shadow-lg w-11/12 sm:w-96"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+        className="bg-white p-4 mx-2 rounded-lg shadow-lg overflow-y-auto md:max-w-lg md:p-8"
+        style={{
+          content: {
+            maxHeight: "90vh",
+            margin: "auto",
+            position: "relative",
+          },
+          overlay: {
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          },
+        }}
       >
         <h2 className="text-xl font-bold mb-4">Confirmação</h2>
         <p className="mb-4">
@@ -258,13 +286,13 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
         <div className="flex justify-end space-x-2">
           <button
             onClick={closeConfirmationModal}
-            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition duration-300"
+            className="px-4 py-2 border rounded"
           >
             Cancelar
           </button>
           <button
             onClick={confirmAction}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+            className="px-4 py-2 bg-orange-600 text-white rounded"
           >
             Confirmar
           </button>

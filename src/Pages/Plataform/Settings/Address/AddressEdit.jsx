@@ -3,8 +3,7 @@ import { FaEdit, FaTrash, FaPlus, FaArrowLeft } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import AddAddressModal from "../../components/ModalAddress"; 
-import EditAddressModal from "../../components/EditAddressModal"; 
+import ModalAddress from "../../components/ModalAddress"; // Componente unificado
 
 const AddressEdit = () => {
   const [isDisabled, setIsDisabled] = useState(false);
@@ -19,61 +18,38 @@ const AddressEdit = () => {
       city: "Londrina",
     },
   ]);
-  const [addModalIsOpen, setAddModalIsOpen] = useState(false); // Estado para o modal de adicionar
-  const [editModalIsOpen, setEditModalIsOpen] = useState(false); // Estado para o modal de editar
-  const [editingAddress, setEditingAddress] = useState(null);
-  const [form, setForm] = useState({
-    label: "",
-    address: "",
-    zip: "",
-    state: "",
-    city: "",
-  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingAddress, setEditingAddress] = useState(null); 
 
   const openAddModal = () => {
-    setForm({
-      label: "",
-      address: "",
-      zip: "",
-      state: "",
-      city: "",
-    });
-    setAddModalIsOpen(true);
+    setEditingAddress(null); 
+    setIsModalOpen(true);
   };
 
   const openEditModal = (address) => {
-    setEditingAddress(address.id);
-    setForm(address);
-    setEditModalIsOpen(true);
+    setEditingAddress(address); 
+    setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setAddModalIsOpen(false);
-    setEditModalIsOpen(false);
+    setIsModalOpen(false);
   };
 
-  const handleChange = (e) => {
-    let { name, value } = e.target;
-
-    if (name === "zip") {
-      value = value.replace(/\D/g, ""); // Remove tudo que não for número
-      if (value.length > 8) value = value.slice(0, 8); // Limita a 8 dígitos
-      if (value.length > 5) value = value.replace(/^(\d{5})(\d{0,3})/, "$1-$2"); // Adiciona traço
+  const handleSave = (formData) => {
+    if (!formData.label || !formData.address || !formData.zip || !formData.city || !formData.state) {
+      toast.error("Preencha todos os campos obrigatórios.", { autoClose: 2000 });
+      return;
     }
 
-    setForm({ ...form, [name]: value });
-  };
-
-  const handleSave = () => {
     if (editingAddress !== null) {
       setAddresses(
         addresses.map((addr) =>
-          addr.id === editingAddress ? { ...form, id: editingAddress } : addr
+          addr.id === editingAddress.id ? { ...formData, id: editingAddress.id } : addr
         )
       );
       toast.success("Endereço atualizado com sucesso!", { autoClose: 2000 });
     } else {
-      setAddresses([...addresses, { ...form, id: Date.now() }]);
+      setAddresses([...addresses, { ...formData, id: Date.now() }]);
       toast.success("Endereço adicionado com sucesso!", { autoClose: 2000 });
     }
     closeModal();
@@ -82,36 +58,6 @@ const AddressEdit = () => {
   const handleDelete = (id) => {
     setAddresses(addresses.filter((addr) => addr.id !== id));
     toast.success("Endereço excluído com sucesso!", { autoClose: 2000 });
-  };
-
-  const handleZipBlur = async () => {
-    const cleanZip = form.zip.replace("-", "");
-    if (cleanZip.length === 8) {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `https://brasilapi.com.br/api/cep/v1/${cleanZip}`
-        );
-        const data = await response.json();
-
-        if (!data.errors) {
-          setForm({
-            ...form,
-            address: data.street || "",
-            neighborhood: data.neighborhood || "",
-            city: data.city || "",
-            state: data.state || "",
-          });
-        } else {
-          toast.error("CEP não encontrado!", { autoClose: 2000 });
-        }
-      } catch (error) {
-        console.error("Erro ao buscar CEP:", error);
-        toast.error("Erro ao buscar CEP. Tente novamente.", { autoClose: 2000 });
-      } finally {
-        setIsLoading(false);
-      }
-    }
   };
 
   return (
@@ -156,30 +102,11 @@ const AddressEdit = () => {
         <FaPlus className="mr-2" /> Adicionar Novo Endereço
       </button>
 
-      {/* Modal de Adicionar */}
-      <AddAddressModal
-        isOpen={addModalIsOpen}
+      <ModalAddress
+        isOpen={isModalOpen}
         onClose={closeModal}
         onSave={handleSave}
-        form={form}
-        handleChange={handleChange}
-        handleZipBlur={handleZipBlur}
-        isLoading={isLoading}
-        isDisabled={isDisabled}
-        setIsDisabled={setIsDisabled}
-      />
-
-      {/* Modal de Editar */}
-      <EditAddressModal
-        isOpen={editModalIsOpen}
-        onClose={closeModal}
-        onSave={handleSave}
-        form={form}
-        handleChange={handleChange}
-        handleZipBlur={handleZipBlur}
-        isLoading={isLoading}
-        isDisabled={isDisabled}
-        setIsDisabled={setIsDisabled}
+        initialData={editingAddress} 
       />
     </div>
   );

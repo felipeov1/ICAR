@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { toast } from "react-toastify";
-import BookingCard from "./BookingCard";
-import PastBookingCard from "./PastBookingCard";
+import BookingCard from "./AppointmentCard";
+import PastBookingCard from "./PastAppointmentCard";
 
 const Bookings = () => {
   const [activeTab, setActiveTab] = useState("agendados");
@@ -11,19 +11,17 @@ const Bookings = () => {
   const [isMobile, setIsMobile] = useState(false); // Estado para verificar se é mobile
   const observerRef = useRef(null);
 
-  // Função para verificar se o dispositivo é móvel
   const checkIsMobile = () => {
-    return window.innerWidth <= 768; // Consideramos mobile se a largura for <= 768px
+    return window.innerWidth <= 768; 
   };
 
-  // Atualiza o estado de isMobile ao carregar e redimensionar a tela
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(checkIsMobile());
     };
 
-    handleResize(); // Verifica no carregamento inicial
-    window.addEventListener("resize", handleResize); // Verifica ao redimensionar
+    handleResize(); 
+    window.addEventListener("resize", handleResize); 
 
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -51,7 +49,7 @@ const Bookings = () => {
       date_time: "2023-07-10 15:30:00",
       amount_paid: "80.0",
       payment_method: "Pix",
-      status: "completed", 
+      status: "Finalizado", 
     },
     {
       id: 5,
@@ -62,7 +60,7 @@ const Bookings = () => {
       date_time: "2023-07-10 15:30:00",
       amount_paid: "80.0",
       payment_method: "Pix",
-      status: "completed", 
+      status: "Finalizado", 
     },
     {
       id: 3,
@@ -73,7 +71,7 @@ const Bookings = () => {
       date_time: "2023-09-20 14:00:00",
       amount_paid: "70.0",
       payment_method: "credit_card",
-      status: "canceled", 
+      status: "Cancelado", 
     },
   ];
 
@@ -81,7 +79,7 @@ const Bookings = () => {
     activeTab === "agendados"
       ? services.filter((s) => s.status === "pending")
       : services.filter(
-          (s) => s.status === "completed" || s.status === "canceled"
+          (s) => s.status === "Finalizado" || s.status === "Cancelado"
         );
 
   const displayedServices = filteredServices.slice(0, visibleItems);
@@ -170,9 +168,9 @@ const Bookings = () => {
       {/* Ajuste condicional do overflow */}
       <div
         className={`mt-4 p-2 lg:p-4 ${
-          isMobile ? "overflow-y-auto" : "overflow-y-hidden"
+          isMobile ? "overflow-y-auto" : "overflow-y-auto"
         }`}
-        style={{ height: isMobile ? "50rem" : "auto" }} // Altura fixa apenas para mobile
+        style={{ maxHeight: isMobile ? "calc(100vh - 200px)" : "none" }} // Altura máxima para mobile
       >
         <h2 className="text-md font-bold mb-2 lg:text-xl">
           {activeTab === "agendados"

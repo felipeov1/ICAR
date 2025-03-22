@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import Modal from "react-modal";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Calendar from "../../../components/Calendar";
-import ModalAddress from "../../../components/ModalAddress";
+import Calendar from "../../components/Calendar";
+import ModalAddress from "../../components/ModalAddress";
 
 Modal.setAppElement("#root");
 
-const BookingSummary = () => {
-  
+const AppointmentSummary = () => {
   const location = useLocation();
   const { selectedService, selectedOption, price } = location.state || {};
   const [selectedDate, setSelectedDate] = useState(null);
@@ -19,9 +18,6 @@ const BookingSummary = () => {
   const [selectedAddress, setSelectedAddress] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalAddressOpen, setIsModalAddressOpen] = useState(false);
-  const [error, setError] = useState("");
-  const [isObservationsDisabled, setIsObservationsDisabled] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [addresses, setAddresses] = useState([
     {
       id: 3,
@@ -40,33 +36,22 @@ const BookingSummary = () => {
       city: "Londrina",
     },
   ]);
-  const [editingAddress, setEditingAddress] = useState(null);
-  const [form, setForm] = useState({
-    label: "",
-    address: "",
-    zip: "",
-    state: "",
-    city: "",
-  });
 
   const navigate = useNavigate();
 
-  // Endereço fixo do lava-rápido
   const lavaRapidoAddress = "Rua do Lava Rápido, 123 - Centro";
 
-  // Observações para atendimento domiciliar
   const domicilioObservations =
     "Para essa modalidade, o lava-rápido escolhido utiliza água do local. Certifique-se de que há disponibilidade de água e energia elétrica no endereço informado.";
 
-  // Simulando horários disponíveis por dia
   const dailyAvailableTimes = {
-    0: ["8:30", "10:20", "13:00", "15:40", "17:00"], // Segunda
-    1: ["8:30", "10:20", "13:00", "15:40", "17:00"], // Terça
-    2: ["8:30", "10:20", "13:00", "15:40"], // Quarta
-    3: ["8:30", "10:20", "13:00", "17:00"], // Quinta
-    4: ["8:30", "10:20", "13:00", "15:40", "17:00"], // Sexta
-    5: ["8:30", "10:20", "13:00", "15:40"], // Sábado
-    6: [], // Domingo (não atende)
+    0: ["8:30", "10:20", "13:00", "15:40", "17:00"],
+    1: ["8:30", "10:20", "13:00", "15:40", "17:00"],
+    2: ["8:30", "10:20", "13:00", "15:40"],
+    3: ["8:30", "10:20", "13:00", "17:00"],
+    4: ["8:30", "10:20", "13:00", "15:40", "17:00"],
+    5: ["8:30", "10:20", "13:00", "15:40"],
+    6: [],
   };
 
   const [currentMonth] = useState(new Date().getMonth());
@@ -80,12 +65,16 @@ const BookingSummary = () => {
 
   const handleNextStep = () => {
     if (!selectedDate || !selectedTime) {
-      setError("Por favor, selecione uma data e um horário.");
+      toast.error("Por favor, selecione uma data e um horário.", {
+        autoClose: 2000,
+      });
       return;
     }
 
     if (selectedOption === "Domiciliar" && !selectedAddress) {
-      setError("Por favor, selecione ou adicione um endereço.");
+      toast.error("Por favor, selecione ou adicione um endereço.", {
+        autoClose: 2000,
+      });
       return;
     }
 
@@ -107,20 +96,7 @@ const BookingSummary = () => {
     });
   };
 
-  const openModalAddress = (address = null) => {
-    if (address) {
-      setEditingAddress(address.id);
-      setForm(address);
-    } else {
-      setEditingAddress(null);
-      setForm({
-        label: "",
-        address: "",
-        zip: "",
-        state: "",
-        city: "",
-      });
-    }
+  const openModalAddress = () => {
     setIsModalAddressOpen(true);
   };
 
@@ -128,67 +104,10 @@ const BookingSummary = () => {
     setIsModalAddressOpen(false);
   };
 
-  const handleChange = (e) => {
-    let { name, value } = e.target;
-
-    if (name === "zip") {
-      value = value.replace(/\D/g, "");
-      if (value.length > 8) value = value.slice(0, 8);
-      if (value.length > 5) value = value.replace(/^(\d{5})(\d{0,3})/, "$1-$2");
-    }
-
-    setForm({ ...form, [name]: value });
-  };
-
-  const handleSaveAddress = () => {
-    if (editingAddress !== null) {
-      setAddresses(
-        addresses.map((addr) =>
-          addr.id === editingAddress ? { ...form, id: editingAddress } : addr
-        )
-      );
-      toast.success("Endereço atualizado com sucesso!", { autoClose: 2000 });
-    } else {
-      setAddresses([...addresses, { ...form, id: Date.now() }]);
-      toast.success("Endereço adicionado com sucesso!", { autoClose: 2000 });
-    }
+  const handleSaveAddress = (formData) => {
+    setAddresses([...addresses, { ...formData, id: Date.now() }]);
+    toast.success("Endereço adicionado com sucesso!", { autoClose: 2000 });
     closeModalAddress();
-  };
-
-  const handleDeleteAddress = (id) => {
-    setAddresses(addresses.filter((addr) => addr.id !== id));
-    toast.success("Endereço excluído com sucesso!", { autoClose: 2000 });
-  };
-
-  const handleZipBlur = async () => {
-    const cleanZip = form.zip.replace("-", "");
-    if (cleanZip.length === 8) {
-      setIsLoading(true);
-      try {
-        const response = await fetch(
-          `https://brasilapi.com.br/api/cep/v1/${cleanZip}`
-        );
-        const data = await response.json();
-
-        if (!data.errors) {
-          setForm({
-            ...form,
-            address: data.street || "",
-            city: data.city || "",
-            state: data.state || "",
-          });
-        } else {
-          toast.error("CEP não encontrado!", { autoClose: 2000 });
-        }
-      } catch (error) {
-        console.error("Erro ao buscar CEP:", error);
-        toast.error("Erro ao buscar CEP. Tente novamente.", {
-          autoClose: 2000,
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    }
   };
 
   return (
@@ -213,7 +132,6 @@ const BookingSummary = () => {
 
         <hr className="border-gray-300 mb-8 mt-6" />
 
-        {/* Dados Selecionados Anteriormente */}
         <div className="mb-8">
           <p className="text-gray-700 text-xl ">
             <strong>Serviço:</strong> {selectedService}
@@ -237,7 +155,6 @@ const BookingSummary = () => {
           )}
         </div>
 
-        {/* Seleção de Data e Horário */}
         <div className="mb-8">
           <h3 className="font-semibold mb-4 text-lg">
             Selecione a data e o horário
@@ -278,7 +195,6 @@ const BookingSummary = () => {
           )}
         </div>
 
-        {/* Seleção de Endereço (apenas para domicílio) */}
         {selectedOption === "Domiciliar" && (
           <div className="mb-8">
             <h3 className="font-semibold mb-4 md:text-lg">Endereço</h3>
@@ -301,7 +217,7 @@ const BookingSummary = () => {
                 </button>
               ))}
               <button
-                onClick={() => setIsModalAddressOpen(true)}
+                onClick={openModalAddress}
                 className="w-full py-2 bg-blue-700 text-white rounded-lg flex justify-center items-center"
               >
                 <FaPlus className="mr-2" /> Adicionar Novo Endereço
@@ -310,25 +226,12 @@ const BookingSummary = () => {
           </div>
         )}
 
-        {/* Modal de Adicionar Endereço */}
         <ModalAddress
           isOpen={isModalAddressOpen}
-          onClose={() => setIsModalAddressOpen(false)}
+          onClose={closeModalAddress}
           onSave={handleSaveAddress}
-          addresses={addresses}
-          setAddresses={setAddresses}
-          editingAddress={editingAddress}
-          setEditingAddress={setEditingAddress}
-          form={form}
-          setForm={setForm}
-          handleChange={handleChange}
-          handleZipBlur={handleZipBlur}
         />
 
-        {/* Mensagem de Erro */}
-        {error && <div className="text-red-600 mb-4 text-sm">{error}</div>}
-
-        {/* Botão de Próximo Passo */}
         <button
           className="bg-[#1e3a8a] fixed bottom-0 left-0 w-full py-3 text-white text-lg md:static md:rounded-lg md:hover:bg-[#1c3a8a] md:transition-colors"
           onClick={handleNextStep}
@@ -337,7 +240,6 @@ const BookingSummary = () => {
         </button>
       </div>
 
-      {/* Modal de Confirmação */}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
@@ -391,4 +293,4 @@ const BookingSummary = () => {
   );
 };
 
-export default BookingSummary;
+export default AppointmentSummary;

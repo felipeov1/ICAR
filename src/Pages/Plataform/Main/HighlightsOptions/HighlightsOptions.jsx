@@ -1,117 +1,40 @@
 import React, { useRef } from "react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { useSwipeable } from "react-swipeable"; // Importe o hook useSwipeable
+import { useSwipeable } from "react-swipeable";
 import carWashImage from "../../../../public/assets/images/logo/icar-logo-blue.jpg";
 
 const HighlightsOptions = () => {
   const optionsRef1 = useRef(null);
-  const optionsRef2 = useRef(null);
-
-  // Função para rolar para a esquerda
-  const scrollLeft = (ref) => {
-    if (ref.current) {
-      ref.current.scrollBy({
-        left: -200, // Quantidade de pixels para rolar
-        behavior: "smooth", // Rolagem suave
-      });
-    }
-  };
-
-  // Função para rolar para a direita
-  const scrollRight = (ref) => {
-    if (ref.current) {
-      ref.current.scrollBy({
-        left: 200, // Quantidade de pixels para rolar
-        behavior: "smooth", // Rolagem suave
-      });
-    }
-  };
-
-  // Configuração do swipe para o primeiro carrossel
-  const handlers1 = useSwipeable({
-    onSwipedLeft: () => scrollRight(optionsRef1), // Rola para a direita ao deslizar para a esquerda
-    onSwipedRight: () => scrollLeft(optionsRef1), // Rola para a esquerda ao deslizar para a direita
-    preventDefaultTouchmoveEvent: true, // Evita comportamento padrão do touch
-    trackMouse: true, // Permite usar o mouse para simular o swipe
-  });
-
-  // Configuração do swipe para o segundo carrossel
-  const handlers2 = useSwipeable({
-    onSwipedLeft: () => scrollRight(optionsRef2), // Rola para a direita ao deslizar para a esquerda
-    onSwipedRight: () => scrollLeft(optionsRef2), // Rola para a esquerda ao deslizar para a direita
-    preventDefaultTouchmoveEvent: true, // Evita comportamento padrão do touch
-    trackMouse: true, // Permite usar o mouse para simular o swipe
-  });
-
-  const nearbyCompanies = [
-    {
-      name: "FastCar",
-      image: carWashImage,
-      link: "/app/empresa",
-    },
-    {
-      name: "Lava Rápido VIP",
-      image: carWashImage,
-      link: "/app/empresa",
-    },
-    {
-      name: "Guará",
-      image: carWashImage,
-      link: "/app/empresa",
-    },
-    {
-      name: "Lava Bem",
-      image: carWashImage,
-      link: "/app/empresa",
-    },
-  ];
 
   const domicilieDeliveryCompanies = [
-    {
-      name: "FastCar",
-      image: carWashImage,
-      link: "/app/empresa",
-    },
-    {
-      name: "Lava Rápido VIP",
-      image: carWashImage,
-      link: "/app/empresa",
-    },
-    {
-      name: "Guará",
-      image: carWashImage,
-      link: "/app/empresa",
-    },
-    {
-      name: "Lava Bem",
-      image: carWashImage,
-      link: "/app/empresa",
-    },
+    { name: "FastCar", image: carWashImage, link: "/app/empresa" },
+    { name: "Lava Rápido VIP", image: carWashImage, link: "/app/empresa" },
+    { name: "Guará", image: carWashImage, link: "/app/empresa" },
+    { name: "Lava Bem", image: carWashImage, link: "/app/empresa" },
   ];
+
+  const handlers = useSwipeable({
+    onSwipedLeft: () => optionsRef1.current.scrollBy({ left: 200, behavior: "smooth" }),
+    onSwipedRight: () => optionsRef1.current.scrollBy({ left: -200, behavior: "smooth" }),
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: false,
+  });
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-      {/* Seção de Lavagem a Domicílio ou Retirada e Entrega */}
-      <p className="mb-2">Lavagem a Domicílio</p> 
-      <div className="relative mb-8">
-        {/* Botões de navegação (visíveis apenas em telas pequenas) */}
-        <button
-          className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-[#ffffff8a] p-2 rounded-full shadow-md z-10 hover:bg-gray-300 transition duration-200 sm:hidden"
-          onClick={() => scrollLeft(optionsRef1)}
-        >
-          <ChevronLeftIcon className="w-6 h-6 text-gray-800" />
-        </button>
 
-        {/* Cards */}
+      <p className="mb-4">Lavagem a Domicílio</p>
+      
+
+      <div className="relative mb-8">
         <div
           ref={optionsRef1}
-          {...handlers1} // Adiciona os handlers de swipe
-          className="flex gap-4 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6"
+          {...handlers}
+          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6"
         >
           {domicilieDeliveryCompanies.map((company, index) => (
             <div
               key={index}
-              className="flex-shrink-0 w-52 h-36 rounded-lg shadow-md relative hover:shadow-lg transition-shadow duration-200 sm:w-full sm:h-48 sm:flex-shrink"
+              className="flex-shrink-0 w-52 h-36 rounded-lg shadow-md relative hover:shadow-lg transition-shadow duration-200 sm:w-full sm:h-48"
             >
               <a href={company.link} rel="noopener noreferrer">
                 <img
@@ -119,7 +42,7 @@ const HighlightsOptions = () => {
                   alt={company.name}
                   className="w-full h-full object-cover rounded-lg"
                 />
-                {/* Nome da empresa (visível apenas em telas maiores) */}
+
                 <div className="hidden sm:block absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 rounded-b-lg">
                   <span className="text-sm font-medium">{company.name}</span>
                 </div>
@@ -127,56 +50,7 @@ const HighlightsOptions = () => {
             </div>
           ))}
         </div>
-
-        {/* Botões de navegação (visíveis apenas em telas pequenas) */}
-        <button
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#ffffff8a] p-2 rounded-full shadow-md z-10 hover:bg-gray-300 transition duration-200 sm:hidden"
-          onClick={() => scrollRight(optionsRef1)}
-        >
-          <ChevronRightIcon className="w-6 h-6 text-gray-800" />
-        </button>
       </div>
-
-      {/* <h2 className="text-lg font-bold mb-4">Pertos de você</h2>
-      <div className="relative mb-6">
-        <button
-          className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-[#ffffff8a] p-2 rounded-full shadow-md z-10 hover:bg-gray-300 transition duration-200 sm:hidden"
-          onClick={() => scrollLeft(optionsRef2)}
-        >
-          <ChevronLeftIcon className="w-6 h-6 text-gray-800" />
-        </button>
-
-        <div
-          ref={optionsRef2}
-          {...handlers2} 
-          className="flex gap-4 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 sm:gap-6"
-        >
-          {nearbyCompanies.map((company, index) => (
-            <div
-              key={index}
-              className="flex-shrink-0 w-52 h-36 rounded-lg shadow-md relative hover:shadow-lg transition-shadow duration-200 sm:w-full sm:h-48 sm:flex-shrink"
-            >
-              <a href={company.link} rel="noopener noreferrer">
-                <img
-                  src={company.image}
-                  alt={company.name}
-                  className="w-full h-full object-cover rounded-lg"
-                />
-                <div className="hidden sm:block absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white p-2 rounded-b-lg">
-                  <span className="text-sm font-medium">{company.name}</span>
-                </div>
-              </a>
-            </div>
-          ))}
-        </div>
-
-        <button
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#ffffff8a] p-2 rounded-full shadow-md hover:bg-gray-300 transition duration-200 sm:hidden"
-          onClick={() => scrollRight(optionsRef2)}
-        >
-          <ChevronRightIcon className="w-6 h-6 text-gray-800" />
-        </button> 
-      </div> */}
     </section>
   );
 };

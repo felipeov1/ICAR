@@ -33,12 +33,12 @@ const Ads = () => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Configuração do swipe
+
   const handlers = useSwipeable({
-    onSwipedLeft: () => handleNext(), // Passa para a próxima imagem ao deslizar para a esquerda
-    onSwipedRight: () => handlePrevious(), // Volta para a imagem anterior ao deslizar para a direita
-    preventDefaultTouchmoveEvent: true, // Evita comportamento padrão do touch
-    trackMouse: true, // Permite usar o mouse para simular o swipe
+    onSwipedLeft: () => handleNext(),
+    onSwipedRight: () => handlePrevious(), 
+    preventDefaultTouchmoveEvent: true, 
+    trackMouse: true,
   });
 
   useEffect(() => {
@@ -63,8 +63,8 @@ const Ads = () => {
     <section className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 lg:mt-10">
       <p className="mb-2">Destaques</p>
 
-      <div className="relative" {...handlers}> {/* Adicione os handlers aqui */}
-        {/* Link na imagem atual */}
+      <div className="relative" {...handlers}> 
+
         <a
           href={images[currentIndex].link}
           rel="noopener noreferrer"
@@ -76,7 +76,7 @@ const Ads = () => {
           />
         </a>
 
-        {/* Botão de navegação para a esquerda */}
+
         <button
           className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-[#ffffff8a] p-2 rounded-full shadow-md hover:bg-gray-300"
           onClick={handlePrevious}
@@ -84,7 +84,7 @@ const Ads = () => {
           <ChevronLeftIcon className="w-6 h-6 text-gray-800" />
         </button>
 
-        {/* Botão de navegação para a direita */}
+
         <button
           className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-[#ffffff8a] p-2 rounded-full shadow-md hover:bg-gray-300"
           onClick={handleNext}
@@ -92,7 +92,7 @@ const Ads = () => {
           <ChevronRightIcon className="w-6 h-6 text-gray-800" />
         </button>
 
-        {/* Indicadores de progresso */}
+
         <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2 lg:w-80 w-3/4">
           {images.map((_, index) => (
             <div
