@@ -9,27 +9,22 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
-  // Rola para o topo ao carregar a página
   useEffect(() => {
-    window.scrollTo(0, 0); // Sempre começa no topo ao recarregar
+    window.scrollTo(0, 0); 
   }, []);
 
-  // Rola até a seção após o redirecionamento
   useEffect(() => {
-    if (location.state?.scrollTo) {
-      const section = document.querySelector(location.state.scrollTo);
-      if (section) {
-        const offset = -100; // Ajuste o offset conforme necessário
-        const topPosition =
-          section.getBoundingClientRect().top + window.scrollY + offset;
-
-        window.scrollTo({
-          top: topPosition,
-          behavior: "smooth",
-        });
-      }
+    if (window.location.hash) {
+      setTimeout(() => {
+        const section = document.querySelector(window.location.hash);
+        if (section) {
+          const offset = -100;
+          const topPosition = section.getBoundingClientRect().top + window.scrollY + offset;
+          window.scrollTo({ top: topPosition, behavior: "smooth" });
+        }
+      }, 100); 
     }
-  }, [location.state]);
+  }, [location]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -75,7 +70,7 @@ const Navbar = () => {
                 href="/entrar"
                 className="px-4 py-2 bg-orange-600 text-white font-semibold rounded hover:bg-orange-700"
               >
-                Agendar
+                Entrar
               </a>
             </div>
 
@@ -88,11 +83,6 @@ const Navbar = () => {
               <NavLink href="#funcionalidades">
                 <span className="text-white hover:text-[#e6e6e644]">
                   Funcionalidades
-                </span>
-              </NavLink>
-              <NavLink href="#depoimentos">
-                <span className="text-white hover:text-[#e6e6e644]">
-                  Depoimentos
                 </span>
               </NavLink>
               <NavLink href="#duvidas">
@@ -165,14 +155,6 @@ const Navbar = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Funcionalidades
-              </span>
-            </NavLink>
-            <NavLink href="#depoimentos">
-              <span
-                className="block text-xl text-white hover:text-[#e6e6e644]"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Depoimentos
               </span>
             </NavLink>
             <NavLink href="#duvidas">

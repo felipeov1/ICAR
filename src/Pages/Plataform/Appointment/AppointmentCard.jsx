@@ -140,10 +140,11 @@ const BookingCard = ({ service, onCancel, onEdit }) => {
           </button>
         </div>
       </section>
+
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
-        className="bg-white p-4 mx-2 rounded-lg shadow-lg overflow-y-auto md:max-w-lg md:p-8"
+        className="bg-white p-4 mx-2 rounded-lg shadow-lg overflow-y-auto md:w-1/3 md:p-8"
         style={{
           content: {
             maxHeight: "86vh",

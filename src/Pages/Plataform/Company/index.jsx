@@ -8,7 +8,7 @@ import Footer from "../Main/Footer/Footer";
 const services = [
   { id: 1, name: "Lavagem Completa", locationType: "lava-rapido" },
   { id: 2, name: "Polimento", locationType: "domicilio" },
-  { id: 3, name: "Higienização", locationType: "lava-rapido" },
+  { id: 3, name: "Higienização", locationType: "domicilio" },
 ];
 
 const App = () => {

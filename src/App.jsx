@@ -20,7 +20,6 @@ function App() {
 
 function AppContent() {
   const location = useLocation();
-  const { loading } = useLoading();
   const isAppRoute = location.pathname.startsWith("/app");
   const isAuthPage = ["/entrar", "/criar-conta"].includes(location.pathname);
 
@@ -30,13 +29,14 @@ function AppContent() {
 
   return (
     <div className="min-h-screen">
-      {!isAppRoute && !isAuthPage && <Navbar />}
+
+      {!isAppRoute && <Navbar />}
 
       <Suspense fallback={<Loading />}>
         <AppRoutes />
       </Suspense>
 
-      {!isAppRoute && !isAuthPage && (
+      {!isAuthPage && !isAppRoute && (
         <>
           <Footer />
           <CookieConsent />

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 import logo from "../../../public/assets/images/logo/icar-logo-transparent.png";
 
 const Footer = () => {
@@ -84,14 +84,6 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Links Úteis</h4>
             <ul className="text-gray-400">
-              <li className="mb-2">
-                <a href="#" className="hover:text-white"></a>
-              </li>
-              <li className="mb-2">
-                <a href="#" className="hover:text-white">
-                  Serviços
-                </a>
-              </li>
               <li className="mb-2">
                 <a href="/nossas-politicas" className="hover:text-white">
                   Termos de Uso

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { CirclePlay } from "lucide-react";
@@ -7,6 +8,12 @@ import HeroImage from "../../../../public/assets/images/art/banner-main.png";
 const Hero = () => {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
+  const navigate = useNavigate();
+
+  const handleJoin = () => {
+    navigate("/entrar");
+  };
+  
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 888);
@@ -47,7 +54,10 @@ const Hero = () => {
             forma prática e rápida!
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors">
+            <button
+              onClick={handleJoin}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors"
+            >
               Agendar Serviço
             </button>
             <button className="bg-transparent text-black px-6 py-3 rounded-lg text-lg font-semibold hover:bg-orange-600 hover:text-white transition-colors flex justify-center sm:justify-start items-center group">

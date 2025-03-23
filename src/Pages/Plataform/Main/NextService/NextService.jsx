@@ -4,11 +4,12 @@ const NextService = () => {
   const services = [
     {
       id: 1,
+      company: "Lava Icar",
       service_name: "Lavagem completa",
       modality: "Domiciliar",
       vehicle_type: "Hatch",
-      date_time: "2025-11-11 11:00:00",
-      amount_paid: "50.0",
+      date_time: "01/01/2005 11:00:00",
+      amount_paid: 50,
       payment_method: "Cartão de Crédito",
       status: "pending", 
     },
@@ -24,6 +25,10 @@ const NextService = () => {
       {/* Verifica se há serviços */}
       {hasServices ? (
         <div className="space-y-2">
+          <div>
+            <span className="text-gray-600">Serviço: </span>
+            <span className="font-medium">{services[0].company}</span>
+          </div>
           <div>
             <span className="text-gray-600">Serviço: </span>
             <span className="font-medium">{services[0].service_name}</span>
@@ -42,8 +47,8 @@ const NextService = () => {
           </div>
           <div>
             <span className="text-gray-600">Valor: </span>
-            <span className="font-medium">R${services[0].amount_paid}</span>
-          </div>
+            R${services[0]?.amount_paid.toFixed(2).replace(".", ",")}
+            </div>
           <div>
             <span className="text-gray-600">Método de Pagamento: </span>
             <span className="font-medium">{services[0].payment_method}</span>

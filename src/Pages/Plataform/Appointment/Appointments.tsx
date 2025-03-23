@@ -8,11 +8,11 @@ const Bookings = () => {
   const ITEMS_PER_PAGE = 3;
   const [visibleItems, setVisibleItems] = useState(ITEMS_PER_PAGE);
   const [loading, setLoading] = useState(false);
-  const [isMobile, setIsMobile] = useState(false); // Estado para verificar se é mobile
+  const [isMobile, setIsMobile] = useState(false);
   const observerRef = useRef(null);
 
   const checkIsMobile = () => {
-    return window.innerWidth <= 768; 
+    return window.innerWidth <= 768;
   };
 
   useEffect(() => {
@@ -20,8 +20,8 @@ const Bookings = () => {
       setIsMobile(checkIsMobile());
     };
 
-    handleResize(); 
-    window.addEventListener("resize", handleResize); 
+    handleResize();
+    window.addEventListener("resize", handleResize);
 
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -38,7 +38,62 @@ const Bookings = () => {
       date_time: "2025-11-11 11:00:00",
       amount_paid: "50.0",
       payment_method: "Cartão de Crédito",
-      status: "pending", 
+      status: "pending",
+    },
+    {
+      id: 12,
+      company: "Lava Icar",
+      service_name: "Lavagem completa",
+      modality: "Domiciliar",
+      vehicle_type: "Hatch",
+      date_time: "2025-11-11 11:00:00",
+      amount_paid: "50.0",
+      payment_method: "Cartão de Crédito",
+      status: "pending",
+    },
+    {
+      id: 1552,
+      company: "Lava Icar",
+      service_name: "Lavagem completa",
+      modality: "Domiciliar",
+      vehicle_type: "Hatch",
+      date_time: "2025-11-11 11:00:00",
+      amount_paid: "50.0",
+      payment_method: "Cartão de Crédito",
+      status: "pending",
+    },
+    {
+      id: 1245,
+      company: "Lava Icar",
+      service_name: "Lavagem completa",
+      modality: "Domiciliar",
+      vehicle_type: "Hatch",
+      date_time: "2025-11-11 11:00:00",
+      amount_paid: "50.0",
+      payment_method: "Cartão de Crédito",
+      status: "pending",
+    },
+    {
+      id: 123,
+      company: "Lava Icar",
+      service_name: "Lavagem completa",
+      modality: "Domiciliar",
+      vehicle_type: "Hatch",
+      date_time: "2025-11-11 11:00:00",
+      amount_paid: "50.0",
+      payment_method: "Cartão de Crédito",
+      status: "pending",
+    },
+    {
+      id: 10,
+      company: "Lava Icar",
+      service_name: "Lavagem completa",
+      modality: "Domiciliar",
+      vehicle_type: "Hatch",
+      date_time: "2025-11-11 11:00:00",
+      amount_paid: "50.0",
+      payment_method: "Cartão de Crédito",
+      status: "pending",
     },
     {
       id: 2,
@@ -49,7 +104,7 @@ const Bookings = () => {
       date_time: "2023-07-10 15:30:00",
       amount_paid: "80.0",
       payment_method: "Pix",
-      status: "Finalizado", 
+      status: "Finalizado",
     },
     {
       id: 5,
@@ -60,7 +115,7 @@ const Bookings = () => {
       date_time: "2023-07-10 15:30:00",
       amount_paid: "80.0",
       payment_method: "Pix",
-      status: "Finalizado", 
+      status: "Finalizado",
     },
     {
       id: 3,
@@ -71,7 +126,40 @@ const Bookings = () => {
       date_time: "2023-09-20 14:00:00",
       amount_paid: "70.0",
       payment_method: "credit_card",
-      status: "Cancelado", 
+      status: "Cancelado",
+    },
+    {
+      id: 324,
+      company: "Lava Icar",
+      service_name: "Lavagem de motor",
+      modality: "Local",
+      vehicle_type: "SUV",
+      date_time: "2023-09-20 14:00:00",
+      amount_paid: "70.0",
+      payment_method: "credit_card",
+      status: "Cancelado",
+    },
+    {
+      id: 3344,
+      company: "Lava Icar",
+      service_name: "Lavagem de motor",
+      modality: "Local",
+      vehicle_type: "SUV",
+      date_time: "2023-09-20 14:00:00",
+      amount_paid: "70.0",
+      payment_method: "credit_card",
+      status: "Cancelado",
+    },
+    {
+      id: 33,
+      company: "Lava Icar",
+      service_name: "Lavagem de motor",
+      modality: "Local",
+      vehicle_type: "SUV",
+      date_time: "2023-09-20 14:00:00",
+      amount_paid: "70.0",
+      payment_method: "credit_card",
+      status: "Cancelado",
     },
   ];
 
@@ -166,51 +254,43 @@ const Bookings = () => {
       </div>
 
       {/* Ajuste condicional do overflow */}
-      <div
-        className={`mt-4 p-2 lg:p-4 ${
-          isMobile ? "overflow-y-auto" : "overflow-y-auto"
-        }`}
-        style={{ maxHeight: isMobile ? "calc(100vh - 200px)" : "none" }} // Altura máxima para mobile
-      >
-        <h2 className="text-md font-bold mb-2 lg:text-xl">
-          {activeTab === "agendados"
-            ? "Agendamentos Ativos"
-            : "Agendamentos Finalizados ou Cancelados"}
-        </h2>
+      <div className="mt-4 p-2 lg:p-4">
+  <h2 className="text-md font-bold mb-2 lg:text-xl">
+    {activeTab === "agendados"
+      ? "Agendamentos Ativos"
+      : "Agendamentos Finalizados ou Cancelados"}
+  </h2>
 
-        {displayedServices.length > 0 ? (
-          <div className="space-y-4">
-            {displayedServices.map((service) =>
-              activeTab === "agendados" ? (
-                <BookingCard
-                  key={service.id}
-                  service={service}
-                  onCancel={handleCancel}
-                  onEdit={handleEdit}
-                />
-              ) : (
-                <PastBookingCard
-                  key={service.id}
-                  service={service}
-                  onCancel={handleCancel}
-                  onRate={handleRate}
-                />
-              )
-            )}
-          </div>
+  {displayedServices.length > 0 ? (
+    <div className="space-y-4">
+      {displayedServices.map((service) =>
+        activeTab === "agendados" ? (
+          <BookingCard
+            key={service.id}
+            service={service}
+            onCancel={handleCancel}
+            onEdit={handleEdit}
+          />
         ) : (
-          <p className="text-gray-500">Nenhum serviço encontrado.</p>
-        )}
+          <PastBookingCard
+            key={service.id}
+            service={service}
+            onCancel={handleCancel}
+            onRate={handleRate}
+          />
+        )
+      )}
+    </div>
+  ) : (
+    <p className="text-gray-500">Nenhum serviço encontrado.</p>
+  )}
 
-        <div
-          ref={observerRef}
-          className="w-full flex justify-center items-center py-4"
-        >
-          {loading && (
-            <div className="animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-          )}
-        </div>
-      </div>
+  <div ref={observerRef} className="w-full flex justify-center items-center py-4">
+    {loading && (
+      <div className="animate-spin h-6 w-6 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+    )}
+  </div>
+</div>
     </div>
   );
 };

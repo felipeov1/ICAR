@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import banner from "../../../public/assets/images/art/auth-banner.png";
 import bannerMobile from "../../../public/assets/images/art/auth-banner-mobile.png";
-import logo from "../../../public/assets/images/logo/icar-logo-transparent.png";
 
 function Login() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -21,9 +20,9 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row items-center justify-center">
+    <div className="h-full flex  flex-col md:flex-row items-center justify-center">
       <div
-        className="hidden lg:block w-1/2 h-screen"
+        className="hidden lg:block w-1/2 h-screen "
         style={{
           backgroundImage: `url(${banner})`,
           backgroundSize: "cover",
@@ -39,20 +38,19 @@ function Login() {
         style={{
           backgroundImage: windowWidth < 1024 ? `url(${bannerMobile})` : "none",
           backgroundColor: "white",
+          backdropFilter: windowWidth < 1024 ? "blur(8px)" : "none", // Aplica blur apenas no mobile
+          WebkitBackdropFilter: windowWidth < 1024 ? "blur(8px)" : "none", // Suporte para Safari
         }}
       >
-        <div className="lg:hidden mt-16">
-          <img src={logo} alt="logo Icar" width={150} />
-        </div>
-
-        <div className="w-11/12 sm:max-w-md p-6 bg-transparent backdrop-blur-sm rounded-lg flex flex-col items-center mt-auto md:mt-0">
-          <div className="hidden sm:block mb-10">
-            <h1 className="text-3xl font-bold lg:text-blue-900 text-white">
+    
+        <div className="w-full max-w-md  p-6 bg-transparent rounded-lg flex flex-col items-center mt-20 md:mt-0">
+          <div className="mb-10">
+            <h1 className="text-3xl font-bold lg:text-blue-900 text-white text-center">
               Acesse sua conta na icar
             </h1>
           </div>
 
-          <form className="space-y-4 w-full">
+          <form className="w-full space-y-2">
             <div>
               <label
                 htmlFor="name"
@@ -63,7 +61,7 @@ function Login() {
               <input
                 id="name"
                 type="text"
-                className="mt-1 block w-full px-4 py-2 border border-blue-900  md:bg-white text-blue-900 rounded-lg focus:ring-blue-900-lg focus:border-blue-900-lg"
+                className="mt-1 block w-full px-4 py-2 border border-blue-900 md:bg-white text-blue-900 rounded-lg focus:ring-blue-900 focus:border-blue-900"
                 placeholder="Digite seu nome completo"
               />
             </div>

@@ -4,6 +4,7 @@ import bannerMobile from "../../../public/assets/images/art/auth-banner-mobile.p
 import logo from "../../../public/assets/images/logo/icar-logo-transparent.png";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import header from "../../../components/layout/Navbar";
 
 function CriarConta() {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -67,19 +68,13 @@ function CriarConta() {
 
   const formatPhone = (value) => {
     const cleaned = value.replace(/\D/g, "");
-
     const limited = cleaned.slice(0, 11);
 
     if (limited.length > 10) {
-      return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(
-        7
-      )}`;
+      return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7)}`;
     } else if (limited.length > 6) {
-      return `(${limited.slice(0, 2)}) ${limited.slice(2, 6)}-${limited.slice(
-        6
-      )}`;
+      return `(${limited.slice(0, 2)}) ${limited.slice(2, 6)}-${limited.slice(6)}`;
     } else if (limited.length > 2) {
-      phone;
       return `(${limited.slice(0, 2)}) ${limited.slice(2)}`;
     } else {
       return limited;
@@ -114,7 +109,7 @@ function CriarConta() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row items-center justify-center">
+    <div className="h-full flex flex-col md:flex-row items-center justify-center">
       <div
         className="hidden lg:block w-1/2 h-screen"
         style={{
@@ -126,19 +121,17 @@ function CriarConta() {
       <div
         className={
           windowWidth < 768
-            ? "w-full h-screen bg-cover bg-center flex flex-col justify-center items-center"
+            ? "w-full h-full bg-cover bg-center flex flex-col  items-center p-4 "
             : "w-full lg:w-1/2 min-h-screen flex flex-col items-center lg:justify-center justify-between p-6"
         }
         style={{
           backgroundImage: windowWidth < 1024 ? `url(${bannerMobile})` : "none",
           backgroundColor: "white",
+          
         }}
       >
-        <div className="lg:hidden mt-16">
-          <img src={logo} alt="logo Icar" width={150} />
-        </div>
 
-        <div className="w-11/12 sm:max-w-md p-6 bg-transparent backdrop-blur-sm rounded-lg flex flex-col items-center mt-auto md:mt-0">
+        <div className="w-11/12 sm:max-w-md p-6 bg-white/90 backdrop-blur-sm rounded-lg flex flex-col items-center mt-28 md:mt-0">
           <ToastContainer />
 
           <div className="hidden sm:block mb-10">
@@ -151,14 +144,14 @@ function CriarConta() {
             <div>
               <label
                 htmlFor="name"
-                className="block text-sm font-medium lg:text-blue-900 text-white"
+                className="block text-sm font-medium text-blue-900"
               >
                 Nome Completo
               </label>
               <input
                 id="name"
                 type="text"
-                className="mt-1 block w-full px-4 py-2 border border-blue-900  md:bg-white text-blue-900 rounded-lg focus:ring-blue-900-lg focus:border-blue-900-lg"
+                className="mt-1 block w-full px-4 py-2 border border-blue-900 bg-white text-blue-900 rounded-lg focus:ring-blue-900 focus:border-blue-900"
                 placeholder="Digite seu nome completo"
                 required
               />
@@ -167,14 +160,14 @@ function CriarConta() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium lg:text-blue-900 text-white"
+                className="block text-sm font-medium text-blue-900"
               >
                 Email
               </label>
               <input
                 id="email"
                 type="email"
-                className="mt-1 block w-full px-4 py-2 border border-blue-900 md:bg-white text-blue-900 rounded-lg focus:ring-blue-900 focus:border-blue-900"
+                className="mt-1 block w-full px-4 py-2 border border-blue-900 bg-white text-blue-900 rounded-lg focus:ring-blue-900 focus:border-blue-900"
                 placeholder="Digite seu email"
                 required
               />
@@ -183,7 +176,7 @@ function CriarConta() {
             <div>
               <label
                 htmlFor="phone"
-                className="block text-sm font-medium lg:text-blue-900 text-white"
+                className="block text-sm font-medium text-blue-900"
               >
                 Celular
               </label>
@@ -192,7 +185,7 @@ function CriarConta() {
                 id="phone"
                 value={phone}
                 onChange={handlePhoneChange}
-                className="mt-2 p-3 w-full border border-gray-300 rounded-lg"
+                className="mt-1 block w-full px-4 py-2 border border-blue-900 bg-white text-blue-900 rounded-lg focus:ring-blue-900 focus:border-blue-900"
                 placeholder="(DD) XXXXX-XXXX"
                 maxLength={15}
               />
@@ -201,7 +194,7 @@ function CriarConta() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium lg:text-blue-900 text-white"
+                className="block text-sm font-medium text-blue-900"
               >
                 Senha
               </label>
@@ -254,14 +247,14 @@ function CriarConta() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={handlePasswordChange}
-                  className="mt-1 block w-full px-4 py-2 border border-blue-900 md:bg-white text-blue-900 rounded-lg focus:ring-blue-900 focus:border-blue-900"
+                  className="mt-1 block w-full px-4 py-2 border border-blue-900 bg-white text-blue-900 rounded-lg focus:ring-blue-900 focus:border-blue-900 pr-10"
                   placeholder="Digite sua senha"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-3 flex items-center text-blue-900"
+                  className="absolute inset-y-0 right-3 flex items-center text-blue-900 bg-transparent border-none cursor-pointer"
                 >
                   {showPassword ? "Ocultar" : "Mostrar"}
                 </button>
@@ -295,7 +288,7 @@ function CriarConta() {
             <div>
               <label
                 htmlFor="re-password"
-                className="block text-sm font-medium lg:text-blue-900 text-white"
+                className="block text-sm font-medium text-blue-900"
               >
                 Confirme a Senha
               </label>
@@ -305,7 +298,7 @@ function CriarConta() {
                   type={showPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="mt-1 block w-full px-4 py-2 border border-blue-900 md:bg-white text-blue-900 rounded-lg focus:ring-blue-900 focus:border-blue-900"
+                  className="mt-1 block w-full px-4 py-2 border border-blue-900 bg-white text-blue-900 rounded-lg focus:ring-blue-900 focus:border-blue-900"
                   placeholder="Digite sua senha novamente"
                   required
                 />
@@ -328,14 +321,14 @@ function CriarConta() {
               />
               <label
                 htmlFor="remember"
-                className="ml-2 block text-sm lg:text-blue-900 text-white"
+                className="ml-2 block text-sm text-blue-900"
               >
                 Aceitar termos de uso e privacidade
               </label>
             </div>
 
             <div className="mb-10">
-              <p className="font-light text-center text-white lg:text-blue-900">
+              <p className="font-light text-center text-blue-900">
                 <a
                   className="underline"
                   href="/nossas-politicas"

@@ -1,32 +1,33 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const NavLink = ({ href, children }) => {
+const NavLink = ({ href, children, onClick }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleClick = (e) => {
     e.preventDefault();
-
-    // Se não estiver na página inicial, redireciona para a página inicial
+    
+    if (onClick) onClick(); 
+  
     if (location.pathname !== "/") {
-      navigate("/", { state: { scrollTo: href } }); // Passa a seção como estado
-    } else {
-      // Se já estiver na página inicial, rola até a seção
-      const targetElement = document.querySelector(href);
-      if (targetElement) {
-        const offset = -100; // Ajuste o offset conforme necessário
-        const topPosition =
-          targetElement.getBoundingClientRect().top + window.scrollY + offset;
 
-        window.scrollTo({
-          top: topPosition,
-          behavior: "smooth",
-        });
-      }
+      navigate(`/${href}`);
+    } else {
+
+      window.location.hash = href; 
+  
+      setTimeout(() => {
+        const targetElement = document.querySelector(href);
+        if (targetElement) {
+          const offset = -100;
+          const topPosition = targetElement.getBoundingClientRect().top + window.scrollY + offset;
+          window.scrollTo({ top: topPosition, behavior: "smooth" });
+        }
+      }, 100);
     }
   };
-
+  
   return (
     <a
       href={href}
