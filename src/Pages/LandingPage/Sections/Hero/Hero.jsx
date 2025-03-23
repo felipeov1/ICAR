@@ -30,7 +30,7 @@ const Hero = () => {
   return (
     <section
       id="inicio"
-      className="relative min-h-screen lg:h-screen w-full bg-[#fcfcfc] pt-[3.6rem]"
+      className="relative min-h-screen  w-full bg-[#fcfcfc] pt-[3.6rem]"
     >
       <div className="container-fluid  mx-auto flex-1 lg:h-full w-full flex flex-col-reverse lg:flex-row items-center lg:justify-between">
         <motion.div

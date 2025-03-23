@@ -111,7 +111,7 @@ const ModalAddress = ({
     <Modal
       isOpen={isOpen}
       onRequestClose={onClose}
-      className="bg-white p-4 mx-2 rounded-lg shadow-lg overflow-y-auto md:max-w-lg md:p-8"
+      className="bg-white p-4 mx-2 rounded-lg shadow-lg overflow-y-scroll md:max-w-lg md:p-8"
       style={{
         content: {
           maxHeight: "90vh",
