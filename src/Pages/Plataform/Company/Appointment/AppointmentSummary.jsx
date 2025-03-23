@@ -37,6 +37,10 @@ const AppointmentSummary = () => {
     },
   ]);
 
+  // Estados para o cupom e desconto
+  const [couponCode, setCouponCode] = useState("");
+  const [discount, setDiscount] = useState(0);
+
   const navigate = useNavigate();
 
   const lavaRapidoAddress = "Rua do Lava Rápido, 123 - Centro";
@@ -61,6 +65,27 @@ const AppointmentSummary = () => {
     const newDate = new Date(currentYear, currentMonth, day);
     setSelectedDate(newDate);
     setSelectedTime("");
+  };
+
+  // Função para aplicar o cupom
+  const applyCoupon = () => {
+    const validCoupons = {
+      DESCONTO10: 10,
+      PROMO20: 20,
+    };
+
+    if (validCoupons[couponCode]) {
+      setDiscount(validCoupons[couponCode]);
+      toast.success(
+        `Cupom aplicado: ${couponCode} (${validCoupons[couponCode]}% de desconto)!`,
+        {
+          autoClose: 2000,
+        }
+      );
+    } else {
+      setDiscount(0);
+      toast.error("Cupom inválido ou expirado.", { autoClose: 2000 });
+    }
   };
 
   const handleNextStep = () => {
@@ -92,6 +117,7 @@ const AppointmentSummary = () => {
           selectedOption === "Lava Rápido"
             ? lavaRapidoAddress
             : selectedAddress,
+        totalPrice: price * (1 - discount / 100), // Envia o valor com desconto
       },
     });
   };
@@ -145,9 +171,39 @@ const AppointmentSummary = () => {
             </div>
           )}
 
+          {/* Exibição do Valor com Desconto */}
           <p className="text-gray-700 mt-4 text-xl">
-            <strong>Valor:</strong> R${price.toFixed(2)}
+            <strong>Valor:</strong> R${" "}
+            {(price * (1 - discount / 100)).toFixed(2)}{" "}
+            {discount > 0 && (
+              <span className="text-sm text-green-600">
+                ({discount}% de desconto aplicado)
+              </span>
+            )}
           </p>
+
+          {/* Campo de Cupom */}
+          <div className="mt-6">
+            <label className="block text-gray-700 text-xl mb-2">
+              <strong>Cupom de Desconto:</strong>
+            </label>
+            <div className="flex">
+              <input
+                type="text"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                placeholder="Digite o cupom"
+                className="flex-1 p-1 border"
+              />
+              <button
+                onClick={applyCoupon}
+                className="px-4  bg-blue-800 text-white hover:bg-blue-900"
+              >
+                Aplicar
+              </button>
+            </div>
+          </div>
+
           {selectedOption === "Lava Rápido" && (
             <p className="text-gray-700 mt-4 text-xl">
               <strong>Endereço:</strong> {lavaRapidoAddress}
