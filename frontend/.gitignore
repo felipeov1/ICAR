@@ -16,13 +16,13 @@ build/
 # Vite cache
 .vite/
 
-# Tailwind CSS
-tailwind.config.js
+# Tailwind CSS (não ignorar o arquivo de configuração)
+# Ignorando outros arquivos relacionados ao Tailwind que não são necessários
 tailwind.config.cjs
 tailwind.config.mjs
 tailwind.config.ts
 
-# Environment variables
+# Environment variables (não versionar arquivos de ambiente sensíveis)
 .env
 .env.local
 .env.development.local
