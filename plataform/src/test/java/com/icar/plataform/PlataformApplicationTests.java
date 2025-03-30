@@ -8,6 +8,6 @@ class PlataformApplicationTests {
 
 	@Test
 	void contextLoads() {
-	}
 
+	}
 }

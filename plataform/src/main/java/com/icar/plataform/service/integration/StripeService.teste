@@ -1,0 +1,25 @@
+package com.icar.plataform.service.integration;
+
+import com.icar.plataform.domain.enums.PaymentMethodType;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+
+@Service
+@RequiredArgsConstructor
+public class StripeService {
+
+    private final StripeProperties properties;
+
+    public StripePaymentResponse createPaymentIntent(
+            BigDecimal amount,
+            PaymentMethodType method,
+            String currency
+    ) {
+        // Implementar chamada HTTP para API do Stripe
+        // Retornar paymentIntentId e pixCode (se for PIX)
+    }
+}
+
