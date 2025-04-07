@@ -1,6 +1,6 @@
 package com.icar.plataform.infrastructure.validation.validator.customer;
 
-import com.icar.plataform.api.dto.request.CustomerCreateRequest;
+import com.icar.plataform.api.dto.request.RegisterCustomerRequest;
 import com.icar.plataform.domain.repository.CustomerRepository;
 import com.icar.plataform.infrastructure.validation.exception.CustomValidationException;
 import com.icar.plataform.infrastructure.validation.exception.ValidationError;
@@ -17,7 +17,7 @@ public class CustomerValidator {
 
     private final CustomerRepository customerRepository;
 
-    public void validateCreate(CustomerCreateRequest request) {
+    public void validateCreate(RegisterCustomerRequest request) {
         List<ValidationError> errors = new ArrayList<>();
 
         // Full name validation

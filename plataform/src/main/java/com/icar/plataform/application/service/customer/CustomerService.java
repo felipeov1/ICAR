@@ -1,10 +1,10 @@
 package com.icar.plataform.application.service.customer;
 
-import com.icar.plataform.api.dto.request.CustomerCreateRequest;
-import com.icar.plataform.api.dto.response.CustomerCreateResponse;
+import com.icar.plataform.api.dto.request.RegisterCustomerRequest;
+import com.icar.plataform.api.dto.response.RegisterCustomerResponse;
 import com.icar.plataform.api.dto.response.EmailVerificationResponse;
 
 public interface CustomerService {
-    CustomerCreateResponse create(CustomerCreateRequest request);
+    RegisterCustomerResponse create(RegisterCustomerRequest request);
     EmailVerificationResponse verifyEmail(String token);
 }

@@ -1,7 +1,7 @@
 package com.icar.plataform.application.service.customer;
 
-import com.icar.plataform.api.dto.request.CustomerCreateRequest;
-import com.icar.plataform.api.dto.response.CustomerCreateResponse;
+import com.icar.plataform.api.dto.request.RegisterCustomerRequest;
+import com.icar.plataform.api.dto.response.RegisterCustomerResponse;
 import com.icar.plataform.api.dto.response.EmailVerificationResponse;
 import com.icar.plataform.api.mapper.CustomerMapper;
 import com.icar.plataform.domain.enums.UserStatus;
@@ -39,7 +39,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public CustomerCreateResponse create(CustomerCreateRequest request) {
+    public RegisterCustomerResponse create(RegisterCustomerRequest request) {
         // Validações completas (formato + regras de negócio)
         customerValidator.validateCreate(request);
 

@@ -1,7 +1,7 @@
 package com.icar.plataform.api.controller.v1;
 
-import com.icar.plataform.api.dto.request.CustomerCreateRequest;
-import com.icar.plataform.api.dto.response.CustomerCreateResponse;
+import com.icar.plataform.api.dto.request.RegisterCustomerRequest;
+import com.icar.plataform.api.dto.response.RegisterCustomerResponse;
 import com.icar.plataform.api.dto.response.EmailVerificationResponse;
 import com.icar.plataform.application.service.customer.CustomerService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,13 +19,13 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping("/registrar")
-    public ResponseEntity<?> create(@RequestBody @Valid CustomerCreateRequest request) {
-        CustomerCreateResponse response = customerService.create(request);
+    public ResponseEntity<?> create(@RequestBody @Valid RegisterCustomerRequest request) {
+        RegisterCustomerResponse response = customerService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/confirmacao/{token}")
-    public ResponseEntity<?> confirmEmail(@PathVariable String token) {
+    @GetMapping("/confirmacao")
+    public ResponseEntity<?> confirmEmail(@RequestParam String token) {
         EmailVerificationResponse response = customerService.verifyEmail(token);
         return ResponseEntity.ok(response);
     }
