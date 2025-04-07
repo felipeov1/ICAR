@@ -31,12 +31,6 @@ public class CarWashProfile {
     @Column(nullable = false, length = 255)
     private String address;
 
-    @Column(columnDefinition = "NUMERIC(10,8)")
-    private BigDecimal latitude;
-
-    @Column(columnDefinition = "NUMERIC(11,8)")
-    private BigDecimal longitude;
-
     @Column(name = "cover_photo", length = 255)
     private String coverPhoto;
 

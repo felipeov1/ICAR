@@ -25,9 +25,12 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
+            "/webjars/**",
+            "/swagger-resources/**",
+            "/favicon.ico",
             "/api/v1/health",
-            "/api/v1/appointments/**"  // Adicione esta linha
-
+            "/api/v1/appointments/**",
+            "/api/v1/carwashes/**"
     };
 
     @Bean
@@ -36,7 +39,6 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
-                        .requestMatchers("/api/public/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(httpBasic -> httpBasic
@@ -56,11 +58,12 @@ public class SecurityConfig {
 
         UserDetails user = User.builder()
                 .username(username)
-                .password("{noop}" + password)
+                .password(passwordEncoder().encode(password))
                 .roles("ADMIN")
                 .build();
         return new InMemoryUserDetailsManager(user);
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();

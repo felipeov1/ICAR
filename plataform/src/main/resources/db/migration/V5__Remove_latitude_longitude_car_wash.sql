@@ -1,0 +1,1 @@
+ALTER TABLE car_wash_profile DROP COLUMN latitude, DROP COLUMN longitude;

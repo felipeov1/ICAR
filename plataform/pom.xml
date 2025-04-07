@@ -39,6 +39,11 @@
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<version>3.0.2</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
@@ -73,6 +78,8 @@
 			<version>0.2.0</version>
 			<scope>provided</scope>
 		</dependency>
+
+
 
 		<!-- API Documentation -->
 		<dependency>
@@ -182,6 +189,8 @@
 					</argLine>
 				</configuration>
 			</plugin>
+
+
 		</plugins>
 	</build>
 </project>
