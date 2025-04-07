@@ -1,0 +1,2 @@
+ALTER TABLE email_verification ADD COLUMN version BIGINT DEFAULT 0;
+ALTER TABLE customer ADD COLUMN version BIGINT DEFAULT 0;

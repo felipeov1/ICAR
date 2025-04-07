@@ -21,14 +21,14 @@ public class CustomerValidator {
         List<ValidationError> errors = new ArrayList<>();
 
         // Full name validation
-        validateField(errors, "fullName", request.getFullName(),
+        validateField(errors, "fullName", request.fullName(),
                 value -> value == null || value.length() < 3 || value.length() > 255,
                 "Full name must be between 3 and 255 characters",
                 "INVALID_LENGTH"
         );
 
         // Password validations
-        String password = request.getPassword();
+        String password = request.password();
 
         validateField(errors, "password", password,
                 value -> value == null || value.length() < 8,
@@ -55,14 +55,14 @@ public class CustomerValidator {
         );
 
         // Phone number validation
-        validateField(errors, "phone", request.getPhone(),
+        validateField(errors, "phone", request.phone(),
                 value -> value == null || !value.matches("^\\d{11}$"),
                 "Phone number must contain exactly 11 digits",
                 "INVALID_PHONE"
         );
 
         // Business rules (uniqueness checks)
-        if (customerRepository.existsByEmail(request.getEmail())) {
+        if (customerRepository.existsByEmail(request.email())) {
             errors.add(ValidationError.builder()
                     .field("email")
                     .message("Email is already registered")
@@ -70,7 +70,7 @@ public class CustomerValidator {
                     .build());
         }
 
-        if (customerRepository.existsByPhone(request.getPhone())) {
+        if (customerRepository.existsByPhone(request.phone())) {
             errors.add(ValidationError.builder()
                     .field("phone")
                     .message("Phone number is already registered")
