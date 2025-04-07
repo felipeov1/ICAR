@@ -20,7 +20,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendVerificationEmail(String toEmail, String verificationToken) {
-        String verificationUrl = baseUrl + "/v1/customers/verify-email?token=" + verificationToken;
+        String verificationUrl = baseUrl + "/confirmacao/" + verificationToken;
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);

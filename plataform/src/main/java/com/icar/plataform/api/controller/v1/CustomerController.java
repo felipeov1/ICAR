@@ -13,20 +13,19 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Customers", description = "Customers management operations")
 @RestController
-@RequestMapping("/v1/customers")
 @RequiredArgsConstructor
 public class CustomerController {
 
     private final CustomerService customerService;
 
-    @PostMapping("/register")
+    @PostMapping("/registrar")
     public ResponseEntity<?> create(@RequestBody @Valid CustomerCreateRequest request) {
         CustomerCreateResponse response = customerService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/verify-email")
-    public ResponseEntity<?> verifyEmail(@RequestParam String token) {
+    @GetMapping("/confirmacao/{token}")
+    public ResponseEntity<?> confirmEmail(@PathVariable String token) {
         EmailVerificationResponse response = customerService.verifyEmail(token);
         return ResponseEntity.ok(response);
     }
