@@ -18,7 +18,7 @@ public interface CarWashRepository extends JpaRepository<CarWash, UUID> {
     void updateRating(@Param("id") UUID id, @Param("rating") Double rating);
 
     @Query(value = """
-        SELECT * FROM car_wash c 
+        SELECT * FROM car_wash c
         WHERE ST_DWithin(
             ST_MakePoint(:longitude, :latitude)::geography,
             ST_MakePoint(c.longitude, c.latitude)::geography,

@@ -30,8 +30,8 @@ public class Appointment {
     private CarWash carWash;
 
     @ManyToOne
-    @JoinColumn(name = "service_id", nullable = false)
-    private Service service;
+    @JoinColumn(name = "id", nullable = false)
+    private CarWashOffering carWashOffering;
 
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;

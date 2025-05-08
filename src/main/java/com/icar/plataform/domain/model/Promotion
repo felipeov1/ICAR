@@ -23,7 +23,7 @@ public class Promotion {
 
     @ManyToOne
     @JoinColumn(name = "service_id", nullable = false)
-    private Service service;
+    private CarWashOffering carWashOffering;
 
     @Column(nullable = false, columnDefinition = "NUMERIC(5,2)")
     private BigDecimal discount;

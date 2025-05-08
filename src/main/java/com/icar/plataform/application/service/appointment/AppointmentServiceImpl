@@ -132,7 +132,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     // Métodos auxiliares privados
-    private void calculateFinalPrice(Appointment appointment, com.icar.plataform.domain.model.Service service) {
+    private void calculateFinalPrice(Appointment appointment, com.icar.plataform.domain.model.CarWashOffering service) {
         Optional<Promotion> activePromotion = promotionRepository.findByServiceIdAndStartDateBeforeAndEndDateAfter(
                 service.getId(),
                 LocalDateTime.now(),

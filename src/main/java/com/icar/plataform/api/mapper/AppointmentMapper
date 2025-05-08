@@ -43,10 +43,10 @@ public interface AppointmentMapper {
         return carWash;
     }
 
-    default Service idToService(UUID id) {
+    default CarWashOffering idToService(UUID id) {
         if (id == null) return null;
-        Service service = new Service();
-        service.setId(id);
-        return service;
+        CarWashOffering carWashOffering = new CarWashOffering();
+        carWashOffering.setId(id);
+        return carWashOffering;
     }
 }

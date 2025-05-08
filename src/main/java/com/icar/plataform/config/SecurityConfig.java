@@ -29,8 +29,8 @@ public class SecurityConfig {
 
     private static final String[] SWAGGER_WHITELIST = {
             "/v3/api-docs/**",
-            "/swagger-ui/**",
             "/swagger-ui.html",
+            "/swagger-ui/**", // ← ADICIONE ESTA LINHA
             "/webjars/**",
             "/swagger-resources/**",
             "/favicon.ico",

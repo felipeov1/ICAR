@@ -12,5 +12,6 @@ public interface CarWashMapper {
     @Mapping(target = "id", ignore = true)
     CarWash toEntity(CarWashRequest dto);
 
+    @Mapping(target = "averageRating", expression = "java(entity.getAverageRating() != null ? entity.getAverageRating() : 0.0)")
     CarWashResponse toDto(CarWash entity);
 }

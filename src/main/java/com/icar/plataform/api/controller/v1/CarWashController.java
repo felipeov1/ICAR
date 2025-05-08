@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Tag(name = "Car Washes", description = "Car wash establishment operations")
 @RestController
@@ -31,5 +32,11 @@ public class CarWashController {
     @GetMapping("/all")
     public ResponseEntity<List<CarWashResponse>> findAll() {
         return ResponseEntity.ok(service.findAllByOrderByCreatedAtAsc());
+    }
+
+    @Operation(summary = "Get car wash details")
+    @GetMapping("/{id}")
+    public ResponseEntity<CarWashResponse> findById(@PathVariable UUID id) {
+        return ResponseEntity.ok(service.findById(id));
     }
 }
