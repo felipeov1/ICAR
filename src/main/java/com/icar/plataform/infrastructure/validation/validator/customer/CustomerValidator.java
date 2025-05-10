@@ -1,7 +1,7 @@
 package com.icar.plataform.infrastructure.validation.validator.customer;
 
-import com.icar.plataform.api.dto.request.RegisterCustomerRequest;
-import com.icar.plataform.domain.repository.CustomerRepository;
+import com.icar.plataform.api.dto.request.auth.RegisterCustomerRequest;
+import com.icar.plataform.domain.repository.customer.CustomerRepository;
 import com.icar.plataform.infrastructure.validation.exception.CustomValidationException;
 import com.icar.plataform.infrastructure.validation.exception.ValidationError;
 import lombok.RequiredArgsConstructor;

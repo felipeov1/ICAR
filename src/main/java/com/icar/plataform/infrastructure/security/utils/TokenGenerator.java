@@ -1,6 +1,6 @@
 package com.icar.plataform.infrastructure.security.utils;
 
-import com.icar.plataform.domain.model.Customer;
+import com.icar.plataform.domain.model.customer.Customer;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;

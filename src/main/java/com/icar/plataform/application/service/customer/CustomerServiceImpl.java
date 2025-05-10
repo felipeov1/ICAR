@@ -1,14 +1,14 @@
 package com.icar.plataform.application.service.customer;
 
-import com.icar.plataform.api.dto.request.RegisterCustomerRequest;
-import com.icar.plataform.api.dto.response.RegisterCustomerResponse;
-import com.icar.plataform.api.dto.response.EmailVerificationResponse;
-import com.icar.plataform.api.mapper.CustomerMapper;
+import com.icar.plataform.api.dto.request.auth.RegisterCustomerRequest;
+import com.icar.plataform.api.dto.response.auth.RegisterCustomerResponse;
+import com.icar.plataform.api.dto.response.auth.EmailVerificationResponse;
+import com.icar.plataform.api.mapper.customer.CustomerMapper;
 import com.icar.plataform.domain.enums.UserStatus;
-import com.icar.plataform.domain.model.Customer;
-import com.icar.plataform.domain.model.EmailVerification;
-import com.icar.plataform.domain.repository.CustomerRepository;
-import com.icar.plataform.domain.repository.EmailVerificationRepository;
+import com.icar.plataform.domain.model.customer.Customer;
+import com.icar.plataform.domain.model.email.EmailVerification;
+import com.icar.plataform.domain.repository.customer.CustomerRepository;
+import com.icar.plataform.domain.repository.email.EmailVerificationRepository;
 import com.icar.plataform.infrastructure.security.utils.TokenGenerator;
 import com.icar.plataform.infrastructure.validation.validator.customer.CustomerValidator;
 import com.icar.plataform.application.service.email.EmailService;

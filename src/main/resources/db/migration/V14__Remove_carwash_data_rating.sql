@@ -1,0 +1,1 @@
+ALTER TABLE car_wash DROP COLUMN IF EXISTS average_rating

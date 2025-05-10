@@ -1,7 +1,7 @@
 package com.icar.plataform.application.service.appointment;
 
-import com.icar.plataform.api.dto.request.ReviewRequest;
-import com.icar.plataform.api.dto.response.ReviewResponse;
+import com.icar.plataform.api.dto.request.system.ReviewRequest;
+import com.icar.plataform.api.dto.response.system.ReviewResponse;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -1,7 +1,7 @@
 package com.icar.plataform.application.service.customer;
 
-import com.icar.plataform.api.dto.request.CustomerAddressRequest;
-import com.icar.plataform.api.dto.response.CustomerAddressResponse;
+import com.icar.plataform.api.dto.request.customer.CustomerAddressRequest;
+import com.icar.plataform.api.dto.response.customer.CustomerAddressResponse;
 
 import java.util.List;
 import java.util.UUID;

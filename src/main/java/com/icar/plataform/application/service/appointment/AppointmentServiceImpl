@@ -51,14 +51,14 @@ public class AppointmentServiceImpl implements AppointmentService {
         Customer customer = customerRepository.findById(dto.customerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
 
-        CarWash carWash = carWashRepository.findById(dto.carWashId())
+        CarWash carWashRegistration = carWashRepository.findById(dto.carWashId())
                 .orElseThrow(() -> new ResourceNotFoundException("Car wash not found"));
 
         com.icar.plataform.domain.model.Service service = serviceRepository.findById(dto.serviceId())
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
 
-        checkTimeSlotAvailability(carWash.getId(), dto.dateTime());
-        checkBusinessHours(carWash, dto.dateTime());
+        checkTimeSlotAvailability(carWashRegistration.getId(), dto.dateTime());
+        checkBusinessHours(carWashRegistration, dto.dateTime());
 
         Appointment appointment = mapper.toEntity(dto);
         calculateFinalPrice(appointment, service);
@@ -132,7 +132,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     // Métodos auxiliares privados
-    private void calculateFinalPrice(Appointment appointment, com.icar.plataform.domain.model.CarWashOffering service) {
+    private void calculateFinalPrice(Appointment appointment, com.icar.plataform.domain.model.carwash.CarWashOffering service) {
         Optional<Promotion> activePromotion = promotionRepository.findByServiceIdAndStartDateBeforeAndEndDateAfter(
                 service.getId(),
                 LocalDateTime.now(),
@@ -164,7 +164,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
     }
 
-    private void checkBusinessHours(CarWash carWash, LocalDateTime dateTime) {
+    private void checkBusinessHours(CarWash carWashRegistration, LocalDateTime dateTime) {
         // Implementação da verificação de horário comercial
         // Você precisará adicionar a lógica específica para seu negócio
         if (dateTime.getHour() < 8 || dateTime.getHour() > 18) {

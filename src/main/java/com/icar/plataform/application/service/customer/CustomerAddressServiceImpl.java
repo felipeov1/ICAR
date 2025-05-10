@@ -1,12 +1,12 @@
 package com.icar.plataform.application.service.customer;
 
-import com.icar.plataform.api.dto.request.CustomerAddressRequest;
-import com.icar.plataform.api.dto.response.CustomerAddressResponse;
-import com.icar.plataform.api.mapper.CustomerAddressMapper;
-import com.icar.plataform.domain.model.Customer;
-import com.icar.plataform.domain.model.CustomerAddress;
-import com.icar.plataform.domain.repository.CustomerAddressRepository;
-import com.icar.plataform.domain.repository.CustomerRepository;
+import com.icar.plataform.api.dto.request.customer.CustomerAddressRequest;
+import com.icar.plataform.api.dto.response.customer.CustomerAddressResponse;
+import com.icar.plataform.api.mapper.customer.CustomerAddressMapper;
+import com.icar.plataform.domain.model.customer.Customer;
+import com.icar.plataform.domain.model.customer.CustomerAddress;
+import com.icar.plataform.domain.repository.customer.CustomerAddressRepository;
+import com.icar.plataform.domain.repository.customer.CustomerRepository;
 import com.icar.plataform.shared.exception.BusinessException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;

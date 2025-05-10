@@ -1,8 +1,8 @@
 package com.icar.plataform.infrastructure.security.service;
 
 import com.icar.plataform.domain.enums.UserStatus;
-import com.icar.plataform.domain.model.Customer;
-import com.icar.plataform.domain.repository.CustomerRepository;
+import com.icar.plataform.domain.model.customer.Customer;
+import com.icar.plataform.domain.repository.customer.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

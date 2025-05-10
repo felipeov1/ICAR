@@ -1,11 +1,10 @@
 package com.icar.plataform.application.service.auth;
 
-import com.icar.plataform.api.dto.request.LoginRequest;
-import com.icar.plataform.api.dto.response.CustomerResponse;
-import com.icar.plataform.api.dto.response.LoginResponse;
-import com.icar.plataform.domain.enums.UserStatus;
-import com.icar.plataform.domain.model.Customer;
-import com.icar.plataform.domain.repository.CustomerRepository;
+import com.icar.plataform.api.dto.request.auth.LoginRequest;
+import com.icar.plataform.api.dto.response.customer.CustomerResponse;
+import com.icar.plataform.api.dto.response.auth.LoginResponse;
+import com.icar.plataform.domain.model.customer.Customer;
+import com.icar.plataform.domain.repository.customer.CustomerRepository;
 import com.icar.plataform.infrastructure.security.utils.TokenGenerator;
 import com.icar.plataform.shared.exception.BusinessException;
 import lombok.RequiredArgsConstructor;

@@ -1,12 +1,12 @@
 package com.icar.plataform.application.service.carwash;
 
-import com.icar.plataform.api.dto.request.CarWashOfferingRequest;
-import com.icar.plataform.api.dto.response.CarWashOfferingResponse;
-import com.icar.plataform.api.mapper.CarWashOfferingMapper;
-import com.icar.plataform.domain.model.CarWash;
-import com.icar.plataform.domain.model.CarWashOffering;
-import com.icar.plataform.domain.repository.CarWashRepository;
-import com.icar.plataform.domain.repository.CarWashOfferingRepository;
+import com.icar.plataform.api.dto.request.carwash.CarWashOfferingRequest;
+import com.icar.plataform.api.dto.response.carwash.CarWashOfferingResponse;
+import com.icar.plataform.api.mapper.carwash.CarWashOfferingMapper;
+import com.icar.plataform.domain.model.carwash.CarWashOffering;
+import com.icar.plataform.domain.model.carwash.CarWashProfile;
+import com.icar.plataform.domain.repository.carwash.CarWashOfferingRepository;
+import com.icar.plataform.domain.repository.carwash.CarWashProfileRepository;
 import com.icar.plataform.shared.exception.DuplicateEntityException;
 import com.icar.plataform.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -16,41 +16,47 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-@Service // Changed from @org.springframework.stereotype.Service to avoid confusion
+@Service
 @RequiredArgsConstructor
 public class CarWashOfferingServiceImpl implements CarWashOfferingService {
+
     private final CarWashOfferingRepository carWashOfferingRepository;
-    private final CarWashRepository carWashRepository;
+    private final CarWashProfileRepository carWashProfileRepository;
     private final CarWashOfferingMapper carWebserviceMapper;
 
     @Override
     @Transactional
-    public CarWashOfferingResponse create(UUID carWashId, CarWashOfferingRequest request) {
-        // 1. Get the CarWash entity - no .getCarWash() needed
-        CarWash carWash = carWashRepository.findById(carWashId)
-                .orElseThrow(() -> new ResourceNotFoundException("Car wash not found"));
+    public CarWashOfferingResponse create(UUID carWashProfileId, CarWashOfferingRequest request) {
+        CarWashProfile carWashProfile = carWashProfileRepository.findById(carWashProfileId)
+                .orElseThrow(() -> new ResourceNotFoundException("Car wash profile not found"));
 
-        // 2. Check for duplicate service names
-        if (carWashOfferingRepository.existsByCarWashAndNameIgnoreCase(carWash, request.name())) {
+        if (carWashOfferingRepository.existsByCarWashProfileAndNameIgnoreCase(carWashProfile, request.name())) {
             throw new DuplicateEntityException(
-                    "Service with this name already exists for this car wash",
+                    "Service with this name already exists for this car wash profile",
                     "service",
                     "name"
             );
         }
 
-        // 3. Create and save the new service
         CarWashOffering service = carWebserviceMapper.toEntity(request);
-        service.setCarWash(carWash);  // Associate with the car wash
+        service.setCarWashProfile(carWashProfile);
 
         CarWashOffering saved = carWashOfferingRepository.save(service);
         return carWebserviceMapper.toDto(saved);
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<CarWashOfferingResponse> findAllByCarWashProfile(UUID carWashProfileId) {
+        return carWashOfferingRepository.findByCarWashProfileId(carWashProfileId).stream()
+                .map(carWebserviceMapper::toDto)
+                .toList();
+    }
+
+    @Override
     @Transactional
-    public CarWashOfferingResponse update(UUID serviceId, CarWashOfferingRequest request) {
-        CarWashOffering service = carWashOfferingRepository.findById(serviceId)
+    public CarWashOfferingResponse update(UUID offeringId, CarWashOfferingRequest request) {
+        CarWashOffering service = carWashOfferingRepository.findById(offeringId)
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
 
         carWebserviceMapper.updateEntity(request, service);
@@ -60,19 +66,12 @@ public class CarWashOfferingServiceImpl implements CarWashOfferingService {
 
     @Override
     @Transactional
-    public void deactivate(UUID serviceId) {
-        CarWashOffering service = carWashOfferingRepository.findById(serviceId)
+    public void deactivate(UUID offeringId) {
+        CarWashOffering service = carWashOfferingRepository.findById(offeringId)
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found"));
 
         service.setActive(false);
         carWashOfferingRepository.save(service);
     }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<CarWashOfferingResponse> findAllByCarWash(UUID carWashId) {
-        return carWashOfferingRepository.findByCarWashId(carWashId).stream()
-                .map(carWebserviceMapper::toDto)
-                .toList();
-    }
 }
+
