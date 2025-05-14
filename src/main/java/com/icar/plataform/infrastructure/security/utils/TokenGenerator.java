@@ -1,10 +1,7 @@
 package com.icar.plataform.infrastructure.security.utils;
 
 import com.icar.plataform.domain.model.customer.Customer;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.micrometer.common.lang.Nullable;
 import org.slf4j.Logger;
@@ -31,30 +28,11 @@ public class TokenGenerator {
     private Long jwtExpiration;
 
     public String generateAccessToken(Customer customer) {
-        return buildToken(customer, 3600000); // 1 hora
+        return generateToken(customer, 3600000); // 1 hora
     }
 
     public String generateRefreshToken(Customer customer) {
-        return buildToken(customer, 2592000000L); // 30 dias
-    }
-
-    private String buildToken(Customer customer, long expirationMs) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("id", customer.getId());
-        claims.put("email", customer.getEmail());
-        claims.put("role", "CUSTOMER");
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(customer.getEmail())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+        return generateToken(customer, 2592000000L); // 30 dias
     }
 
     public String generateToken(Customer customer, long expirationTimeMillis) {
@@ -68,7 +46,7 @@ public class TokenGenerator {
             return Jwts.builder()
                     .setClaims(claims)
                     .setSubject(customer.getEmail())
-                    .setIssuedAt(new Date(System.currentTimeMillis()))
+                    .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMillis))
                     .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                     .compact();
@@ -76,6 +54,10 @@ public class TokenGenerator {
             logger.error("Failed to generate token", e);
             throw new RuntimeException("Failed to generate JWT token", e);
         }
+    }
+
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     public String getEmailFromToken(String token) {
@@ -107,20 +89,21 @@ public class TokenGenerator {
         try {
             if (isTokenExpired(token)) {
                 logger.warn("Token is expired");
-                return false; // token inválido
+                return false;
             }
 
             if (userDetails != null) {
                 String tokenEmail = getEmailFromToken(token);
                 if (!tokenEmail.equals(userDetails.getUsername())) {
                     logger.warn("Token email mismatch");
-                    return false; // token inválido
+                    return false;
                 }
             }
-            return true; // token válido
+
+            return true;
         } catch (Exception e) {
             logger.error("Token validation failed", e);
-            return false; // token inválido
+            return false;
         }
     }
 
@@ -128,6 +111,4 @@ public class TokenGenerator {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
-
-
 }

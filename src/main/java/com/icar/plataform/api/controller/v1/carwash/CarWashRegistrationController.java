@@ -2,7 +2,7 @@ package com.icar.plataform.api.controller.v1.carwash;
 
 import com.icar.plataform.api.dto.request.carwash.CarWashRegistrationRequest;
 import com.icar.plataform.api.dto.response.carwash.CarWashRegistrationResponse;
-import com.icar.plataform.application.service.carwash.CarWashRegistrationService;
+import com.icar.plataform.application.service.carwash.legal.CarWashRegistrationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "Car Washes", description = "Car wash establishment operations")
+@Tag(name = "Car Wash - Legal Information", description = "Car wash establishment operations")
 @RestController
 @RequestMapping("/api/v1/carwashes")
 @RequiredArgsConstructor

@@ -13,6 +13,7 @@ import com.icar.plataform.domain.repository.customer.CustomerRepository;
 import com.icar.plataform.infrastructure.security.utils.TokenGenerator;
 import com.icar.plataform.infrastructure.validation.exception.CustomValidationException;
 import com.icar.plataform.shared.exception.BusinessException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Auth", description = "Security to access and register")
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor

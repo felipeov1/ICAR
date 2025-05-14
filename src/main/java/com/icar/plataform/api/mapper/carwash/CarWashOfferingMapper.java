@@ -1,9 +1,9 @@
 package com.icar.plataform.api.mapper.carwash;
 
-import com.icar.plataform.api.dto.request.carwash.CarWashOfferingRequest;
-import com.icar.plataform.api.dto.response.carwash.CarWashOfferingResponse;
+import com.icar.plataform.api.dto.request.carwash.profile.CarWashOfferingRequest;
+import com.icar.plataform.api.dto.response.carwash.profile.CarWashOfferingResponse;
+import com.icar.plataform.domain.model.carwash.offering.CarWashOffering;
 import com.icar.plataform.domain.enums.CarWashOfferingModality;
-import com.icar.plataform.domain.model.carwash.CarWashOffering;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -20,9 +20,10 @@ public interface CarWashOfferingMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "estimatedTime", source = "estimatedTime")
+    @Mapping(target = "modality", source = "modality")  // Este mapeamento garante que o enum seja mapeado
     CarWashOffering toEntity(CarWashOfferingRequest dto);
 
-    @Mapping(target = "statusText", expression = "java(entity.getActive() != null && entity.getActive() ? \"Ativo\" : \"Desativado\")")
+    @Mapping(target = "statusText", expression = "java(entity.isActive() ? \"Ativo\" : \"Desativado\")")
     @Mapping(target = "modalityText", expression = "java(getModalityText(entity.getModality()))")
     @Mapping(target = "formattedPrice", expression = "java(formatPrice(entity.getPrice()))")
     @Mapping(target = "formattedTime", expression = "java(formatEstimatedTime(entity.getEstimatedTime()))")
@@ -33,13 +34,14 @@ public interface CarWashOfferingMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "estimatedTime", source = "estimatedTime")
+    @Mapping(target = "modality", source = "modality")  // Mapeando também no método de atualização
     void updateEntity(CarWashOfferingRequest dto, @MappingTarget CarWashOffering entity);
 
     default String formatPrice(BigDecimal price) {
         if (price == null) {
             return "";
         }
-        Locale locale = Locale.of("pt", "BR");
+        Locale locale = new Locale("pt", "BR");
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(locale);
         return currencyFormat.format(price);
     }
@@ -58,9 +60,9 @@ public interface CarWashOfferingMapper {
     }
 
     default String getModalityText(CarWashOfferingModality modality) {
-        if (modality == CarWashOfferingModality.IN_PERSON) {
+        if (CarWashOfferingModality.IN_PERSON.equals(modality)) {
             return "Na empresa";
-        } else if (modality == CarWashOfferingModality.AT_HOME) {
+        } else if (CarWashOfferingModality.AT_HOME.equals(modality)) {
             return "Domiciliar";
         }
         return "";
