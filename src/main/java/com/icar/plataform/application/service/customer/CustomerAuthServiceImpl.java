@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class CustomerServiceImpl implements CustomerService {
+public class CustomerAuthServiceImpl implements CustomerAuthService {
 
     private final CustomerValidator customerValidator;
     private final CustomerRepository customerRepository;

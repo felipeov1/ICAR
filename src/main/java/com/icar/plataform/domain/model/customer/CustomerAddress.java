@@ -40,8 +40,8 @@ public class CustomerAddress {
     @Column(nullable = false)
     private String street;
 
-    @Column(nullable = false)
-    private String number;
+    @Column(name = "street_number", nullable = false)
+    private String streetNumber;
 
     @Column(name = "additional_instructions")
     private String additionalInstructions;

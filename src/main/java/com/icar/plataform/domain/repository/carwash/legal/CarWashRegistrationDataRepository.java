@@ -5,11 +5,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface CarWashRegistrationDataRepository extends JpaRepository<CarWashRegistration, UUID> {
 
-    List<CarWashRegistration> findAllByOrderByCreatedAtAsc();
+    boolean existsBySubdomainAndDeletedAtIsNull(String subdomain);
 
+    List<CarWashRegistration> findAllByDeletedAtIsNullOrderByCreatedAtAsc();
+
+    Optional<CarWashRegistration> findByIdAndDeletedAtIsNull(UUID id);
+
+    Optional<CarWashRegistration> findBySubdomainAndDeletedAtIsNull(String subdomain);
 }

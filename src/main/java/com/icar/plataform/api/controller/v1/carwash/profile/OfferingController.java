@@ -3,6 +3,7 @@ package com.icar.plataform.api.controller.v1.carwash.profile;
 import com.icar.plataform.api.dto.request.carwash.profile.CarWashOfferingRequest;
 import com.icar.plataform.api.dto.response.carwash.profile.CarWashOfferingResponse;
 import com.icar.plataform.application.service.carwash.offering.CarWashOfferingService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,26 +15,26 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-@Tag(name = "Car Wash Profile - Offerings", description = "Manage available offerings/packages")
+@Tag(name = "Car Wash Profile - Offerings", description = "Manage car wash services and offerings")
 @RestController
-@RequestMapping("/api/v1/carwashes/{carwashId}/profile/offerings")
+@RequestMapping("/api/v1/carwashes/{carWashId}/offerings")
 @RequiredArgsConstructor
 public class OfferingController {
 
     private final CarWashOfferingService offeringService;
 
-    // List all offerings for this car wash
+    @Operation(summary = "Get all offerings for a car wash")
     @GetMapping
-    public ResponseEntity<List<CarWashOfferingResponse>> findAllOfferings(@PathVariable UUID carwashId) {
-        return ResponseEntity.ok(offeringService.findAllByCarWashProfile(carwashId));
+    public ResponseEntity<List<CarWashOfferingResponse>> findAllOfferings(@PathVariable UUID carWashId) {
+        return ResponseEntity.ok(offeringService.findAllByCarWashId(carWashId));
     }
 
-    // Create a new offering
+    @Operation(summary = "Create a new offering")
     @PostMapping
     public ResponseEntity<CarWashOfferingResponse> createOffering(
-            @PathVariable UUID carwashId,
+            @PathVariable UUID carWashId,
             @Valid @RequestBody CarWashOfferingRequest request) {
-        CarWashOfferingResponse response = offeringService.create(carwashId, request);
+        CarWashOfferingResponse response = offeringService.create(carWashId, request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(response.id())
@@ -41,21 +42,32 @@ public class OfferingController {
         return ResponseEntity.created(location).body(response);
     }
 
-    // Update an existing offering
+    @Operation(summary = "Update an existing offering")
     @PutMapping("/{offeringId}")
     public ResponseEntity<CarWashOfferingResponse> updateOffering(
-            @PathVariable UUID carwashId,
+            @PathVariable UUID carWashId,
             @PathVariable UUID offeringId,
             @Valid @RequestBody CarWashOfferingRequest request) {
         return ResponseEntity.ok(offeringService.update(offeringId, request));
     }
 
-    // Delete (deactivate) an offering
+    @Operation(summary = "Deactivate an offering")
     @DeleteMapping("/{offeringId}")
-    public ResponseEntity<Void> deleteOffering(
-            @PathVariable UUID carwashId,
+    public ResponseEntity<Void> deactivateOffering(
+            @PathVariable UUID carWashId,
             @PathVariable UUID offeringId) {
         offeringService.deactivate(offeringId);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Activate an offering")
+    @PatchMapping("/{offeringId}/activate")
+    public ResponseEntity<Void> activateOffering(
+            @PathVariable UUID carWashId,
+            @PathVariable UUID offeringId) {
+        offeringService.activate(offeringId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

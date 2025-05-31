@@ -11,6 +11,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -19,22 +20,22 @@ public interface CarWashOfferingMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "estimatedTime", source = "estimatedTime")
-    @Mapping(target = "modality", source = "modality")  // Este mapeamento garante que o enum seja mapeado
+    @Mapping(target = "modality", source = "modality")
     CarWashOffering toEntity(CarWashOfferingRequest dto);
 
-    @Mapping(target = "statusText", expression = "java(entity.isActive() ? \"Ativo\" : \"Desativado\")")
+    @Mapping(target = "statusText", expression = "java(getStatusText(entity.isActive(), entity.getDeletedAt()))")
     @Mapping(target = "modalityText", expression = "java(getModalityText(entity.getModality()))")
     @Mapping(target = "formattedPrice", expression = "java(formatPrice(entity.getPrice()))")
     @Mapping(target = "formattedTime", expression = "java(formatEstimatedTime(entity.getEstimatedTime()))")
-    @Mapping(target = "estimatedTime", source = "entity.estimatedTime")
     CarWashOfferingResponse toDto(CarWashOffering entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "estimatedTime", source = "estimatedTime")
-    @Mapping(target = "modality", source = "modality")  // Mapeando também no método de atualização
+    @Mapping(target = "deletedAt", ignore = true)
+    @Mapping(target = "profile", ignore = true)
     void updateEntity(CarWashOfferingRequest dto, @MappingTarget CarWashOffering entity);
 
     default String formatPrice(BigDecimal price) {
@@ -60,11 +61,15 @@ public interface CarWashOfferingMapper {
     }
 
     default String getModalityText(CarWashOfferingModality modality) {
-        if (CarWashOfferingModality.IN_PERSON.equals(modality)) {
-            return "Na empresa";
-        } else if (CarWashOfferingModality.AT_HOME.equals(modality)) {
-            return "Domiciliar";
-        }
-        return "";
+        if (modality == null) return "";
+        return switch (modality) {
+            case IN_PERSON -> "Na empresa";
+            case AT_HOME -> "Domiciliar";
+        };
+    }
+
+    default String getStatusText(boolean active, LocalDateTime deletedAt) {
+        if (deletedAt != null) return "Excluído";
+        return active ? "Ativo" : "Inativo";
     }
 }

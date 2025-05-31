@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CarWashOfferingService {
-    CarWashOfferingResponse create(UUID carWashProfileId, CarWashOfferingRequest request);
+    CarWashOfferingResponse create(UUID carWashId, CarWashOfferingRequest request);
+    List<CarWashOfferingResponse> findAllByCarWashId(UUID carWashId);
     CarWashOfferingResponse update(UUID offeringId, CarWashOfferingRequest request);
     void deactivate(UUID offeringId);
-    List<CarWashOfferingResponse> findAllByCarWashProfile(UUID carWashProfileId);
+    void activate(UUID offeringId);
 }

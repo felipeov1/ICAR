@@ -1,5 +1,6 @@
 package com.icar.plataform.api.dto.response.customer;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record CustomerAddressResponse(
@@ -9,6 +10,12 @@ public record CustomerAddressResponse(
         String city,
         String state,
         String street,
-        String number,
-        String additionalInstructions
-) {}
+        String streetNumber,
+        String additionalInstructions,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+) {
+    public String getShortDisplay() {
+        return String.format("%s: %s, %s", addressName, street, streetNumber);
+    }
+}

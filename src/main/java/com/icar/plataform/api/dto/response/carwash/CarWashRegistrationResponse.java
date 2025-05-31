@@ -7,10 +7,11 @@ public record CarWashRegistrationResponse(
         UUID id,
         String cnpj,
         String cpf,
-        String legal_name,
-        String trade_name,
+        String legalName,
+        String tradeName,
         String ownerName,
         String phone,
         String email,
-        String address
+        String address,
+        String subdomain
 ) {}

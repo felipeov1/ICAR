@@ -9,8 +9,10 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring")
 public interface CustomerAddressMapper {
 
+    @Mapping(target = "streetNumber", source = "streetNumber")
     CustomerAddress toEntity(CustomerAddressRequest request, @Context Customer customer);
 
+    @Mapping(target = "streetNumber", source = "streetNumber")  
     CustomerAddressResponse toResponse(CustomerAddress entity);
 
     @AfterMapping

@@ -4,7 +4,7 @@ import com.icar.plataform.api.dto.request.auth.RegisterCustomerRequest;
 import com.icar.plataform.api.dto.response.auth.RegisterCustomerResponse;
 import com.icar.plataform.api.dto.response.auth.EmailVerificationResponse;
 
-public interface CustomerService {
+public interface CustomerAuthService {
     RegisterCustomerResponse create(RegisterCustomerRequest request);
     EmailVerificationResponse verifyEmail(String token);
 }

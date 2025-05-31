@@ -12,5 +12,4 @@ public record CarWashOfferingRequest(
         @NotNull @Min(5) @Max(240) Integer estimatedTime,
         @NotNull CarWashOfferingModality modality,
         Boolean active
-
 ) {}

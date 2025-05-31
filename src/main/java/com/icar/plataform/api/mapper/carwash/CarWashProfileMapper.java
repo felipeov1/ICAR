@@ -8,17 +8,16 @@ import com.icar.plataform.api.dto.request.carwash.profile.CarWashProfileRequest;
 import com.icar.plataform.domain.model.carwash.profile.SpecialDay;
 import com.icar.plataform.domain.model.carwash.profile.WeeklySchedule;
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface CarWashProfileMapper {
     CarWashProfileResponse toDto(CarWashProfile carWashProfile);
     CarWashProfile toEntity(CarWashProfileRequest carWashProfileRequest);
 
-    WeeklyScheduleResponse toWeeklyScheduleDto(WeeklySchedule weeklySchedule);
-    SpecialDayResponse toSpecialDayDto(SpecialDay specialDay);
+    void updateEntity(CarWashProfileRequest request, @MappingTarget CarWashProfile entity);
 
-    List<WeeklyScheduleResponse> toWeeklyScheduleDtos(List<WeeklySchedule> weeklySchedules);
-    List<SpecialDayResponse> toSpecialDayDtos(List<SpecialDay> specialDays);
+
+
 }

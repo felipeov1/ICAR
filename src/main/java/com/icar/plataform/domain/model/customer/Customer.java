@@ -4,6 +4,7 @@ import com.icar.plataform.domain.enums.UserStatus;
 import com.icar.plataform.domain.model.email.EmailVerification;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -42,6 +43,10 @@ public class Customer {
 
     @Column(name = "email_verified")
     private boolean emailVerified;
+
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")

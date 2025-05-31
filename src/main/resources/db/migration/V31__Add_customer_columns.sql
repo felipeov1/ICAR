@@ -1,0 +1,11 @@
+ALTER TABLE customer
+ADD COLUMN created_at TIMESTAMP DEFAULT NOW();
+
+ALTER TABLE customer_address
+RENAME COLUMN "number" TO street_number;
+
+ALTER TABLE customer_address
+ALTER COLUMN address_name TYPE VARCHAR(100),
+ALTER COLUMN city TYPE VARCHAR(100),
+ALTER COLUMN state TYPE VARCHAR(50),
+ALTER COLUMN street TYPE VARCHAR(255);

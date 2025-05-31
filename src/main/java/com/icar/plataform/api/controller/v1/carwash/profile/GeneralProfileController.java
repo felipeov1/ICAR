@@ -16,7 +16,6 @@ import java.util.UUID;
 @RequestMapping("/api/v1/carwashes/{carwashId}/profile")
 @RequiredArgsConstructor
 public class GeneralProfileController {
-
     private final CarWashProfileService carWashProfileService;
 
     @PostMapping

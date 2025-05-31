@@ -24,19 +24,40 @@ public class CarWashRegistrationController {
     @Operation(summary = "Register new car wash")
     @PostMapping
     public ResponseEntity<CarWashRegistrationResponse> create(
-            @Valid @org.springframework.web.bind.annotation.RequestBody CarWashRegistrationRequest request) {
+            @Valid @RequestBody CarWashRegistrationRequest request) {
         return ResponseEntity.status(201).body(service.create(request));
     }
 
     @Operation(summary = "List all Car Washes ordered by creation date")
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<CarWashRegistrationResponse>> findAll() {
         return ResponseEntity.ok(service.findAllByOrderByCreatedAtAsc());
+    }
+
+    @Operation(summary = "Get car wash by subdomain")
+    @GetMapping("/subdomain/{subdomain}")
+    public ResponseEntity<CarWashRegistrationResponse> findBySubdomain(@PathVariable String subdomain) {
+        return ResponseEntity.ok(service.findBySubdomain(subdomain));
     }
 
     @Operation(summary = "Get car wash details")
     @GetMapping("/{id}")
     public ResponseEntity<CarWashRegistrationResponse> findById(@PathVariable UUID id) {
         return ResponseEntity.ok(service.findById(id));
+    }
+
+    @Operation(summary = "Update car wash by id")
+    @PutMapping("/{id}")
+    public ResponseEntity<CarWashRegistrationResponse> update(
+            @PathVariable UUID id,
+            @Valid @RequestBody CarWashRegistrationRequest request) {
+        return ResponseEntity.ok(service.update(id, request));
+    }
+
+    @Operation(summary = "Deactivate car wash by id (soft delete)")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deactivate(@PathVariable UUID id) {
+        service.deactivate(id);
+        return ResponseEntity.noContent().build();
     }
 }

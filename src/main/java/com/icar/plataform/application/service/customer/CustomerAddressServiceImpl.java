@@ -57,7 +57,7 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
         address.setCity(request.city());
         address.setState(request.state());
         address.setStreet(request.street());
-        address.setNumber(request.number());
+        address.setStreetNumber(request.streetNumber());
         address.setAdditionalInstructions(request.additionalInstructions());
 
         address.setUpdatedAt(LocalDateTime.now());

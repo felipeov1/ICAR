@@ -7,7 +7,7 @@ import com.icar.plataform.api.dto.response.customer.AccessTokenResponse;
 import com.icar.plataform.api.dto.response.auth.LoginResponse;
 import com.icar.plataform.api.dto.response.auth.RegisterCustomerResponse;
 import com.icar.plataform.application.service.auth.AuthService;
-import com.icar.plataform.application.service.customer.CustomerService;
+import com.icar.plataform.application.service.customer.CustomerAuthService;
 import com.icar.plataform.domain.model.customer.Customer;
 import com.icar.plataform.domain.repository.customer.CustomerRepository;
 import com.icar.plataform.infrastructure.security.utils.TokenGenerator;
@@ -22,16 +22,16 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Auth", description = "Security to access and register")
+@Tag(name = "Customer Auth", description = "Security to access and register")
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-    private final CustomerService customerService;
-    private final TokenGenerator tokenGenerator; // Adicionado
-    private final CustomerRepository customerRepository; // Adicionado
+    private final CustomerAuthService customerAuthService;
+    private final TokenGenerator tokenGenerator;
+    private final CustomerRepository customerRepository;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request,
@@ -72,7 +72,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterCustomerRequest request) {
         try {
-            RegisterCustomerResponse response = customerService.create(request);
+            RegisterCustomerResponse response = customerAuthService.create(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (CustomValidationException e) {
             return ResponseEntity.badRequest().body(e.getErrors());
@@ -82,7 +82,7 @@ public class AuthController {
     @GetMapping("/verify-email")
     public ResponseEntity<EmailVerificationResponse> verifyEmail(
             @RequestParam String token) {
-        EmailVerificationResponse response = customerService.verifyEmail(token);
+        EmailVerificationResponse response = customerAuthService.verifyEmail(token);
         return ResponseEntity.ok(response);
     }
 

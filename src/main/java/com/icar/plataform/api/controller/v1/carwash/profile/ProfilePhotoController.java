@@ -1,13 +1,12 @@
 package com.icar.plataform.api.controller.v1.carwash.profile;
 
-import com.icar.plataform.api.dto.request.carwash.profile.ProfilePhotoRequest;
-import com.icar.plataform.application.service.carwash.profile.CarWashProfileService;
+import com.icar.plataform.api.dto.request.carwash.profile.PhotoDTO;
 import com.icar.plataform.application.service.carwash.profile.PhotoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,21 +22,22 @@ public class ProfilePhotoController {
     @PostMapping
     public ResponseEntity<Void> addPhotos(
             @PathVariable UUID carwashId,
-            @Valid @RequestBody ProfilePhotoRequest request) {
-        photoService.addPhotos(carwashId, request.getPhotos());
+            @RequestParam("files") List<MultipartFile> files) {
+        photoService.addPhotos(carwashId, files);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
     public ResponseEntity<Void> removePhoto(
             @PathVariable UUID carwashId,
-            @RequestParam String photoUrl) {
-        photoService.removePhoto(carwashId, photoUrl);
+            @RequestParam String photoName) {  // ALTERAÇÃO AQUI
+        photoService.removePhoto(carwashId, photoName);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<String>> getPhotos(@PathVariable UUID carwashId) {
-        return ResponseEntity.ok(photoService.getPhotos(carwashId));
+    public ResponseEntity<List<PhotoDTO>> getPhotos(@PathVariable UUID carwashId) {
+        List<PhotoDTO> photos = photoService.getPhotos(carwashId);
+        return ResponseEntity.ok(photos);
     }
 }
