@@ -1,6 +1,5 @@
 package com.icar.plataform.domain.model.carwash.offering;
 
-import com.icar.plataform.domain.enums.CarWashOfferingModality;
 import com.icar.plataform.domain.model.carwash.profile.CarWashProfile;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -36,10 +35,6 @@ public class CarWashOffering {
 
     @Column(name = "estimated_time", nullable = false)
     private Integer estimatedTime; // in minutes
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private CarWashOfferingModality modality;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;

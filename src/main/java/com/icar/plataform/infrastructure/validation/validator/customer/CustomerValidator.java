@@ -44,7 +44,7 @@ public class CustomerValidator {
 
         validateField(errors, "password", password,
                 value -> !value.matches(".*[0-9].*"),
-                "Password must contain at least one number",
+                "Password must contain at least one getStreetNumber",
                 "PASSWORD_MISSING_NUMBER"
         );
 
@@ -54,10 +54,10 @@ public class CustomerValidator {
                 "PASSWORD_MISSING_SPECIAL"
         );
 
-        // Phone number validation
+        // Phone getStreetNumber validation
         validateField(errors, "phone", request.phone(),
                 value -> value == null || !value.matches("^\\d{11}$"),
-                "Phone number must contain exactly 11 digits",
+                "Phone getStreetNumber must contain exactly 11 digits",
                 "INVALID_PHONE"
         );
 
@@ -73,7 +73,7 @@ public class CustomerValidator {
         if (customerRepository.existsByPhone(request.phone())) {
             errors.add(ValidationError.builder()
                     .field("phone")
-                    .message("Phone number is already registered")
+                    .message("Phone getStreetNumber is already registered")
                     .errorCode("PHONE_ALREADY_EXISTS")
                     .build());
         }

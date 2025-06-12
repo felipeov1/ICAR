@@ -3,7 +3,6 @@ package com.icar.plataform.api.mapper.carwash;
 import com.icar.plataform.api.dto.request.carwash.profile.CarWashOfferingRequest;
 import com.icar.plataform.api.dto.response.carwash.profile.CarWashOfferingResponse;
 import com.icar.plataform.domain.model.carwash.offering.CarWashOffering;
-import com.icar.plataform.domain.enums.CarWashOfferingModality;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -22,11 +21,9 @@ public interface CarWashOfferingMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "estimatedTime", source = "estimatedTime")
-    @Mapping(target = "modality", source = "modality")
     CarWashOffering toEntity(CarWashOfferingRequest dto);
 
     @Mapping(target = "statusText", expression = "java(getStatusText(entity.isActive(), entity.getDeletedAt()))")
-    @Mapping(target = "modalityText", expression = "java(getModalityText(entity.getModality()))")
     @Mapping(target = "formattedPrice", expression = "java(formatPrice(entity.getPrice()))")
     @Mapping(target = "formattedTime", expression = "java(formatEstimatedTime(entity.getEstimatedTime()))")
     CarWashOfferingResponse toDto(CarWashOffering entity);
@@ -60,13 +57,7 @@ public interface CarWashOfferingMapper {
         }
     }
 
-    default String getModalityText(CarWashOfferingModality modality) {
-        if (modality == null) return "";
-        return switch (modality) {
-            case IN_PERSON -> "Na empresa";
-            case AT_HOME -> "Domiciliar";
-        };
-    }
+
 
     default String getStatusText(boolean active, LocalDateTime deletedAt) {
         if (deletedAt != null) return "Excluído";

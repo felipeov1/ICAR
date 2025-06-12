@@ -1,9 +1,9 @@
-package com.icar.plataform.api.dto.response;
+package com.icar.plataform.api.dto.response.appointment;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.icar.plataform.domain.enums.AppointmentStatus;
-import com.icar.plataform.domain.enums.PaymentMethodType;
+import com.icar.plataform.domain.enums.PaymentMethod;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,19 +13,14 @@ public record AppointmentResponse(
         String customerName,
         UUID carWashId,
         String carWashName,
-        UUID serviceId,
+        UUID offeringId,
         String serviceName,
-
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        AddressSummaryResponse address,  // endereço resumido aqui
+        String carType,
         LocalDateTime dateTime,
-
         AppointmentStatus status,
-        PaymentMethodType paymentMethod,
-        Double amountPaid,
-
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+        PaymentMethod paymentMethod,
+        BigDecimal amountPaid,
         LocalDateTime createdAt,
-
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
         LocalDateTime updatedAt
 ) {}

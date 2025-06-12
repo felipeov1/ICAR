@@ -1,6 +1,5 @@
 package com.icar.plataform.api.dto.response.carwash.profile;
 
-import com.icar.plataform.domain.enums.CarWashOfferingModality;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
@@ -14,7 +13,6 @@ public record CarWashOfferingResponse(
         String formattedPrice,
         String formattedTime,
         Integer estimatedTime,
-        @NotNull CarWashOfferingModality modality,
         String modalityText,
         Boolean active,
         String statusText

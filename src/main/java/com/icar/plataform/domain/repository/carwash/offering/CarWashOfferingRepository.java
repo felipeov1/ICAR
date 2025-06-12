@@ -5,6 +5,7 @@ import com.icar.plataform.domain.model.carwash.profile.CarWashProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -37,4 +38,8 @@ public interface CarWashOfferingRepository extends JpaRepository<CarWashOffering
     @Modifying
     @Query("UPDATE CarWashOffering o SET o.active = :active WHERE o.id = :id")
     void updateActiveStatus(UUID id, boolean active);
+
+    @Query("SELECT o FROM CarWashOffering o WHERE o.id = :offeringId AND o.profile.carWashRegistration.id = :carWashId")
+    Optional<CarWashOffering> findByIdAndCarWashId(@Param("offeringId") UUID serviceId,
+                                                   @Param("carWashId") UUID carWashId);
 }
