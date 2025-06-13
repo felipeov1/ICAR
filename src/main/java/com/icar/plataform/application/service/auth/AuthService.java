@@ -8,6 +8,7 @@ import com.icar.plataform.domain.repository.customer.CustomerRepository;
 import com.icar.plataform.infrastructure.security.utils.TokenGenerator;
 import com.icar.plataform.shared.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,11 @@ public class AuthService {
         if (!passwordEncoder.matches(request.password(), customer.getPassword())) {
             throw new BusinessException("Credenciais inválidas");
         }
+
+        if (!customer.isEmailVerified()) {
+            throw new BusinessException("E-mail não verificado");
+        }
+
 
         return new LoginResponse(
                 tokenGenerator.generateAccessToken(customer), // Access Token (1 hora)

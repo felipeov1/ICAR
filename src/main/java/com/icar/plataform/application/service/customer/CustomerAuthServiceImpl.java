@@ -40,30 +40,55 @@ public class CustomerAuthServiceImpl implements CustomerAuthService {
     @Override
     @Transactional
     public RegisterCustomerResponse create(RegisterCustomerRequest request) {
-        // Validações completas (formato + regras de negócio)
         customerValidator.validateCreate(request);
 
-        // Criação do cliente
-        Customer customer = customerMapper.toEntity(request);
-        customer.setPassword(passwordEncoder.encode(request.password()));
-        customer.setStatus(UserStatus.PENDING); // Alterado para PENDING
+        if (customerRepository.existsByEmail(request.email())) {
+            Customer existing = customerRepository.findByEmail(request.email())
+                    .orElseThrow(() -> new BusinessException("Erro ao verificar e-mail"));
 
-        // Salvamento
-        Customer saved = customerRepository.save(customer);
+            if (!existing.isEmailVerified()) {
+                try {
+                    emailVerificationRepository.deleteByCustomer(existing);
 
-        EmailVerification verification = EmailVerification.builder()
-                .customer(customer)
-                .token(UUID.randomUUID().toString())
-                .createdAt(LocalDateTime.now())
-                .expiresAt(LocalDateTime.now().plusHours(1))
-                .build();
+                    EmailVerification verification = EmailVerification.builder()
+                            .customer(existing)
+                            .token(UUID.randomUUID().toString())
+                            .createdAt(LocalDateTime.now())
+                            .expiresAt(LocalDateTime.now().plusHours(1))
+                            .build();
 
-        emailVerificationRepository.save(verification);
+                    emailVerificationRepository.save(verification);
+                    emailService.sendVerificationEmail(existing.getEmail(), verification.getToken());
 
-        // Envia e-mail
-        emailService.sendVerificationEmail(saved.getEmail(), verification.getToken());
+                    return customerMapper.toDto(existing);
+                } catch (Exception e) {
+                    throw new BusinessException("Falha ao reenviar e-mail de verificação: " + e.getMessage());
+                }
+            }
+            throw new BusinessException("Este e-mail já está cadastrado e verificado");
+        }
+        System.out.println("Tentando criar conta para: " + request.email());
+        try {
+            Customer customer = customerMapper.toEntity(request);
+            customer.setPassword(passwordEncoder.encode(request.password()));
+            customer.setStatus(UserStatus.PENDING);
 
-        return customerMapper.toDto(saved);
+            Customer saved = customerRepository.save(customer);
+
+            EmailVerification verification = EmailVerification.builder()
+                    .customer(customer)
+                    .token(UUID.randomUUID().toString())
+                    .createdAt(LocalDateTime.now())
+                    .expiresAt(LocalDateTime.now().plusHours(1))
+                    .build();
+
+            emailVerificationRepository.save(verification);
+            emailService.sendVerificationEmail(saved.getEmail(), verification.getToken());
+
+            return customerMapper.toDto(saved);
+        } catch (Exception e) {
+            throw new BusinessException("Falha ao criar conta: " + e.getMessage());
+        }
     }
 
     @Override

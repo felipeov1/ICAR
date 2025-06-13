@@ -1,0 +1,1 @@
+ALTER TABLE car_wash_profile_offering DROP COLUMN "modality";
