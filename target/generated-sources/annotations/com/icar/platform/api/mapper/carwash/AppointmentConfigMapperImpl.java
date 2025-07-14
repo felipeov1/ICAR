@@ -1,0 +1,68 @@
+package com.icar.platform.api.mapper.carwash;
+
+import com.icar.platform.api.dto.request.carwash.profile.AppointmentConfigRequest;
+import com.icar.platform.api.dto.response.carwash.profile.AppointmentConfigResponse;
+import com.icar.platform.domain.model.carwash.profile.AppointmentConfig;
+import javax.annotation.processing.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = "org.mapstruct.ap.MappingProcessor",
+    date = "2025-07-13T20:04:58-0300",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
+)
+@Component
+public class AppointmentConfigMapperImpl implements AppointmentConfigMapper {
+
+    @Override
+    public AppointmentConfigResponse toResponse(AppointmentConfig entity) {
+        if ( entity == null ) {
+            return null;
+        }
+
+        AppointmentConfigResponse appointmentConfigResponse = new AppointmentConfigResponse();
+
+        appointmentConfigResponse.setMaxAdvanceBookingDays( entity.getMaxAdvanceBookingDays() );
+        appointmentConfigResponse.setGapMinutes( entity.getGapMinutes() );
+        appointmentConfigResponse.setAllowOvertime( entity.isAllowOvertime() );
+        appointmentConfigResponse.setMinAdvanceNoticeMinutes( entity.getMinAdvanceNoticeMinutes() );
+        appointmentConfigResponse.setMinEditNoticeMinutes( entity.getMinEditNoticeMinutes() );
+        appointmentConfigResponse.setMinCancelNoticeMinutes( entity.getMinCancelNoticeMinutes() );
+
+        return appointmentConfigResponse;
+    }
+
+    @Override
+    public void updateFromRequest(AppointmentConfigRequest request, AppointmentConfig entity) {
+        if ( request == null ) {
+            return;
+        }
+
+        entity.setMinAdvanceNoticeMinutes( request.getMinAdvanceNoticeMinutes() );
+        entity.setMinEditNoticeMinutes( request.getMinEditNoticeMinutes() );
+        entity.setMinCancelNoticeMinutes( request.getMinCancelNoticeMinutes() );
+        entity.setGapMinutes( request.getGapMinutes() );
+        if ( request.getAllowOvertime() != null ) {
+            entity.setAllowOvertime( request.getAllowOvertime() );
+        }
+    }
+
+    @Override
+    public AppointmentConfig toEntity(AppointmentConfigRequest request) {
+        if ( request == null ) {
+            return null;
+        }
+
+        AppointmentConfig appointmentConfig = new AppointmentConfig();
+
+        appointmentConfig.setMinAdvanceNoticeMinutes( request.getMinAdvanceNoticeMinutes() );
+        appointmentConfig.setMinEditNoticeMinutes( request.getMinEditNoticeMinutes() );
+        appointmentConfig.setMinCancelNoticeMinutes( request.getMinCancelNoticeMinutes() );
+        appointmentConfig.setGapMinutes( request.getGapMinutes() );
+        if ( request.getAllowOvertime() != null ) {
+            appointmentConfig.setAllowOvertime( request.getAllowOvertime() );
+        }
+
+        return appointmentConfig;
+    }
+}

@@ -1,0 +1,61 @@
+package com.icar.platform.domain.model.customer;
+
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name = "customer_address")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CustomerAddress {
+
+    @Id
+    @GeneratedValue
+    private UUID id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
+
+    @Column(name = "address_name", nullable = false)
+    private String addressName;
+
+    @Column(name = "zip_code", nullable = false)
+    private String zipCode;
+
+    @Column(nullable = false)
+    private String city;
+
+    @Column(nullable = false)
+    private String state;
+
+    @Column(nullable = false)
+    private String street;
+
+    @Column(nullable = false)
+    private String neighborhood;
+
+    @Column(name = "street_number", nullable = false)
+    private String streetNumber;
+
+    @Column(name = "additional_instructions")
+    private String additionalInstructions;
+
+    @CreationTimestamp
+    private ZonedDateTime createdAt;
+
+    @UpdateTimestamp
+    private ZonedDateTime updatedAt;
+
+    @Column(name = "deleted_at")
+    private ZonedDateTime deletedAt;
+}

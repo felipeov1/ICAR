@@ -1,0 +1,22 @@
+package com.icar.platform.api.mapper.customer;
+
+import com.icar.platform.api.dto.request.customer.CustomerAddressRequest;
+import com.icar.platform.api.dto.response.customer.CustomerAddressResponse;
+import com.icar.platform.domain.model.customer.Customer;
+import com.icar.platform.domain.model.customer.CustomerAddress;
+import org.mapstruct.*;
+
+@Mapper(componentModel = "spring")
+public interface CustomerAddressMapper {
+
+    @Mapping(target = "streetNumber", source = "streetNumber")
+    CustomerAddress toEntity(CustomerAddressRequest request, @Context Customer customer);
+
+    @Mapping(target = "streetNumber", source = "streetNumber")  
+    CustomerAddressResponse toResponse(CustomerAddress entity);
+
+    @AfterMapping
+    default void setCustomer(@MappingTarget CustomerAddress address, @Context Customer customer) {
+        address.setCustomer(customer);
+    }
+}
