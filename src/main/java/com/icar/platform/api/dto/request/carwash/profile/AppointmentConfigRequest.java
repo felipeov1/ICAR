@@ -9,16 +9,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AppointmentConfigRequest {
-    @Positive
     private Integer minAdvanceNoticeMinutes;
-    @Positive
     private Integer minEditNoticeMinutes;
-    @Positive
     private Integer minCancelNoticeMinutes;
-
-    @PositiveOrZero
     private Integer gapMinutes;
-
     @NotNull
     private Boolean allowOvertime;
 }

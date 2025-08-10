@@ -1,9 +1,9 @@
 package com.icar.platform.infrastructure.security.filter;
 
+import com.icar.platform.infrastructure.security.service.CarWashDetailsService;
 import com.icar.platform.infrastructure.security.service.CustomerDetailsService;
 import com.icar.platform.infrastructure.security.utils.TokenGenerator;
 import io.micrometer.common.lang.NonNullApi;
-import io.micrometer.common.lang.Nullable;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,26 +12,27 @@ import org.flywaydb.core.internal.util.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Component
 @NonNullApi
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
-
     private final TokenGenerator tokenGenerator;
     private final CustomerDetailsService customerDetailsService;
+    private final CarWashDetailsService carWashDetailsService;
 
     public JwtAuthenticationFilter(TokenGenerator tokenGenerator,
-                                   CustomerDetailsService customerDetailsService) {
+                                   CustomerDetailsService customerDetailsService,
+                                   CarWashDetailsService carWashDetailsService) {
         this.tokenGenerator = tokenGenerator;
         this.customerDetailsService = customerDetailsService;
+        this.carWashDetailsService = carWashDetailsService;
     }
 
     @Override
@@ -41,26 +42,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt)) {
+            if (StringUtils.hasText(jwt) && tokenGenerator.validateToken(jwt, null)) {
+                String subject = tokenGenerator.getSubjectFromToken(jwt);
+                String role = tokenGenerator.getRoleFromToken(jwt);
 
-                if (!tokenGenerator.validateToken(jwt, null)) {
-                    logger.warn("Token structure invalid or expired");
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
-                    return;
-                }
-
-                String email = tokenGenerator.getEmailFromToken(jwt);
-                UserDetails userDetails = customerDetailsService.loadUserByUsername(email);
-
-                if (!tokenGenerator.validateToken(jwt, userDetails)) {
-                    logger.warn("Token doesn't match user details");
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
-                    return;
-                }
-
-                if(!tokenGenerator.validateToken(jwt, userDetails)) {
-                    logger.warn("Token doesnt match");
-                }
+                UserDetailsService userDetailsService = getUserDetailsService(role);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(subject);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
@@ -68,21 +55,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 null,
                                 userDetails.getAuthorities());
 
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request));
-
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception ex) {
             logger.error("Authentication failed", ex);
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed");
-            return;
+            SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);
     }
 
-    @Nullable
+    private UserDetailsService getUserDetailsService(String role) {
+        if ("CARWASH".equalsIgnoreCase(role)) {
+            return carWashDetailsService;
+        }
+        return customerDetailsService;
+    }
+
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {

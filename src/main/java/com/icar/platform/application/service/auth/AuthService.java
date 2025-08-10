@@ -1,6 +1,7 @@
 package com.icar.platform.application.service.auth;
 
 import com.icar.platform.api.dto.request.auth.LoginRequest;
+import com.icar.platform.api.dto.response.auth.UserDto;
 import com.icar.platform.api.dto.response.customer.CustomerResponse;
 import com.icar.platform.api.dto.response.auth.LoginResponse;
 import com.icar.platform.domain.model.customer.Customer;
@@ -23,7 +24,7 @@ public class AuthService {
     @Value("${jwt.expiration.access-token}")
     private long accessTokenExpirationMs;
 
-    public LoginResponse authenticate(LoginRequest request, boolean rememberMe) {
+    public LoginResponse authenticate(LoginRequest request) {
         Customer customer = customerRepository.findByEmail(request.email())
                 .orElseThrow(() -> new BusinessException("Credenciais inválidas"));
 
@@ -35,20 +36,16 @@ public class AuthService {
             throw new BusinessException("E-mail não verificado");
         }
 
-        long refreshExpiration = rememberMe ? 2592000000L : 86400000L;
-        String refreshToken = tokenGenerator.generateToken(customer, refreshExpiration);
-        long accessTokenValiditySeconds = accessTokenExpirationMs / 1000;
+        String accessToken = tokenGenerator.generateAccessToken(customer);
+        String refreshToken = tokenGenerator.generateRefreshToken(customer);
 
-        return new LoginResponse(
-                tokenGenerator.generateAccessToken(customer),
-                refreshToken,
-                accessTokenValiditySeconds,
-                new CustomerResponse(
-                        customer.getId(),
-                        customer.getFullName(),
-                        customer.getEmail(),
-                        customer.isEmailVerified()
-                )
-        );
+        UserDto userDto = new UserDto();
+        userDto.setId(customer.getId());
+        userDto.setEmail(customer.getEmail());
+        userDto.setFullName(customer.getFullName());
+        userDto.setRole("CUSTOMER");
+        userDto.setEmailVerified(customer.isEmailVerified());
+
+        return new LoginResponse(accessToken, refreshToken, userDto);
     }
 }

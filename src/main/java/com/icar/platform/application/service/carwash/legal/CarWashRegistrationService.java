@@ -11,9 +11,12 @@ import java.util.UUID;
 @Service
 public interface CarWashRegistrationService {
     CarWashRegistrationResponse create(CarWashRegistrationRequest dto);
+
     List<CarWashRegistrationResponse> findAllByOrderByCreatedAtAsc();
+
     CarWashRegistrationResponse findById(UUID id);
-    CarWashRegistrationResponse findBySubdomain(String slug);
+
     CarWashRegistrationResponse update(UUID id, CarWashRegistrationRequest dto);
+
     void deactivate(UUID id);
 }

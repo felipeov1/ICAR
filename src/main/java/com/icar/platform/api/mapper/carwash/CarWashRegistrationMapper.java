@@ -7,7 +7,6 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface CarWashRegistrationMapper {
-
     CarWashRegistration toEntity(CarWashRegistrationRequest dto);
     CarWashRegistrationResponse toDto(CarWashRegistration entity);
 }

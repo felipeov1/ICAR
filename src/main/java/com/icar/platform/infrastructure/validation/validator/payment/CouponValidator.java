@@ -6,14 +6,13 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Component
 public class CouponValidator {
 
     public void validateCoupon(Coupon coupon, UUID customerId, BigDecimal orderValue) {
-        ZonedDateTime now = ZonedDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
 
         if (coupon.getValidFrom().isAfter(now)) {
             throw new BusinessException("Este cupom ainda não está válido");

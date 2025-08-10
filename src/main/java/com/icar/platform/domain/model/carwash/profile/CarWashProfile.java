@@ -9,7 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -40,9 +40,6 @@ public class CarWashProfile {
     @Column(name = "reviews", nullable = false)
     private Integer reviews;
 
-    @Column(name = "price_range", nullable = false, length = 10)
-    private String priceRange;
-
     @Column(name = "modalities", columnDefinition = "text[]")
     private String[] modalities;
 
@@ -51,6 +48,21 @@ public class CarWashProfile {
 
     @Column(name = "cover_photo", length = 255)
     private String coverPhoto;
+
+    @Column(unique = true, nullable = false, length = 100)
+    private String subdomain;
+
+    @Column(length = 20)
+    private String whatsapp;
+
+    @Column(name = "locations", columnDefinition = "text[]")
+    private String[] locations;
+
+    @Column(length = 500)
+    private String observations;
+
+    @Column(name = "is_onboarding_complete", nullable = false)
+    private boolean isOnboardingComplete = false;
 
     @ElementCollection
     @CollectionTable(
@@ -86,9 +98,16 @@ public class CarWashProfile {
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private ZonedDateTime updatedAt;
+    private LocalDateTime updatedAt;
+
+    public boolean isComplete() {
+        return name != null && !name.isEmpty() &&
+                whatsapp != null && !whatsapp.isEmpty() &&
+                subdomain != null && !subdomain.isEmpty() &&
+                isOnboardingComplete;
+    }
 }

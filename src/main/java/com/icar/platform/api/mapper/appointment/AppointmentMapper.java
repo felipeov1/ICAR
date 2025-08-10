@@ -1,13 +1,15 @@
 package com.icar.platform.api.mapper.appointment;
 
 import com.icar.platform.api.dto.response.appointment.AppointmentResponse;
+import com.icar.platform.api.dto.response.carwash.CompanyAppointmentResponse;
 import com.icar.platform.domain.model.appointment.CarWashAppointment;
+import com.icar.platform.domain.model.carwash.offering.VehicleOfferingDetail;
 import com.icar.platform.domain.model.carwash.profile.AppointmentConfig;
+import com.icar.platform.domain.model.carwash.profile.CompanyCustomer;
+import com.icar.platform.domain.model.customer.Customer;
 import com.icar.platform.domain.repository.carwash.profile.AppointmentConfigRepository;
 import com.icar.platform.domain.repository.carwash.profile.ReviewRepository;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -23,25 +25,55 @@ public abstract class AppointmentMapper {
     protected AppointmentConfigRepository appointmentConfigRepository;
     @Autowired
     protected ReviewRepository reviewRepository;
-    public record ExtraServiceInfo(UUID id, String name, BigDecimal price, Integer time) {}
+
     @Mapping(target = "carWashName", source = "entity.profile.name")
     @Mapping(target = "carwashId", source = "entity.profile.id")
-    @Mapping(source = "offering.id", target = "offeringId")
-    @Mapping(source = "address.id", target = "addressId")
+    @Mapping(target = "addressId", source = "address.id")
     @Mapping(target = "carWashPhone", source = "entity.profile.carWashRegistration.phone")
-    @Mapping(target = "serviceName", source = "entity.offering.name")
-    @Mapping(target = "extraServices", source = "entity", qualifiedByName = "mapExtraServices")
     @Mapping(target = "vehicleType", source = "entity.carType")
     @Mapping(target = "finalPrice", source = "entity.amountPaid")
     @Mapping(target = "addressStreet", source = "entity.address.street")
     @Mapping(target = "addressNumber", source = "entity.address.streetNumber")
     @Mapping(target = "addressCityState", expression = "java(entity.getAddress().getCity() + \"/\" + entity.getAddress().getState())")
     @Mapping(target = "addressInstructions", source = "entity.address.additionalInstructions")
-    @Mapping(target = "estimatedTime", source = "entity.totalDurationMinutes")
+    @Mapping(target = "totalDurationMinutes", source = "entity.totalDurationMinutes")
     @Mapping(target = "minCancelNoticeMinutes", source = "entity", qualifiedByName = "getMinCancelNotice")
     @Mapping(target = "minEditNoticeMinutes", source = "entity", qualifiedByName = "getMinEditNotice")
     @Mapping(target = "hasBeenReviewed", source = "entity", qualifiedByName = "checkIfReviewed")
+    @Mapping(target = "services", source = "entity", qualifiedByName = "mapServices")
     public abstract AppointmentResponse toResponse(CarWashAppointment entity);
+
+
+    @Mapping(target = "status", expression = "java(entity.getStatus().name())")
+    @Mapping(target = "paymentMethod", expression = "java(entity.getPaymentMethod().name())")
+    @Mapping(target = "finalPrice", source = "amountPaid")
+    @Mapping(target = "vehicleType", source = "carType")
+    @Mapping(target = "services", source = "entity", qualifiedByName = "mapCompanyServices")
+    @Mapping(target = "addressStreet", source = "entity.address.street")
+    @Mapping(target = "addressNumber", source = "entity.address.streetNumber")
+    @Mapping(target = "addressCityState", expression = "java(entity.getAddress().getCity() + \"/\" + entity.getAddress().getState())")
+    public abstract CompanyAppointmentResponse toCompanyResponse(CarWashAppointment entity);
+
+    @Named("mapCompanyServices")
+    public List<CompanyAppointmentResponse.ServiceInfo> mapCompanyServices(CarWashAppointment appointment) {
+        if (appointment.getSelectedServices() == null || appointment.getCarType() == null) {
+            return Collections.emptyList();
+        }
+        String vehicleType = appointment.getCarType();
+        return appointment.getSelectedServices().stream()
+                .map(service -> {
+                    VehicleOfferingDetail detail = service.getVehicleDetails().get(vehicleType);
+                    BigDecimal price = (detail != null) ? detail.getPrice() : null;
+                    Integer time = (detail != null) ? detail.getEstimatedTime() : null;
+                    return new CompanyAppointmentResponse.ServiceInfo(
+                            service.getId(),
+                            service.getName(),
+                            price,
+                            time
+                    );
+                })
+                .collect(Collectors.toList());
+    }
 
     @Named("getMinCancelNotice")
     public Integer getMinCancelNotice(CarWashAppointment appointment) {
@@ -71,19 +103,73 @@ public abstract class AppointmentMapper {
         return reviewRepository.existsByAppointmentId(appointment.getId());
     }
 
-    @Named("mapExtraServices")
-    public List<AppointmentResponse.ExtraServiceInfo> mapExtraServices(CarWashAppointment appointment) {
-        if (appointment.getSelectedExtraServices() == null || appointment.getCarType() == null) {
+    @Named("mapServices")
+    public List<AppointmentResponse.ServiceInfo> mapServices(CarWashAppointment appointment) {
+        if (appointment.getSelectedServices() == null || appointment.getCarType() == null) {
             return Collections.emptyList();
         }
         String vehicleType = appointment.getCarType();
-        return appointment.getSelectedExtraServices().stream()
-                .map(extra -> new AppointmentResponse.ExtraServiceInfo(
-                        extra.getId(),
-                        extra.getName(),
-                        extra.getVehiclePrices().get(vehicleType),
-                        extra.getVehicleEstimatedTimes().get(vehicleType)
-                ))
+        return appointment.getSelectedServices().stream()
+                .map(service -> {
+                    VehicleOfferingDetail detail = service.getVehicleDetails().get(vehicleType);
+                    BigDecimal price = (detail != null) ? detail.getPrice() : null;
+                    Integer time = (detail != null) ? detail.getEstimatedTime() : null;
+                    return new AppointmentResponse.ServiceInfo(
+                            service.getId(),
+                            service.getName(),
+                            price,
+                            time,
+                            service.getServiceType()
+                    );
+                })
                 .collect(Collectors.toList());
+    }
+
+    @AfterMapping
+    protected void mapCustomerInfoToCompanyResponse(CarWashAppointment entity, @MappingTarget CompanyAppointmentResponse response) {
+        if (entity == null) {
+            return;
+        }
+
+        if (entity.getCompanyCustomer() != null) {
+            CompanyCustomer companyCustomer = entity.getCompanyCustomer();
+            response.setCustomer(new CompanyAppointmentResponse.CustomerInfo(
+                    companyCustomer.getId(),
+                    companyCustomer.getFullName(),
+                    companyCustomer.getPhone()
+            ));
+        }
+        else if (entity.getCustomer() != null) {
+            Customer customer = entity.getCustomer();
+            response.setCustomer(new CompanyAppointmentResponse.CustomerInfo(
+                    customer.getId(),
+                    customer.getFullName(),
+                    customer.getPhone()
+            ));
+        }
+    }
+
+    @AfterMapping
+    protected void mapCustomerInfoToResponse(CarWashAppointment entity, @MappingTarget AppointmentResponse response) {
+        if (entity == null) {
+            return;
+        }
+
+        if (entity.getCompanyCustomer() != null) {
+            CompanyCustomer companyCustomer = entity.getCompanyCustomer();
+            response.setCustomer(new AppointmentResponse.CustomerInfo(
+                    companyCustomer.getId(),
+                    companyCustomer.getFullName(),
+                    companyCustomer.getPhone()
+            ));
+        }
+        else if (entity.getCustomer() != null) {
+            Customer customer = entity.getCustomer();
+            response.setCustomer(new AppointmentResponse.CustomerInfo(
+                    customer.getId(),
+                    customer.getFullName(),
+                    customer.getPhone()
+            ));
+        }
     }
 }

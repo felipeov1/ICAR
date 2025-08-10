@@ -7,7 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,14 +46,14 @@ public class Customer {
 
     @CreationTimestamp
     @Column(name = "created_at")
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private ZonedDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
-    private ZonedDateTime deletedAt;
+    private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<EmailVerification> emailVerifications;

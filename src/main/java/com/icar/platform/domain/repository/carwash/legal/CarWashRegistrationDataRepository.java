@@ -13,9 +13,6 @@ import java.util.UUID;
 @Repository
 public interface CarWashRegistrationDataRepository extends JpaRepository<CarWashRegistration, UUID> {
 
-    boolean existsBySubdomainAndDeletedAtIsNull(String subdomain);
-
-
     @Override
     @NonNull
     @EntityGraph(attributePaths = {"profile"})
@@ -27,6 +24,5 @@ public interface CarWashRegistrationDataRepository extends JpaRepository<CarWash
     @EntityGraph(attributePaths = {"profile"})
     Optional<CarWashRegistration> findByIdAndDeletedAtIsNull(UUID id);
 
-    @EntityGraph(attributePaths = {"profile"})
-    Optional<CarWashRegistration> findBySubdomainAndDeletedAtIsNull(String subdomain);
+    Optional<CarWashRegistration> findByEmail(String email);
 }

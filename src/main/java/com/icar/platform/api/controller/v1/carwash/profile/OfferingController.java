@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Tag(name = "Car Wash Profile - Offerings", description = "Manage car wash services and offerings")
 @RestController
-@RequestMapping("/api/v1/carwashes/{carWashId}/offerings")
+@RequestMapping("/api/v1/profile/{profileId}/offerings")
 @RequiredArgsConstructor
 public class OfferingController {
 
@@ -25,24 +25,24 @@ public class OfferingController {
 
     @Operation(summary = "Get all offerings for a car wash")
     @GetMapping
-    public ResponseEntity<List<CarWashOfferingResponse>> findAllOfferings(@PathVariable UUID carWashId) {
-        return ResponseEntity.ok(offeringService.findAllByProfileId(carWashId));
+    public ResponseEntity<List<CarWashOfferingResponse>> findAllOfferings(@PathVariable UUID profileId) {
+        return ResponseEntity.ok(offeringService.findAllByProfileId(profileId));
     }
 
     @Operation(summary = "Get offerings for a specific vehicle type")
     @GetMapping("/vehicle-type/{vehicleType}")
     public ResponseEntity<List<CarWashOfferingResponse>> findOfferingsByVehicleType(
-            @PathVariable UUID carWashId,
+            @PathVariable UUID profileId,
             @PathVariable String vehicleType) {
-        return ResponseEntity.ok(offeringService.findByProfileIdAndVehicleType(carWashId, vehicleType));
+        return ResponseEntity.ok(offeringService.findByProfileIdAndVehicleType(profileId, vehicleType));
     }
 
     @Operation(summary = "Create a new offering")
     @PostMapping
     public ResponseEntity<CarWashOfferingResponse> createOffering(
-            @PathVariable UUID carWashId,
+            @PathVariable UUID profileId,
             @Valid @RequestBody CarWashOfferingRequest request) {
-        CarWashOfferingResponse response = offeringService.create(carWashId, request);
+        CarWashOfferingResponse response = offeringService.create(profileId, request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(response.id())
@@ -53,7 +53,7 @@ public class OfferingController {
     @Operation(summary = "Update an existing offering")
     @PutMapping("/{offeringId}")
     public ResponseEntity<CarWashOfferingResponse> updateOffering(
-            @PathVariable UUID carWashId,
+            @PathVariable UUID profileId,
             @PathVariable UUID offeringId,
             @Valid @RequestBody CarWashOfferingRequest request) {
         return ResponseEntity.ok(offeringService.update(offeringId, request));
@@ -62,7 +62,7 @@ public class OfferingController {
     @Operation(summary = "Deactivate an offering")
     @DeleteMapping("/{offeringId}")
     public ResponseEntity<Void> deactivateOffering(
-            @PathVariable UUID carWashId,
+            @PathVariable UUID profileId,
             @PathVariable UUID offeringId) {
         offeringService.deactivate(offeringId);
         return ResponseEntity.noContent().build();
@@ -71,11 +71,9 @@ public class OfferingController {
     @Operation(summary = "Activate an offering")
     @PatchMapping("/{offeringId}/activate")
     public ResponseEntity<Void> activateOffering(
-            @PathVariable UUID carWashId,
+            @PathVariable UUID profileId,
             @PathVariable UUID offeringId) {
         offeringService.activate(offeringId);
         return ResponseEntity.noContent().build();
     }
-
-
 }

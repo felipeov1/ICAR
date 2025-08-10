@@ -1,5 +1,6 @@
 package com.icar.platform.infrastructure.security.utils;
 
+import com.icar.platform.domain.model.carwash.legal.CarWashRegistration;
 import com.icar.platform.domain.model.customer.Customer;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -27,29 +28,50 @@ public class TokenGenerator {
     @Value("${jwt.secret}")
     private String secret;
 
-
     public String generateAccessToken(Customer customer) {
-
         return generateToken(customer, accessTokenExpiration);
-
     }
 
     public String generateRefreshToken(Customer customer) {
-
         return generateToken(customer, 2592000000L);
     }
 
-    public String generateToken(Customer customer, long expirationTimeMillis) {
-        try {
-            Map<String, Object> claims = new HashMap<>();
-            claims.put("id", customer.getId());
-            claims.put("email", customer.getEmail());
-            claims.put("fullName", customer.getFullName());
-            claims.put("role", "CUSTOMER");
+    public String generateTokenForCarWash(CarWashRegistration carWash, long expirationTimeMillis) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", carWash.getId());
+        claims.put("email", carWash.getEmail());
+        claims.put("tradeName", carWash.getTradeName());
+        claims.put("role", "CARWASH");
+        claims.put("profileId", carWash.getProfileId());
+        claims.put("isProfileComplete", carWash.isProfileComplete());
 
+        return createToken(claims, carWash.getEmail(), expirationTimeMillis);
+    }
+
+    public String generateToken(Customer customer, long expirationTimeMillis) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", customer.getId());
+        claims.put("email", customer.getEmail());
+        claims.put("fullName", customer.getFullName());
+        claims.put("role", "CUSTOMER");
+        claims.put("emailVerified", customer.isEmailVerified());
+
+        return createToken(claims, customer.getEmail(), expirationTimeMillis);
+    }
+
+    public String generateAccessTokenForCarWash(CarWashRegistration carWash) {
+        return generateTokenForCarWash(carWash, accessTokenExpiration);
+    }
+    public String generateRefreshTokenForCarWash(CarWashRegistration carWash) {
+        return generateTokenForCarWash(carWash, 2592000000L);
+    }
+
+
+    private String createToken(Map<String, Object> claims, String subject, long expirationTimeMillis) {
+        try {
             return Jwts.builder()
                     .setClaims(claims)
-                    .setSubject(customer.getEmail())
+                    .setSubject(subject)
                     .setIssuedAt(new Date())
                     .setExpiration(new Date(System.currentTimeMillis() + expirationTimeMillis))
                     .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -64,17 +86,23 @@ public class TokenGenerator {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
+    public String getSubjectFromToken(String token) {
+        return getClaimFromToken(token, Claims::getSubject);
+    }
+
     public String getEmailFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
-    public Date getExpirationDateFromToken(String token) {
-        return getClaimFromToken(token, Claims::getExpiration);
-    }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
+    }
+
+    public String getRoleFromToken(String token) {
+        final Claims claims = getAllClaimsFromToken(token);
+        return (String) claims.get("role");
     }
 
     private Claims getAllClaimsFromToken(String token) {
@@ -100,9 +128,9 @@ public class TokenGenerator {
             parser.parseClaimsJws(token);
 
             if (userDetails != null) {
-                String tokenEmail = getEmailFromToken(token);
-                if (!tokenEmail.equals(userDetails.getUsername())) {
-                    logger.warn("Token email {} doesn't match user {}", tokenEmail, userDetails.getUsername());
+                String tokenSubject = getSubjectFromToken(token);
+                if (!tokenSubject.equals(userDetails.getUsername())) {
+                    logger.warn("Token subject {} doesn't match user {}", tokenSubject, userDetails.getUsername());
                     return false;
                 }
             }
@@ -116,5 +144,4 @@ public class TokenGenerator {
         }
         return false;
     }
-
 }

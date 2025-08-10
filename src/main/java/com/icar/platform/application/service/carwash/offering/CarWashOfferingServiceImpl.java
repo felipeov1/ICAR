@@ -36,18 +36,10 @@ public class CarWashOfferingServiceImpl implements CarWashOfferingService {
             throw new DuplicateEntityException("Já existe um serviço com este nome", "offering", "name");
         }
 
-        validateVehicleDetails(request.vehiclePrices(), request.vehicleEstimatedTimes());
+        validateVehicleDetails(request.vehicleDetails());
 
         CarWashOffering offering = mapper.toEntity(request);
         offering.setProfile(profile);
-        offering.setActive(request.active() != null ? request.active() : true);
-
-
-        if (request.serviceType() != null && !request.serviceType().isBlank()) {
-            offering.setServiceType(request.serviceType().toUpperCase());
-        } else {
-            offering.setServiceType("PRINCIPAL");
-        }
 
         CarWashOffering saved = offeringRepository.save(offering);
         return mapper.toDto(saved);
@@ -59,17 +51,9 @@ public class CarWashOfferingServiceImpl implements CarWashOfferingService {
         CarWashOffering offering = offeringRepository.findById(offeringId)
                 .orElseThrow(() -> new ResourceNotFoundException("Serviço não encontrado"));
 
-        validateVehicleDetails(request.vehiclePrices(), request.vehicleEstimatedTimes());
+        validateVehicleDetails(request.vehicleDetails());
 
         mapper.updateEntity(request, offering);
-
-        if (request.active() != null) {
-            offering.setActive(request.active());
-        }
-
-        if (request.serviceType() != null && !request.serviceType().isBlank()) {
-            offering.setServiceType(request.serviceType().toUpperCase());
-        }
 
         CarWashOffering updated = offeringRepository.save(offering);
         return mapper.toDto(updated);
@@ -87,7 +71,7 @@ public class CarWashOfferingServiceImpl implements CarWashOfferingService {
     @Transactional(readOnly = true)
     public List<CarWashOfferingResponse> findByProfileIdAndVehicleType(UUID profileId, String vehicleType) {
         return offeringRepository.findByProfile_Id(profileId).stream()
-                .filter(offering -> offering.getVehiclePrices().containsKey(vehicleType))
+                .filter(offering -> offering.getVehicleDetails().containsKey(vehicleType))
                 .map(mapper::toDto)
                 .toList();
     }
@@ -111,31 +95,19 @@ public class CarWashOfferingServiceImpl implements CarWashOfferingService {
     }
 
 
-    private void validateVehicleDetails(Map<String, BigDecimal> prices, Map<String, Integer> times) {
-        if (prices.size() != times.size() || !prices.keySet().equals(times.keySet())) {
-            throw new BusinessException("Vehicle types must match between prices and estimated times");
+    private void validateVehicleDetails(Map<String, CarWashOfferingRequest.VehicleDetailRequest> details) {
+        if (details == null || details.isEmpty()) {
+            throw new BusinessException("Pelo menos um tipo de veículo deve ser especificado com preço e duração.");
         }
 
-        if (prices.isEmpty()) {
-            throw new BusinessException("At least one vehicle type must be specified");
-        }
-
-        prices.forEach((type, price) -> {
-            if (price.compareTo(BigDecimal.ZERO) <= 0) {
-                throw new BusinessException("Price must be greater than zero for vehicle type: " + type);
+        details.forEach((type, detail) -> {
+            if (detail.price() == null || detail.price().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new BusinessException("O preço deve ser maior que zero para o tipo de veículo: " + type);
+            }
+            if (detail.durationMinutes() == null || detail.durationMinutes() <= 0) {
+                throw new BusinessException("A duração deve ser maior que zero para o tipo de veículo: " + type);
             }
         });
-
-        times.forEach((type, time) -> {
-            if (time <= 0) {
-                throw new BusinessException("Estimated time must be greater than zero for vehicle type: " + type);
-            }
-        });
-    }
-
-    private String getStatusText(CarWashOffering offering) {
-        if (offering.getDeletedAt() != null) return "Deleted";
-        return offering.isActive() ? "Active" : "Inactive";
     }
 
     @Deprecated

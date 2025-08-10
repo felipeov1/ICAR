@@ -9,6 +9,12 @@ public record CarWashRegistrationRequest(
         String ownerName,
         String phone,
         String email,
-        String address,
-        String subdomain
+        String password,
+        String street,
+        String number,
+        String complement,
+        String neighborhood,
+        String city,
+        String state,
+        String zipCode
 ) {}

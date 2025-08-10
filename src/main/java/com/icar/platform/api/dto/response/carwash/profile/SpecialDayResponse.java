@@ -6,8 +6,10 @@ import java.util.UUID;
 
 public record SpecialDayResponse(
         UUID id,
-        LocalDate date,
+        LocalDate startDate,
+        LocalDate endDate,
+        String description,
+        boolean isClosed,
         LocalTime startTime,
-        LocalTime endTime,
-        boolean isActive
+        LocalTime endTime
 ) {}

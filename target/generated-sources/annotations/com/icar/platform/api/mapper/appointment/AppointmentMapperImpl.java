@@ -1,22 +1,19 @@
 package com.icar.platform.api.mapper.appointment;
 
 import com.icar.platform.api.dto.response.appointment.AppointmentResponse;
-import com.icar.platform.domain.enums.AppointmentStatus;
+import com.icar.platform.api.dto.response.carwash.CompanyAppointmentResponse;
 import com.icar.platform.domain.model.appointment.CarWashAppointment;
 import com.icar.platform.domain.model.carwash.legal.CarWashRegistration;
-import com.icar.platform.domain.model.carwash.offering.CarWashOffering;
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
+import com.icar.platform.domain.model.customer.Customer;
 import com.icar.platform.domain.model.customer.CustomerAddress;
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-07-14T19:39:16-0300",
+    date = "2025-08-04T20:30:58-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -28,57 +25,66 @@ public class AppointmentMapperImpl extends AppointmentMapper {
             return null;
         }
 
-        String carWashName = null;
-        UUID carwashId = null;
-        UUID offeringId = null;
-        UUID addressId = null;
-        String carWashPhone = null;
-        String serviceName = null;
-        List<AppointmentResponse.ExtraServiceInfo> extraServices = null;
-        String vehicleType = null;
-        BigDecimal finalPrice = null;
-        String addressStreet = null;
-        String addressNumber = null;
-        String addressInstructions = null;
-        int estimatedTime = 0;
-        Integer minCancelNoticeMinutes = null;
-        Integer minEditNoticeMinutes = null;
-        boolean hasBeenReviewed = false;
-        UUID id = null;
-        ZonedDateTime dateTime = null;
-        AppointmentStatus status = null;
-        String paymentMethod = null;
+        AppointmentResponse appointmentResponse = new AppointmentResponse();
 
-        carWashName = entityProfileName( entity );
-        carwashId = entityProfileId( entity );
-        offeringId = entityOfferingId( entity );
-        addressId = entityAddressId( entity );
-        carWashPhone = entityProfileCarWashRegistrationPhone( entity );
-        serviceName = entityOfferingName( entity );
-        extraServices = mapExtraServices( entity );
-        vehicleType = entity.getCarType();
-        finalPrice = entity.getAmountPaid();
-        addressStreet = entityAddressStreet( entity );
-        addressNumber = entityAddressStreetNumber( entity );
-        addressInstructions = entityAddressAdditionalInstructions( entity );
+        appointmentResponse.setCarWashName( entityProfileName( entity ) );
+        appointmentResponse.setCarwashId( entityProfileId( entity ) );
+        appointmentResponse.setAddressId( entityAddressId( entity ) );
+        appointmentResponse.setCarWashPhone( entityProfileCarWashRegistrationPhone( entity ) );
+        appointmentResponse.setVehicleType( entity.getCarType() );
+        appointmentResponse.setFinalPrice( entity.getAmountPaid() );
+        appointmentResponse.setAddressStreet( entityAddressStreet( entity ) );
+        appointmentResponse.setAddressNumber( entityAddressStreetNumber( entity ) );
+        appointmentResponse.setAddressInstructions( entityAddressAdditionalInstructions( entity ) );
         if ( entity.getTotalDurationMinutes() != null ) {
-            estimatedTime = entity.getTotalDurationMinutes();
+            appointmentResponse.setTotalDurationMinutes( entity.getTotalDurationMinutes() );
         }
-        minCancelNoticeMinutes = getMinCancelNotice( entity );
-        minEditNoticeMinutes = getMinEditNotice( entity );
-        hasBeenReviewed = checkIfReviewed( entity );
-        id = entity.getId();
-        dateTime = entity.getDateTime();
-        status = entity.getStatus();
+        appointmentResponse.setMinCancelNoticeMinutes( getMinCancelNotice( entity ) );
+        appointmentResponse.setMinEditNoticeMinutes( getMinEditNotice( entity ) );
+        appointmentResponse.setHasBeenReviewed( checkIfReviewed( entity ) );
+        appointmentResponse.setServices( mapServices( entity ) );
+        appointmentResponse.setId( entity.getId() );
+        appointmentResponse.setDateTime( entity.getDateTime() );
+        appointmentResponse.setStatus( entity.getStatus() );
         if ( entity.getPaymentMethod() != null ) {
-            paymentMethod = entity.getPaymentMethod().name();
+            appointmentResponse.setPaymentMethod( entity.getPaymentMethod().name() );
         }
+        appointmentResponse.setCustomer( customerToCustomerInfo( entity.getCustomer() ) );
 
-        String addressCityState = entity.getAddress().getCity() + "/" + entity.getAddress().getState();
+        appointmentResponse.setAddressCityState( entity.getAddress().getCity() + "/" + entity.getAddress().getState() );
 
-        AppointmentResponse appointmentResponse = new AppointmentResponse( id, carwashId, offeringId, addressId, carWashName, carWashPhone, serviceName, extraServices, estimatedTime, dateTime, vehicleType, status, paymentMethod, finalPrice, addressStreet, addressNumber, addressCityState, addressInstructions, minCancelNoticeMinutes, minEditNoticeMinutes, hasBeenReviewed );
+        mapCustomerInfoToResponse( entity, appointmentResponse );
 
         return appointmentResponse;
+    }
+
+    @Override
+    public CompanyAppointmentResponse toCompanyResponse(CarWashAppointment entity) {
+        if ( entity == null ) {
+            return null;
+        }
+
+        CompanyAppointmentResponse companyAppointmentResponse = new CompanyAppointmentResponse();
+
+        companyAppointmentResponse.setFinalPrice( entity.getAmountPaid() );
+        companyAppointmentResponse.setVehicleType( entity.getCarType() );
+        companyAppointmentResponse.setServices( mapCompanyServices( entity ) );
+        companyAppointmentResponse.setAddressStreet( entityAddressStreet( entity ) );
+        companyAppointmentResponse.setAddressNumber( entityAddressStreetNumber( entity ) );
+        companyAppointmentResponse.setId( entity.getId() );
+        companyAppointmentResponse.setDateTime( entity.getDateTime() );
+        if ( entity.getTotalDurationMinutes() != null ) {
+            companyAppointmentResponse.setTotalDurationMinutes( entity.getTotalDurationMinutes() );
+        }
+        companyAppointmentResponse.setCustomer( customerToCustomerInfo1( entity.getCustomer() ) );
+
+        companyAppointmentResponse.setStatus( entity.getStatus().name() );
+        companyAppointmentResponse.setPaymentMethod( entity.getPaymentMethod().name() );
+        companyAppointmentResponse.setAddressCityState( entity.getAddress().getCity() + "/" + entity.getAddress().getState() );
+
+        mapCustomerInfoToCompanyResponse( entity, companyAppointmentResponse );
+
+        return companyAppointmentResponse;
     }
 
     private String entityProfileName(CarWashAppointment carWashAppointment) {
@@ -95,14 +101,6 @@ public class AppointmentMapperImpl extends AppointmentMapper {
             return null;
         }
         return profile.getId();
-    }
-
-    private UUID entityOfferingId(CarWashAppointment carWashAppointment) {
-        CarWashOffering offering = carWashAppointment.getOffering();
-        if ( offering == null ) {
-            return null;
-        }
-        return offering.getId();
     }
 
     private UUID entityAddressId(CarWashAppointment carWashAppointment) {
@@ -123,14 +121,6 @@ public class AppointmentMapperImpl extends AppointmentMapper {
             return null;
         }
         return carWashRegistration.getPhone();
-    }
-
-    private String entityOfferingName(CarWashAppointment carWashAppointment) {
-        CarWashOffering offering = carWashAppointment.getOffering();
-        if ( offering == null ) {
-            return null;
-        }
-        return offering.getName();
     }
 
     private String entityAddressStreet(CarWashAppointment carWashAppointment) {
@@ -155,5 +145,36 @@ public class AppointmentMapperImpl extends AppointmentMapper {
             return null;
         }
         return address.getAdditionalInstructions();
+    }
+
+    protected AppointmentResponse.CustomerInfo customerToCustomerInfo(Customer customer) {
+        if ( customer == null ) {
+            return null;
+        }
+
+        UUID id = null;
+        String phone = null;
+
+        id = customer.getId();
+        phone = customer.getPhone();
+
+        String name = null;
+
+        AppointmentResponse.CustomerInfo customerInfo = new AppointmentResponse.CustomerInfo( id, name, phone );
+
+        return customerInfo;
+    }
+
+    protected CompanyAppointmentResponse.CustomerInfo customerToCustomerInfo1(Customer customer) {
+        if ( customer == null ) {
+            return null;
+        }
+
+        CompanyAppointmentResponse.CustomerInfo customerInfo = new CompanyAppointmentResponse.CustomerInfo();
+
+        customerInfo.setId( customer.getId() );
+        customerInfo.setPhone( customer.getPhone() );
+
+        return customerInfo;
     }
 }

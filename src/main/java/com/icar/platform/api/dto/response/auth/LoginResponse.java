@@ -1,10 +1,19 @@
 package com.icar.platform.api.dto.response.auth;
 
-import com.icar.platform.api.dto.response.customer.CustomerResponse;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 
-public record LoginResponse(
-        String token,
-        String refreshToken,
-        Long expiresIn,
-        CustomerResponse customer
-) {}
+@Data
+public class LoginResponse {
+    private String accessToken;
+    private UserDto user;
+
+    @JsonIgnore
+    private String refreshToken;
+
+    public LoginResponse(String accessToken, String refreshToken, UserDto user) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.user = user;
+    }
+}

@@ -1,0 +1,1 @@
+CREATE INDEX idx_appointment_status_dthr ON car_wash_appointment (status, date_time);

@@ -1,6 +1,7 @@
 package com.icar.platform.api.dto.response.payment.coupon;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -13,5 +14,5 @@ public record AppliedCouponResponse(
         BigDecimal originalAmount,
         BigDecimal finalAmount,
         BigDecimal discountApplied,
-        ZonedDateTime appliedAt
+        LocalDateTime appliedAt
 ) {}

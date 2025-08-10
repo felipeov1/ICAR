@@ -5,12 +5,12 @@ import com.icar.platform.api.dto.response.carwash.CarWashRegistrationResponse;
 import com.icar.platform.api.mapper.carwash.CarWashRegistrationMapper;
 import com.icar.platform.domain.model.carwash.legal.CarWashRegistration;
 import com.icar.platform.domain.repository.carwash.legal.CarWashRegistrationDataRepository;
-import com.icar.platform.infrastructure.validation.exception.ValidationError;
 import com.icar.platform.infrastructure.validation.exception.CustomValidationException;
-import com.icar.platform.shared.exception.DuplicateEntityException;
+import com.icar.platform.infrastructure.validation.exception.ValidationError;
 import com.icar.platform.shared.exception.ResourceNotFoundException;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +27,7 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
     private final CarWashRegistrationDataRepository repository;
     private final CarWashRegistrationMapper mapper;
     private final EntityManager entityManager;
+    private final PasswordEncoder passwordEncoder;
 
     private void enableNotDeletedFilter() {
         entityManager.unwrap(org.hibernate.Session.class)
@@ -53,24 +54,10 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public CarWashRegistrationResponse findBySubdomain(String subdomain) {
-        enableNotDeletedFilter();
-        return repository.findBySubdomainAndDeletedAtIsNull(subdomain)
-                .map(mapper::toDto)
-                .orElseThrow(() -> new ResourceNotFoundException("Lavagem de carro não encontrada para o subdomínio ou está inativa: " + subdomain));
-    }
-
-    @Override
     @Transactional
     public CarWashRegistrationResponse update(UUID id, CarWashRegistrationRequest request) {
         CarWashRegistration existing = repository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Lavagem de carro não encontrada ou inativa"));
-
-        if (!existing.getSubdomain().equals(request.subdomain())
-                && repository.existsBySubdomainAndDeletedAtIsNull(request.subdomain())) {
-            throw new DuplicateEntityException("subdomínio", "Subdomínio já está em uso", "car_wash_registration_subdomain_dup");
-        }
 
         validateRequest(request);
 
@@ -81,8 +68,6 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
         existing.setOwnerName(request.ownerName());
         existing.setPhone(request.phone());
         existing.setEmail(request.email());
-        existing.setAddress(request.address());
-        existing.setSubdomain(request.subdomain());
 
         existing = repository.save(existing);
         return mapper.toDto(existing);
@@ -100,34 +85,18 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
     @Override
     @Transactional
     public CarWashRegistrationResponse create(CarWashRegistrationRequest request) {
-        if (repository.existsBySubdomainAndDeletedAtIsNull(request.subdomain())) {
-            throw new DuplicateEntityException("subdomínio", "Subdomínio já está em uso", "car_wash_registration_subdomain_dup");
-        }
-
         validateRequest(request);
 
         CarWashRegistration entity = mapper.toEntity(request);
+        entity.setPassword(passwordEncoder.encode(request.password()));
         entity.setDeletedAt(null);
+
         entity = repository.save(entity);
         return mapper.toDto(entity);
     }
 
     private void validateRequest(CarWashRegistrationRequest request) {
         List<ValidationError> errors = new ArrayList<>();
-
-        if (request.subdomain() == null || request.subdomain().isBlank()) {
-            errors.add(ValidationError.builder()
-                    .field("subdomínio")
-                    .message("O subdomínio é obrigatório")
-                    .errorCode("required")
-                    .build());
-        } else if (!isValidSubdomain(request.subdomain())) {
-            errors.add(ValidationError.builder()
-                    .field("subdomínio")
-                    .message("O subdomínio deve ter entre 3 e 30 caracteres, conter apenas letras, números e hífens, e não pode começar ou terminar com hífen")
-                    .errorCode("invalid_subdomain")
-                    .build());
-        }
 
         if (request.cnpj() != null && !request.cnpj().isBlank() && !isValidCnpj(request.cnpj())) {
             errors.add(ValidationError.builder()
@@ -145,13 +114,17 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
                     .build());
         }
 
+        if (request.password() == null || request.password().isBlank()) {
+            errors.add(ValidationError.builder()
+                    .field("senha")
+                    .message("A senha é obrigatória")
+                    .errorCode("required")
+                    .build());
+        }
+
         if (!errors.isEmpty()) {
             throw new CustomValidationException(errors);
         }
-    }
-
-    private boolean isValidSubdomain(String subdomain) {
-        return subdomain.matches("^[a-zA-Z0-9]([a-zA-Z0-9-]{1,28}[a-zA-Z0-9])?$");
     }
 
     private boolean isValidCnpj(String cnpj) {

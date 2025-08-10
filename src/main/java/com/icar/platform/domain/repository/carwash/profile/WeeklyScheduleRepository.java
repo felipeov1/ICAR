@@ -14,6 +14,6 @@ public interface WeeklyScheduleRepository extends JpaRepository<WeeklySchedule, 
     List<WeeklySchedule> findByProfile_Id(UUID profileId);
     Optional<WeeklySchedule> findByIdAndProfile_Id(UUID id, UUID profileId);
     void deleteByProfile_Id(UUID profileId);
-    List<WeeklySchedule> findByProfile_IdAndDayOfWeek(UUID profileId, DayOfWeek dayOfWeek);
+    Optional<WeeklySchedule> findByProfile_IdAndDayOfWeek(UUID profileId, DayOfWeek dayOfWeek);
 }
 

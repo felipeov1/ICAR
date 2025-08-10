@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,7 +39,7 @@ public class PhotoServiceImpl implements PhotoService {
                     return new PhotoServicesResponse(
                             photoUrl,
                             "Service photo uploaded successfully",
-                            ZonedDateTime.now()
+                            LocalDateTime.now()
                     );
                 })
                 .toList();
@@ -58,7 +58,7 @@ public class PhotoServiceImpl implements PhotoService {
                 .map(url -> new PhotoServicesResponse(
                         url,
                         "Service photo",
-                        profile.getUpdatedAt() != null ? profile.getUpdatedAt() : ZonedDateTime.now()
+                        profile.getUpdatedAt() != null ? profile.getUpdatedAt() : LocalDateTime.now()
                 ))
                 .collect(Collectors.toList());
     }
@@ -122,20 +122,21 @@ public class PhotoServiceImpl implements PhotoService {
 
     @Override
     @Transactional
-    public void removePhoto(UUID carWashId, String photoUrl) {
+    public void removePhoto(UUID carWashId, String photoUrlFromRequest) {
         CarWashProfile profile = getProfileByCarWashId(carWashId);
         Hibernate.initialize(profile.getPhotos());
 
-        if (photoUrl.equals(profile.getLogo())) {
-            storageService.delete(profile.getLogo());
-            profile.setLogo(null);
-        } else if (photoUrl.equals(profile.getCoverPhoto())) {
-            storageService.delete(profile.getCoverPhoto());
-            profile.setCoverPhoto(null);
-        } else if (profile.getPhotos().remove(photoUrl)) {
-            storageService.delete(photoUrl);
+        String filenameFromRequest = photoUrlFromRequest.substring(photoUrlFromRequest.lastIndexOf('/') + 1);
+
+        java.util.Optional<String> fullPathToRemove = profile.getPhotos().stream()
+                .filter(dbPath -> dbPath.endsWith(filenameFromRequest))
+                .findFirst();
+        if (fullPathToRemove.isPresent()) {
+            String path = fullPathToRemove.get();
+            profile.getPhotos().remove(path);
+            storageService.delete(path);
         } else {
-            throw new ResourceNotFoundException("Photo not found");
+            throw new ResourceNotFoundException("Photo not found in profile's list for filename: " + filenameFromRequest);
         }
 
         profileRepository.save(profile);

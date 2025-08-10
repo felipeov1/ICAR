@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -61,7 +61,7 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
         address.setStreetNumber(request.streetNumber());
         address.setAdditionalInstructions(request.additionalInstructions());
 
-        address.setUpdatedAt(ZonedDateTime.now());
+        address.setUpdatedAt(LocalDateTime.now());
         return addressMapper.toResponse(addressRepository.save(address));
     }
 
@@ -69,7 +69,7 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
         CustomerAddress address = addressRepository.findByIdAndCustomerIdAndDeletedAtIsNull(addressId, customerId)
                 .orElseThrow(() -> new EntityNotFoundException("Endereço não encontrado"));
 
-        address.setDeletedAt(ZonedDateTime.now());
+        address.setDeletedAt(LocalDateTime.now());
         addressRepository.save(address);
     }
 }

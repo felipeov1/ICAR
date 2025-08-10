@@ -8,8 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -42,37 +41,20 @@ public class CarWashOffering {
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private ZonedDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
-    private ZonedDateTime deletedAt;
+    private LocalDateTime deletedAt;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "car_wash_offering_vehicle_details",
-            joinColumns = @JoinColumn(name = "offering_id"),
-            uniqueConstraints = @UniqueConstraint(
-                    columnNames = {"offering_id", "vehicle_type"}
-            )
+            joinColumns = @JoinColumn(name = "offering_id")
     )
     @MapKeyColumn(name = "vehicle_type", length = 100)
-    @Column(name = "price", precision = 10, scale = 2, nullable = false)
-    private Map<String, BigDecimal> vehiclePrices;
-
-    @ElementCollection
-    @CollectionTable(
-            name = "car_wash_offering_vehicle_details",
-            joinColumns = @JoinColumn(name = "offering_id"),
-            uniqueConstraints = @UniqueConstraint(
-                    columnNames = {"offering_id", "vehicle_type"}
-            )
-    )
-    @MapKeyColumn(name = "vehicle_type", length = 100)
-    @Column(name = "estimated_time", nullable = false)
-    private Map<String, Integer> vehicleEstimatedTimes;
-
+    private Map<String, VehicleOfferingDetail> vehicleDetails;
 }

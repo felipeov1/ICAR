@@ -75,13 +75,13 @@ public class AppointmentConfigServiceImpl implements AppointmentConfigService {
     }
 
     private void validateConfig(AppointmentConfigRequest request) {
-        if (request.getMinAdvanceNoticeMinutes() <= 0) {
+        if (request.getMinAdvanceNoticeMinutes() < 0) {
             throw new BusinessException("Min advance notice must be positive");
         }
-        if (request.getMinEditNoticeMinutes() <= 0) {
+        if (request.getMinEditNoticeMinutes() < 0) {
             throw new BusinessException("Min edit notice must be positive");
         }
-        if (request.getMinCancelNoticeMinutes() <= 0) {
+        if (request.getMinCancelNoticeMinutes() < 0) {
             throw new BusinessException("Min cancel notice must be positive");
         }
     }

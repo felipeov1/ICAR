@@ -1,23 +1,19 @@
 package com.icar.platform.api.dto.response.carwash.profile;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 public record CarWashOfferingResponse(
-        @NotNull UUID id,
-        @NotBlank @Size(max = 100) String name,
-        @Size(max = 500) String description,
-        @NotNull BigDecimal price,
-        @NotNull Integer estimatedTime,
-        @NotNull Boolean active,
-        String statusText,
+        UUID id,
+        String name,
+        String description,
         String serviceType,
-        Map<String, BigDecimal> vehiclePrices,
-        Map<String, Integer> vehicleEstimatedTimes
-) {}
+        boolean active,
+        Map<String, VehicleDetailResponse> vehicleDetails
+) {
+    public record VehicleDetailResponse(
+            BigDecimal price,
+            Integer durationMinutes
+    ) {}
+}

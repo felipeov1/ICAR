@@ -44,11 +44,29 @@ public class CarWashRegistration {
     @Column(name = "email", nullable = false, length = 255, unique = true)
     private String email;
 
-    @Column(name = "address", nullable = false, length = 255)
-    private String address;
+    @Column(name = "street", nullable = false)
+    private String street;
 
-    @Column(name = "subdomain", nullable = false, length = 100, unique = true)
-    private String subdomain;
+    @Column(name = "number")
+    private String number;
+
+    @Column(name = "complement")
+    private String complement;
+
+    @Column(name = "neighborhood", nullable = false)
+    private String neighborhood;
+
+    @Column(name = "city", nullable = false)
+    private String city;
+
+    @Column(name = "state", nullable = false, length = 2)
+    private String state;
+
+    @Column(name = "zip_code", nullable = false, length = 9)
+    private String zipCode;
+
+    @Column(nullable = false)
+    private String password;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -63,4 +81,13 @@ public class CarWashRegistration {
 
     @OneToOne(mappedBy = "carWashRegistration", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private CarWashProfile profile;
+
+    public UUID getProfileId() {
+        return profile != null ? profile.getId() : null;
+    }
+
+    public boolean isProfileComplete() {
+        return profile != null && profile.isComplete();
+    }
 }
+

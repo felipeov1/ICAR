@@ -1,7 +1,6 @@
 package com.icar.platform.api.dto.response.carwash.profile;
 
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
-
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -13,9 +12,13 @@ public record CarWashProfileResponse(
         BigDecimal rating,
         Integer reviews,
         String[] modalities,
-        String priceRange,
-        String coverPhoto
+        String coverPhoto,
+        String subdomain,
+        String whatsapp,
+        String[] locations,
+        String observations
 ) {
+
     public static CarWashProfileResponse fromProfile(CarWashProfile profile) {
         return new CarWashProfileResponse(
                 profile.getId(),
@@ -25,8 +28,11 @@ public record CarWashProfileResponse(
                 profile.getRating(),
                 profile.getReviews(),
                 profile.getModalities(),
-                profile.getPriceRange(),
-                profile.getCoverPhoto()
+                profile.getCoverPhoto(),
+                profile.getSubdomain(),
+                profile.getWhatsapp(),
+                profile.getLocations(),
+                profile.getObservations()
         );
     }
 }

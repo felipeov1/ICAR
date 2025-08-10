@@ -4,10 +4,6 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-/**
- * Quando uma entidade duplicada é detectada (email, CPF, etc.)
- * HTTP Status: 409 Conflict
- */
 @Getter
 @ResponseStatus(HttpStatus.CONFLICT)
 public class DuplicateEntityException extends BusinessException {

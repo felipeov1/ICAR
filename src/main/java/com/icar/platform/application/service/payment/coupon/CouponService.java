@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,8 +39,8 @@ public class CouponService {
         coupon.setCode(request.code());
         coupon.setDiscountValue(request.discountValue());
         coupon.setDiscountPercentage(request.discountPercentage());
-        coupon.setValidFrom(ZonedDateTime.from(request.validFrom()));
-        coupon.setValidUntil(ZonedDateTime.from(request.validUntil()));
+        coupon.setValidFrom(LocalDateTime.from(request.validFrom()));
+        coupon.setValidUntil(LocalDateTime.from(request.validUntil()));
         coupon.setMaxUses(request.maxUses());
         coupon.setMaxUsesPerUser(request.maxUsesPerUser());
         coupon.setMinOrderValue(request.minOrderValue());
@@ -64,10 +64,10 @@ public class CouponService {
         Coupon coupon = couponRepository.findValidByCodeAndProfile(code, carwashId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cupom inválido ou não encontrado."));
 
-        if (coupon.getValidFrom().isAfter(ZonedDateTime.now())) {
+        if (coupon.getValidFrom().isAfter(LocalDateTime.now())) {
             throw new BusinessException("Este cupom ainda não está válido.");
         }
-        if (coupon.getValidUntil().isBefore(ZonedDateTime.now())) {
+        if (coupon.getValidUntil().isBefore(LocalDateTime.now())) {
             throw new BusinessException("Este cupom expirou.");
         }
         if (coupon.getMaxUses() != null && coupon.getCurrentUses() >= coupon.getMaxUses()) {
@@ -104,7 +104,7 @@ public class CouponService {
     public void deactivateCoupon(UUID couponId) {
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cupom não encontrado"));
-        coupon.setValidUntil(ZonedDateTime.now());
+        coupon.setValidUntil(LocalDateTime.now());
         couponRepository.save(coupon);
     }
 

@@ -1,18 +1,21 @@
 package com.icar.platform.application.service.carwash.profile;
 
 import com.icar.platform.api.dto.request.carwash.profile.CarWashProfileRequest;
+import com.icar.platform.api.dto.request.carwash.profile.CarWashProfileUpdateRequest;
 import com.icar.platform.api.dto.response.carwash.profile.CarWashProfileResponse;
 import com.icar.platform.api.mapper.carwash.CarWashProfileMapper;
 import com.icar.platform.domain.model.carwash.legal.CarWashRegistration;
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
 import com.icar.platform.domain.repository.carwash.legal.CarWashRegistrationDataRepository;
 import com.icar.platform.domain.repository.carwash.profile.CarWashProfileRepository;
+import com.icar.platform.infrastructure.storage.FileSystemStorageService;
 import com.icar.platform.shared.exception.DuplicateEntityException;
 import com.icar.platform.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +28,7 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
     private final CarWashProfileRepository profileRepository;
     private final CarWashRegistrationDataRepository registrationRepository;
     private final CarWashProfileMapper mapper;
+    private final FileSystemStorageService fileStorageService;
 
     @Override
     @Transactional
@@ -43,6 +47,20 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
 
     @Override
     @Transactional(readOnly = true)
+    public CarWashProfileResponse getProfileByCarWashRegistrationId(UUID carWashId) {
+        return profileRepository.findByCarWashRegistrationId(carWashId)
+                .map(mapper::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado para o lava-rápido com ID: " + carWashId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isSubdomainAvailable(String subdomain) {
+        return !profileRepository.existsBySubdomain(subdomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public CarWashProfileResponse getProfileById(@NonNull UUID profileId) {
         CarWashProfile profile = profileRepository.findById(profileId)
                 .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
@@ -51,12 +69,46 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
 
     @Override
     @Transactional
-    public CarWashProfileResponse updateProfile(@NonNull UUID profileId, @NonNull CarWashProfileRequest request) {
+    public CarWashProfileResponse updateProfile(
+            @NonNull UUID profileId,
+            @NonNull CarWashProfileUpdateRequest request,
+            MultipartFile logo,
+            MultipartFile coverPhoto) {
+
         CarWashProfile profile = profileRepository.findById(profileId)
-                .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado"));
 
         mapper.updateEntity(request, profile);
-        return mapper.toDto(profileRepository.save(profile));
+
+        if (request.getWhatsapp() != null) {
+            profile.setWhatsapp(request.getWhatsapp().replaceAll("[^0-9]", ""));
+        }
+
+        UUID carWashId = profile.getCarWashRegistration().getId();
+        String commonPath = "carwash/" + carWashId.toString() + "/logoandcover";
+
+        if (logo != null && !logo.isEmpty()) {
+            String logoRelativePath = fileStorageService.store(logo, commonPath);
+            profile.setLogo(logoRelativePath);
+        }
+
+        if (coverPhoto != null && !coverPhoto.isEmpty()) {
+            String coverPhotoRelativePath = fileStorageService.store(coverPhoto, commonPath);
+            profile.setCoverPhoto(coverPhotoRelativePath);
+        }
+
+        if (request.getLocations() != null) {
+            profile.setLocations(request.getLocations().toArray(new String[0]));
+        }
+        if (request.getModalities() != null) {
+            profile.setModalities(request.getModalities().toArray(new String[0]));
+        }
+        if (request.getObservations() != null) {
+            profile.setObservations(request.getObservations());
+        }
+
+        CarWashProfile updatedProfile = profileRepository.save(profile);
+        return mapper.toDto(updatedProfile);
     }
 
     @Override

@@ -22,12 +22,14 @@ public interface ScheduleMapper {
     void updateWeeklyScheduleFromRequest(WeeklyScheduleRequest request, @MappingTarget WeeklySchedule entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "active", ignore = true)
+    @Mapping(target = "profile", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     SpecialDay toEntity(SpecialDayRequest request);
-
-    @Mapping(target = "isActive", source = "active")
     SpecialDayResponse toResponse(SpecialDay entity);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "profile", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     void updateSpecialDayFromRequest(SpecialDayRequest request, @MappingTarget SpecialDay entity);
 
     default LocalTime map(String time) {

@@ -16,7 +16,7 @@ import com.icar.platform.domain.repository.carwash.profile.AppointmentConfigRepo
 import com.icar.platform.domain.repository.carwash.profile.CarWashProfileRepository;
 import com.icar.platform.domain.repository.carwash.profile.SpecialDayRepository;
 import com.icar.platform.domain.repository.carwash.profile.WeeklyScheduleRepository;
-import com.icar.platform.shared.exception.BusinessException;
+import com.icar.platform.shared.exception.ConflictException;
 import com.icar.platform.shared.exception.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,100 +34,122 @@ public class ScheduleManagementServiceImpl implements ScheduleManagementService 
     private final WeeklyScheduleRepository weeklyScheduleRepository;
     private final SpecialDayRepository specialDayRepository;
     private final AppointmentConfigRepository appointmentConfigRepository;
-    private final ScheduleMapper mapper;
     private final CarWashAppointmentRepository appointmentRepository;
+    private final ScheduleMapper mapper;
+
+    private void validateNoExistingAppointmentsInRange(UUID profileId, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.plusDays(1).atStartOfDay();
+
+        List<CarWashAppointment> existingAppointments = appointmentRepository
+                .findActiveByProfileIdAndDateTimeRange(profileId, startDateTime, endDateTime);
+
+        if (!existingAppointments.isEmpty()) {
+            int count = existingAppointments.size();
+            String plural = count > 1 ? "s" : "";
+            throw new ConflictException(
+                    "Não é possível salvar a exceção, pois existe" + (count > 1 ? "m" : "") + " " +
+                            count + " agendamento" + plural + " ativo" + plural + " no período selecionado. " +
+                            "Por favor, cancele ou remarque o" + plural + " agendamento" + plural + " antes de continuar."
+            );
+        }
+    }
 
     @Override
     public List<TimeSlotResponse> getAvailableTimeSlots(UUID profileId, LocalDate date, Integer serviceDurationMinutes) {
         AppointmentConfig config = appointmentConfigRepository.findByProfile_Id(profileId)
-                .orElseThrow(() -> new BusinessException("Configuração de agendamento não encontrada."));
-
+                .orElseThrow(() -> new IllegalStateException("Configuração de agendamento não encontrada para o perfil: " + profileId));
 
         final ZoneId profileZoneId = ZoneId.of("America/Sao_Paulo");
-
         LocalDate todayInProfileZone = LocalDate.now(profileZoneId);
         LocalDate maxDateAllowed = todayInProfileZone.plusDays(config.getMaxAdvanceBookingDays());
         if (date.isAfter(maxDateAllowed) || date.isBefore(todayInProfileZone)) {
             return Collections.emptyList();
         }
 
-        final int GAP_MINUTES = config.getGapMinutes();
-        final boolean ALLOW_OVERTIME = config.isAllowOvertime();
-
-        if (GAP_MINUTES < 0) {
-            throw new BusinessException("O intervalo (GAP) entre agendamentos não pode ser negativo.");
-        }
-
-        Optional<SpecialDay> specialDayOpt = specialDayRepository.findByProfile_IdAndDateAndActive(profileId, date, true);
         LocalTime dayStartTime, dayEndTime;
+        int appointmentIntervalMinutes;
 
-        if (specialDayOpt.isPresent() && specialDayOpt.get().getStartTime() != null) {
-            dayStartTime = specialDayOpt.get().getStartTime();
-            dayEndTime = specialDayOpt.get().getEndTime();
+        Optional<WeeklySchedule> weeklyOpt = weeklyScheduleRepository.findByProfile_IdAndDayOfWeek(profileId, date.getDayOfWeek());
+        Optional<SpecialDay> specialDayOpt = specialDayRepository.findActiveByProfileIdAndDate(profileId, date).stream().findFirst();
+
+        if (specialDayOpt.isPresent()) {
+            SpecialDay specialDay = specialDayOpt.get();
+            if (specialDay.isClosed()) { return Collections.emptyList(); }
+            dayStartTime = specialDay.getStartTime();
+            dayEndTime = specialDay.getEndTime();
+            appointmentIntervalMinutes = weeklyOpt
+                    .map(WeeklySchedule::getAppointmentIntervalMinutes)
+                    .orElseThrow(() -> new IllegalStateException("Configuração de intervalo não encontrada para " + date.getDayOfWeek()));
         } else {
-            Optional<WeeklySchedule> weeklyOpt = weeklyScheduleRepository
-                    .findByProfile_IdAndDayOfWeek(profileId, date.getDayOfWeek())
-                    .stream()
-                    .filter(WeeklySchedule::isAvailable)
-                    .findFirst();
-
-            if (weeklyOpt.isPresent()) {
-                dayStartTime = weeklyOpt.get().getStartTime();
-                dayEndTime = weeklyOpt.get().getEndTime();
+            if (weeklyOpt.isPresent() && weeklyOpt.get().isAvailable()) {
+                WeeklySchedule schedule = weeklyOpt.get();
+                dayStartTime = schedule.getStartTime();
+                dayEndTime = schedule.getEndTime();
+                appointmentIntervalMinutes = schedule.getAppointmentIntervalMinutes();
             } else {
                 return Collections.emptyList();
             }
         }
+        return generateAndFilterTimeSlots(profileId, date, serviceDurationMinutes, config, dayStartTime, dayEndTime, profileZoneId, appointmentIntervalMinutes);
+    }
 
-        ZonedDateTime queryStart = date.atStartOfDay(profileZoneId);
-        ZonedDateTime queryEnd = queryStart.plusDays(1);
+
+
+
+    private List<TimeSlotResponse> generateAndFilterTimeSlots(UUID profileId, LocalDate date, int serviceDurationMinutes, AppointmentConfig config, LocalTime startTime, LocalTime endTime, ZoneId zoneId, int appointmentIntervalMinutes) {
+        final int GAP_MINUTES = config.getGapMinutes();
+
+        LocalDateTime queryStart = date.atStartOfDay();
+        LocalDateTime queryEnd = date.atTime(LocalTime.MAX);
         List<CarWashAppointment> bookedAppointments = appointmentRepository.findBookedSlotsByProfileIdAndDateRange(profileId, queryStart, queryEnd);
-        bookedAppointments.sort(Comparator.comparing(CarWashAppointment::getDateTime));
 
         List<TimeSlotResponse> availableSlots = new ArrayList<>();
-        ZonedDateTime earliestBookingTime = ZonedDateTime.now(profileZoneId).plusMinutes(config.getMinAdvanceNoticeMinutes());
+        LocalDateTime earliestBookingTime = LocalDateTime.now(zoneId).plusMinutes(config.getMinAdvanceNoticeMinutes());
+        LocalDateTime cursorTime = date.atTime(startTime);
+        LocalDateTime dayEndDateTime = date.atTime(endTime);
 
-        LocalDateTime potentialStartTime = date.atTime(dayStartTime);
+        int stepMinutes = appointmentIntervalMinutes > 0 ? appointmentIntervalMinutes : 15;
 
-        while (!potentialStartTime.toLocalTime().isAfter(dayEndTime)) {
-            ZonedDateTime potentialZonedDateTime = potentialStartTime.atZone(profileZoneId);
+        while (!cursorTime.isAfter(dayEndDateTime)) {
+            LocalDateTime serviceEndTime = cursorTime.plusMinutes(serviceDurationMinutes);
 
-            if (potentialZonedDateTime.isBefore(earliestBookingTime)) {
-                potentialStartTime = potentialStartTime.plusMinutes(GAP_MINUTES > 0 ? GAP_MINUTES : 15);
-                continue;
+            if (!config.isAllowOvertime() && serviceEndTime.isAfter(dayEndDateTime)) {
+                break;
             }
 
-            LocalDateTime serviceEndTime = potentialStartTime.plusMinutes(serviceDurationMinutes);
-
-            if (!ALLOW_OVERTIME && serviceEndTime.toLocalTime().isAfter(dayEndTime) && serviceEndTime.toLocalDate().isEqual(date)) {
-                break;
+            if (cursorTime.isBefore(earliestBookingTime)) {
+                cursorTime = cursorTime.plusMinutes(stepMinutes);
+                continue;
             }
 
             boolean hasConflict = false;
             for (CarWashAppointment booked : bookedAppointments) {
-                LocalDateTime bookedStartTime = booked.getDateTime().withZoneSameInstant(profileZoneId).toLocalDateTime();
-                LocalDateTime bookedEndTimeWithGap = bookedStartTime.plusMinutes(booked.getTotalDurationMinutes() + GAP_MINUTES);
+                LocalDateTime bookedStart = booked.getDateTime();
+                LocalDateTime bookedEnd = bookedStart.plusMinutes(booked.getTotalDurationMinutes());
 
-                if (potentialStartTime.isBefore(bookedEndTimeWithGap) && serviceEndTime.isAfter(bookedStartTime)) {
+                LocalDateTime bookedStartWithGap = bookedStart.minusMinutes(GAP_MINUTES);
+                LocalDateTime bookedEndWithGap = bookedEnd.plusMinutes(GAP_MINUTES);
+
+                if (cursorTime.isBefore(bookedEndWithGap) && serviceEndTime.isAfter(bookedStartWithGap)) {
                     hasConflict = true;
-                    potentialStartTime = bookedEndTimeWithGap;
                     break;
                 }
             }
 
             if (!hasConflict) {
-                availableSlots.add(new TimeSlotResponse(potentialZonedDateTime, serviceEndTime.atZone(profileZoneId), "AVAILABLE"));
-                potentialStartTime = potentialStartTime.plusMinutes(GAP_MINUTES > 0 ? GAP_MINUTES : serviceDurationMinutes);
+                availableSlots.add(new TimeSlotResponse(cursorTime.atZone(zoneId), serviceEndTime.atZone(zoneId), "AVAILABLE"));
             }
-        }
 
+            cursorTime = cursorTime.plusMinutes(stepMinutes);
+        }
         return availableSlots;
     }
 
     @Override
     public List<String> getAvailableDates(UUID profileId, LocalDate startDate, LocalDate endDate) {
         AppointmentConfig config = appointmentConfigRepository.findByProfile_Id(profileId)
-                .orElseThrow(() -> new BusinessException("Configuração de agendamento não encontrada."));
+                .orElseThrow(() -> new IllegalStateException("Configuração de agendamento não encontrada para o perfil: " + profileId));
 
         LocalDate today = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
         LocalDate effectiveStartDate = startDate.isBefore(today) ? today : startDate;
@@ -145,12 +167,93 @@ public class ScheduleManagementServiceImpl implements ScheduleManagementService 
     }
 
     @Override
-    public List<WeeklyScheduleResponse> getAllWeeklySchedules(UUID profileId) {
-        List<WeeklySchedule> schedules = weeklyScheduleRepository.findByProfile_Id(profileId);
-        if (schedules.isEmpty()) {
-            throw new ResourceNotFoundException("Nenhuma agenda semanal encontrada para o perfil: " + profileId);
+    public List<SpecialDayResponse> getAllSpecialDays(UUID profileId) {
+        LocalDate today = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
+        return specialDayRepository.findByProfile_IdAndEndDateGreaterThanEqual(profileId, today)
+                .stream()
+                .map(entity -> new SpecialDayResponse(
+                        entity.getId(),
+                        entity.getStartDate(),
+                        entity.getEndDate(),
+                        entity.getDescription(),
+                        entity.isClosed(),
+                        entity.getStartTime(),
+                        entity.getEndTime()
+                ))
+                .sorted(Comparator.comparing(SpecialDayResponse::startDate))
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    @Transactional
+    public SpecialDayResponse createSpecialDay(UUID profileId, SpecialDayRequest request) {
+        CarWashProfile profile = getProfile(profileId);
+
+        validateNoOverlapping(profileId, request.getStartDate(), request.getEndDate(), null);
+        validateNoExistingAppointmentsInRange(profileId, request.getStartDate(), request.getEndDate());
+
+        SpecialDay specialDay = new SpecialDay();
+        specialDay.setProfile(profile);
+        specialDay.setStartDate(request.getStartDate());
+        specialDay.setEndDate(request.getEndDate());
+        specialDay.setDescription(request.getDescription());
+        specialDay.setClosed(request.getIsClosed());
+
+        if (request.getIsClosed()) {
+            specialDay.setStartTime(null);
+            specialDay.setEndTime(null);
+        } else {
+            specialDay.setStartTime(request.getStartTime());
+            specialDay.setEndTime(request.getEndTime());
         }
-        return schedules.stream().map(mapper::toResponse).collect(Collectors.toList());
+
+        SpecialDay savedEntity = specialDayRepository.save(specialDay);
+        return mapper.toResponse(savedEntity);
+    }
+
+
+    @Override
+    @Transactional
+    public SpecialDayResponse updateSpecialDay(UUID profileId, UUID specialDayId, SpecialDayRequest request) {
+        SpecialDay specialDay = specialDayRepository.findByIdAndProfileIdIncludeDeleted(specialDayId, profileId)
+                .orElseThrow(() -> new ResourceNotFoundException("Dia especial não encontrado com ID: " + specialDayId));
+
+        validateNoOverlapping(profileId, request.getStartDate(), request.getEndDate(), specialDayId);
+        validateNoExistingAppointmentsInRange(profileId, request.getStartDate(), request.getEndDate());
+
+        specialDay.setStartDate(request.getStartDate());
+        specialDay.setEndDate(request.getEndDate());
+        specialDay.setDescription(request.getDescription());
+        specialDay.setClosed(request.getIsClosed());
+
+        if (request.getIsClosed()) {
+            specialDay.setStartTime(null);
+            specialDay.setEndTime(null);
+        } else {
+            specialDay.setStartTime(request.getStartTime());
+            specialDay.setEndTime(request.getEndTime());
+        }
+
+        SpecialDay savedEntity = specialDayRepository.save(specialDay);
+        return mapper.toResponse(savedEntity);
+    }
+
+
+    @Override
+    @Transactional
+    public void deleteSpecialDay(UUID profileId, UUID specialDayId) {
+        if (!specialDayRepository.existsByIdAndProfile_Id(specialDayId, profileId)) {
+            throw new ResourceNotFoundException("Dia especial não encontrado com ID: " + specialDayId);
+        }
+        specialDayRepository.deleteById(specialDayId);
+    }
+
+    @Override
+    public List<WeeklyScheduleResponse> getAllWeeklySchedules(UUID profileId) {
+        return weeklyScheduleRepository.findByProfile_Id(profileId).stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -164,11 +267,14 @@ public class ScheduleManagementServiceImpl implements ScheduleManagementService 
     @Transactional
     public List<WeeklyScheduleResponse> createWeeklySchedules(UUID profileId, List<WeeklyScheduleRequest> requests) {
         CarWashProfile profile = getProfile(profileId);
-        return requests.stream().map(request -> {
-            WeeklySchedule schedule = mapper.toEntity(request);
+        List<WeeklySchedule> schedules = requests.stream().map(req -> {
+            WeeklySchedule schedule = mapper.toEntity(req);
             schedule.setProfile(profile);
-            return mapper.toResponse(weeklyScheduleRepository.save(schedule));
+            return schedule;
         }).collect(Collectors.toList());
+        return weeklyScheduleRepository.saveAll(schedules).stream()
+                .map(mapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -191,104 +297,37 @@ public class ScheduleManagementServiceImpl implements ScheduleManagementService 
 
     @Override
     @Transactional
-    public List<WeeklyScheduleResponse> setAllWeeklySchedulesWithSameInterval(
-            UUID profileId, LocalTime startTime, LocalTime endTime, int intervalMinutes, boolean available) {
-        validateTimeInterval(startTime, endTime, intervalMinutes);
+    public List<WeeklyScheduleResponse> setAllWeeklySchedulesWithSameInterval(UUID profileId, LocalTime startTime, LocalTime endTime, int intervalMinutes, boolean available) {
         CarWashProfile profile = getProfile(profileId);
         weeklyScheduleRepository.deleteByProfile_Id(profileId);
-        return Arrays.stream(DayOfWeek.values())
-                .map(day -> createWeeklySchedule(profile, day, startTime, endTime, intervalMinutes, available))
+        List<WeeklySchedule> newSchedules = new ArrayList<>();
+        for (DayOfWeek day : DayOfWeek.values()) {
+            WeeklySchedule schedule = new WeeklySchedule();
+            schedule.setProfile(profile);
+            schedule.setDayOfWeek(day);
+            schedule.setStartTime(startTime);
+            schedule.setEndTime(endTime);
+            schedule.setAppointmentIntervalMinutes(intervalMinutes);
+            schedule.setAvailable(available);
+            newSchedules.add(schedule);
+        }
+        return weeklyScheduleRepository.saveAll(newSchedules).stream()
                 .map(mapper::toResponse)
                 .collect(Collectors.toList());
     }
 
-    private WeeklySchedule createWeeklySchedule(CarWashProfile profile, DayOfWeek day,
-                                                LocalTime startTime, LocalTime endTime,
-                                                int intervalMinutes, boolean available) {
-        WeeklySchedule schedule = new WeeklySchedule();
-        schedule.setProfile(profile);
-        schedule.setDayOfWeek(day);
-        schedule.setStartTime(startTime);
-        schedule.setEndTime(endTime);
-        schedule.setAppointmentIntervalMinutes(intervalMinutes);
-        schedule.setAvailable(available);
-        return weeklyScheduleRepository.save(schedule);
-    }
-
-    @Override
-    public List<SpecialDayResponse> getAllSpecialDays(UUID profileId, boolean activeOnly) {
-        List<SpecialDay> specialDays = activeOnly ?
-                specialDayRepository.findByProfile_IdAndActive(profileId, true) :
-                specialDayRepository.findByProfile_Id(profileId);
-        return specialDays.stream().map(mapper::toResponse).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<SpecialDayResponse> getSpecialDaysByDateRange(
-            UUID profileId, LocalDate startDate, LocalDate endDate, boolean activeOnly) {
-        List<SpecialDay> specialDays = activeOnly ?
-                specialDayRepository.findByProfile_IdAndDateBetweenAndActive(profileId, startDate, endDate, true) :
-                specialDayRepository.findByProfile_IdAndDateBetween(profileId, startDate, endDate);
-        return specialDays.stream().map(mapper::toResponse).collect(Collectors.toList());
-    }
-
-    @Override
-    public SpecialDayResponse getSpecialDay(UUID carWashId, UUID specialDayId, boolean includeInactive) {
-        SpecialDay specialDay = includeInactive ?
-                specialDayRepository.findByIdAndProfile_CarWashRegistration_IdIncludingInactive(specialDayId, carWashId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Dia especial não encontrado.")) :
-                specialDayRepository.findByIdAndProfile_CarWashRegistration_Id(specialDayId, carWashId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Dia especial não encontrado."));
-        return mapper.toResponse(specialDay);
-    }
-
-    @Override
-    @Transactional
-    public List<SpecialDayResponse> createSpecialDays(UUID profileId, List<SpecialDayRequest> requests) {
-        CarWashProfile profile = getProfile(profileId);
-        return requests.stream().map(request -> {
-            SpecialDay specialDay = mapper.toEntity(request);
-            specialDay.setProfile(profile);
-            specialDay.setActive(true);
-            return mapper.toResponse(specialDayRepository.save(specialDay));
-        }).collect(Collectors.toList());
-    }
-
-    @Override
-    @Transactional
-    public SpecialDayResponse updateSpecialDay(UUID carWashId, UUID specialDayId, SpecialDayRequest request) {
-        SpecialDay specialDay = specialDayRepository.findByIdAndProfile_CarWashRegistration_Id(specialDayId, carWashId)
-                .orElseThrow(() -> new ResourceNotFoundException("Dia especial não encontrado."));
-        mapper.updateSpecialDayFromRequest(request, specialDay);
-        return mapper.toResponse(specialDayRepository.save(specialDay));
-    }
-
-    @Override
-    @Transactional
-    public void deleteSpecialDay(UUID carWashId, UUID specialDayId) {
-        specialDayRepository.updateActiveStatus(specialDayId, carWashId, false);
-    }
-
-    @Override
-    @Transactional
-    public void restoreSpecialDay(UUID carWashId, UUID specialDayId) {
-        specialDayRepository.updateActiveStatus(specialDayId, carWashId, true);
-    }
-
-    private void validateTimeInterval(LocalTime startTime, LocalTime endTime, int intervalMinutes) {
-        if (intervalMinutes <= 0) {
-            throw new IllegalArgumentException("O intervalo deve ser positivo.");
-        }
-        if (startTime == null || endTime == null) {
-            throw new IllegalArgumentException("As horas de início e fim não podem ser nulas.");
-        }
-        if (startTime.isAfter(endTime)) {
-            throw new IllegalArgumentException("A hora de início deve ser anterior à hora de fim.");
-        }
-    }
-
     private CarWashProfile getProfile(UUID profileId) {
         return profileRepository.findById(profileId)
-                .orElseThrow(() -> new ResourceNotFoundException("Perfil do lava-rápido não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado com ID: " + profileId));
     }
+
+    private void validateNoOverlapping(UUID profileId, LocalDate startDate, LocalDate endDate, UUID excludeId) {
+        UUID idToExclude = (excludeId == null) ? UUID.fromString("00000000-0000-0000-0000-000000000000") : excludeId;
+        List<SpecialDay> overlapping = specialDayRepository.findOverlappingRanges(profileId, startDate, endDate, idToExclude);
+        if (!overlapping.isEmpty()) {
+            throw new ConflictException("O período informado conflita com outra exceção já cadastrada.");
+        }
+    }
+
+
 }

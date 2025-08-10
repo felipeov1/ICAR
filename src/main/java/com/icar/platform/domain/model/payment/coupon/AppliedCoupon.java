@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -44,5 +44,5 @@ public class AppliedCoupon {
 
     @CreationTimestamp
     @Column(name = "applied_at", nullable = false, updatable = false)
-    private ZonedDateTime appliedAt;
+    private LocalDateTime appliedAt;
 }

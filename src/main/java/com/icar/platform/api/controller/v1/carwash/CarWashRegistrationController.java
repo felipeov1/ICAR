@@ -34,12 +34,6 @@ public class CarWashRegistrationController {
         return ResponseEntity.ok(service.findAllByOrderByCreatedAtAsc());
     }
 
-    @Operation(summary = "Get car wash by subdomain")
-    @GetMapping("/subdomain/{subdomain}")
-    public ResponseEntity<CarWashRegistrationResponse> findBySubdomain(@PathVariable String subdomain) {
-        return ResponseEntity.ok(service.findBySubdomain(subdomain));
-    }
-
     @Operation(summary = "Get car wash details")
     @GetMapping("/{id}")
     public ResponseEntity<CarWashRegistrationResponse> findById(@PathVariable UUID id) {

@@ -24,7 +24,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendVerificationEmail(String toEmail, String verificationToken) {
         try {
-            String verificationUrl = storageProperties + "/api/v1/auth/verify-email?token=" + verificationToken;
+            String verificationUrl = "http://192.168.3.8:8080" + "/api/v1/auth/verify-email?token=" + verificationToken;
 
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");

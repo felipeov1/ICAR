@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-07-13T20:04:58-0300",
+    date = "2025-08-04T20:30:58-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -86,7 +86,9 @@ public class ScheduleMapperImpl implements ScheduleMapper {
 
         SpecialDay specialDay = new SpecialDay();
 
-        specialDay.setDate( request.getDate() );
+        specialDay.setStartDate( request.getStartDate() );
+        specialDay.setEndDate( request.getEndDate() );
+        specialDay.setDescription( request.getDescription() );
         specialDay.setStartTime( request.getStartTime() );
         specialDay.setEndTime( request.getEndTime() );
 
@@ -99,19 +101,23 @@ public class ScheduleMapperImpl implements ScheduleMapper {
             return null;
         }
 
-        boolean isActive = false;
         UUID id = null;
-        LocalDate date = null;
+        LocalDate startDate = null;
+        LocalDate endDate = null;
+        String description = null;
         LocalTime startTime = null;
         LocalTime endTime = null;
 
-        isActive = entity.isActive();
         id = entity.getId();
-        date = entity.getDate();
+        startDate = entity.getStartDate();
+        endDate = entity.getEndDate();
+        description = entity.getDescription();
         startTime = entity.getStartTime();
         endTime = entity.getEndTime();
 
-        SpecialDayResponse specialDayResponse = new SpecialDayResponse( id, date, startTime, endTime, isActive );
+        boolean isClosed = false;
+
+        SpecialDayResponse specialDayResponse = new SpecialDayResponse( id, startDate, endDate, description, isClosed, startTime, endTime );
 
         return specialDayResponse;
     }
@@ -122,7 +128,9 @@ public class ScheduleMapperImpl implements ScheduleMapper {
             return;
         }
 
-        entity.setDate( request.getDate() );
+        entity.setStartDate( request.getStartDate() );
+        entity.setEndDate( request.getEndDate() );
+        entity.setDescription( request.getDescription() );
         entity.setStartTime( request.getStartTime() );
         entity.setEndTime( request.getEndTime() );
     }

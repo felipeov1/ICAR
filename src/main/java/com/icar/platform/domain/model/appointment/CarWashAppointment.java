@@ -1,9 +1,12 @@
 package com.icar.platform.domain.model.appointment;
 
 import com.icar.platform.domain.enums.AppointmentStatus;
+import com.icar.platform.domain.enums.CreationChannel;
 import com.icar.platform.domain.enums.PaymentMethod;
 import com.icar.platform.domain.model.carwash.offering.CarWashOffering;
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
+import com.icar.platform.domain.model.carwash.profile.CompanyCustomer;
+import com.icar.platform.domain.model.carwash.profile.Review;
 import com.icar.platform.domain.model.customer.Customer;
 import com.icar.platform.domain.model.customer.CustomerAddress;
 import com.icar.platform.domain.model.payment.coupon.AppliedCoupon;
@@ -11,11 +14,13 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -36,6 +41,10 @@ public class CarWashAppointment {
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_customer_id")
+    private CompanyCustomer companyCustomer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "profile_id", nullable = false)
     private CarWashProfile profile;
 
@@ -43,15 +52,11 @@ public class CarWashAppointment {
     private String carType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "offering_id", nullable = false)
-    private CarWashOffering offering;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id", nullable = false)
     private CustomerAddress address;
 
     @Column(nullable = false)
-    private ZonedDateTime dateTime;
+    private LocalDateTime dateTime;
 
     @Column(name = "original_amount", precision = 10, scale = 2)
     private BigDecimal originalAmount;
@@ -70,25 +75,33 @@ public class CarWashAppointment {
     @Column(nullable = false, length = 20)
     private AppointmentStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "creation_channel", nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    private CreationChannel creationChannel;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private ZonedDateTime updatedAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "deleted_at")
-    private ZonedDateTime deletedAt;
+    private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AppliedCoupon> appliedCoupons = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "car_wash_profile_appointment_selected_extras",
+            name = "car_wash_appointment_selected_services",
             joinColumns = @JoinColumn(name = "appointment_id"),
-            inverseJoinColumns = @JoinColumn(name = "extra_service_id")
+            inverseJoinColumns = @JoinColumn(name = "service_id")
     )
-    private Set<CarWashOffering> selectedExtraServices;
+    private Set<CarWashOffering> selectedServices;
+
+    @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Review review;
 }

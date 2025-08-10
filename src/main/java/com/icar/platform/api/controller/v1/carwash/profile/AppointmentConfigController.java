@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/carwashes/{carwashId}/appointment-config")
+@RequestMapping("/api/v1/profile/{profileId}/appointment-config")
 @RequiredArgsConstructor
 public class AppointmentConfigController {
 
@@ -22,25 +22,25 @@ public class AppointmentConfigController {
     @Operation(summary = "Create appointment configuration", tags = {"Car Wash Profile - Appointment Config"})
     @PostMapping
     public ResponseEntity<AppointmentConfigResponse> createConfig(
-            @PathVariable UUID carwashId,
+            @PathVariable UUID profileId,
             @Valid @RequestBody AppointmentConfigRequest request) {
 
-        AppointmentConfigResponse response = appointmentConfigService.createConfig(carwashId, request);
+        AppointmentConfigResponse response = appointmentConfigService.createConfig(profileId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(summary = "Get appointment configuration", tags = {"Car Wash Profile - Appointment Config"})
     @GetMapping
     public ResponseEntity<AppointmentConfigResponse> getConfig(
-            @PathVariable UUID carwashId) {
-        return ResponseEntity.ok(appointmentConfigService.getConfig(carwashId));
+            @PathVariable UUID profileId) {
+        return ResponseEntity.ok(appointmentConfigService.getConfig(profileId));
     }
 
     @Operation(summary = "Update appointment configuration", tags = {"Car Wash Profile - Appointment Config"})
     @PutMapping
     public ResponseEntity<AppointmentConfigResponse> updateConfig(
-            @PathVariable UUID carwashId,
+            @PathVariable UUID profileId,
             @Valid @RequestBody AppointmentConfigRequest request) {
-        return ResponseEntity.ok(appointmentConfigService.updateConfig(carwashId, request));
+        return ResponseEntity.ok(appointmentConfigService.updateConfig(profileId, request));
     }
 }

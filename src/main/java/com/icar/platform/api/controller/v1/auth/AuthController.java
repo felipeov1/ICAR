@@ -58,18 +58,14 @@ public class AuthController {
     private static final int THIRTY_DAYS_IN_SECONDS = 2592000;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request,
-                                               HttpServletResponse response,
-                                               @RequestParam(required = false, defaultValue = "false") boolean rememberMe) {
-        LoginResponse loginResponse = authService.authenticate(request, rememberMe);
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletResponse response) {
+        LoginResponse loginResponse = authService.authenticate(request);
 
-        int maxAge = rememberMe ? THIRTY_DAYS_IN_SECONDS : -1;
-
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", loginResponse.refreshToken())
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", loginResponse.getRefreshToken())
                 .httpOnly(true)
-//                .secure(true)
                 .path("/")
-                .maxAge(maxAge)
+                .secure(false)
+                .maxAge(THIRTY_DAYS_IN_SECONDS)
                 .sameSite("Lax")
                 .build();
 
@@ -80,14 +76,14 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<AccessTokenResponse> refreshToken(
-            @CookieValue(name = "refresh_token") String refreshToken
+            @CookieValue(name = "refresh_token", required = false) String refreshToken
     ) {
         if (refreshToken == null || refreshToken.isBlank()) {
-            throw new BusinessException("Refresh token not found in cookie");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         if (!tokenGenerator.validateToken(refreshToken, null)) {
-            throw new BusinessException("Invalid or expired refresh token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         String email = tokenGenerator.getEmailFromToken(refreshToken);
@@ -100,9 +96,8 @@ public class AuthController {
         return ResponseEntity.ok(
                 new AccessTokenResponse(newAccessToken, (int) accessTokenValiditySeconds)
         );
-
-
     }
+
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterCustomerRequest request) {
@@ -152,7 +147,6 @@ public class AuthController {
             throw new BusinessException("Email already verified");
         }
 
-        // CORRECTION: Using the newly added 'findByCustomer' method.
         emailVerificationRepository.findByCustomer(customer).ifPresent(emailVerificationRepository::delete);
 
         EmailVerification verification = EmailVerification.builder()

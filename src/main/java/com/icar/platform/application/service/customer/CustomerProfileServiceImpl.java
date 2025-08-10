@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -45,7 +45,7 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
 
         customer.setFullName(request.fullName());
         customer.setPhone(request.phone());
-        customer.setUpdatedAt(ZonedDateTime.now());
+        customer.setUpdatedAt(LocalDateTime.now());
 
         Customer updated = customerRepository.save(customer);
         return new CustomerProfileResponse(

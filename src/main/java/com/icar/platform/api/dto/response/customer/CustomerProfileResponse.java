@@ -1,5 +1,6 @@
 package com.icar.platform.api.dto.response.customer;
 
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -9,6 +10,6 @@ public record CustomerProfileResponse(
         String email,
         String phone,
         boolean emailVerified,
-        ZonedDateTime createdAt,
-        ZonedDateTime  updatedAt
+        LocalDateTime createdAt,
+        LocalDateTime  updatedAt
 ) {}

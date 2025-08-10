@@ -14,12 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/carwashes/{carwashId}/schedule")
+@RequestMapping("/api/v1/profile/{profileId}/schedule")
 @RequiredArgsConstructor
 public class ScheduleController {
 
@@ -28,132 +27,68 @@ public class ScheduleController {
     @Operation(summary = "Get all weekly schedules", tags = {"Car Wash Profile - Schedule - Weekly"})
     @GetMapping("/weekly")
     public ResponseEntity<List<WeeklyScheduleResponse>> getAllWeeklySchedules(
-            @PathVariable UUID carwashId) {
-        List<WeeklyScheduleResponse> schedules = scheduleService.getAllWeeklySchedules(carwashId);
+            @PathVariable UUID profileId) {
+        List<WeeklyScheduleResponse> schedules = scheduleService.getAllWeeklySchedules(profileId);
         return ResponseEntity.ok(schedules);
     }
 
-    @Operation(summary = "Get a specific weekly schedule", tags = {"Car Wash Profile - Schedule - Weekly"})
-    @GetMapping("/weekly/{scheduleId}")
-    public ResponseEntity<WeeklyScheduleResponse> getWeeklySchedule(
-            @PathVariable UUID carwashId,
-            @PathVariable UUID scheduleId) {
-        return ResponseEntity.ok(scheduleService.getWeeklySchedule(carwashId, scheduleId));
-    }
-
-    @Operation(summary = "Create weekly schedules", tags = {"Car Wash Profile - Schedule - Weekly"})
-    @PostMapping("/weekly")
-    public ResponseEntity<List<WeeklyScheduleResponse>> createWeeklySchedules(
-            @PathVariable UUID carwashId,
-            @Valid @RequestBody List<WeeklyScheduleRequest> requests) {
-        return ResponseEntity.ok(scheduleService.createWeeklySchedules(carwashId, requests));
-    }
-
-    @Operation(summary = "Set same schedule for all days", tags = {"Car Wash Profile - Schedule - Weekly"})
-    @PostMapping("/weekly/set-all")
-    public ResponseEntity<List<WeeklyScheduleResponse>> setAllWeeklySchedules(
-            @PathVariable UUID carwashId,
-            @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime startTime,
-            @RequestParam @DateTimeFormat(pattern = "HH:mm") LocalTime endTime,
-            @RequestParam int intervalMinutes,
-            @RequestParam(defaultValue = "true") boolean available) {
-        return ResponseEntity.ok(scheduleService.setAllWeeklySchedulesWithSameInterval(
-                carwashId, startTime, endTime, intervalMinutes, available
-        ));
-    }
 
     @Operation(summary = "Update weekly schedule", tags = {"Car Wash Profile - Schedule - Weekly"})
     @PutMapping("/weekly/{scheduleId}")
     public ResponseEntity<WeeklyScheduleResponse> updateWeeklySchedule(
-            @PathVariable UUID carwashId,
+            @PathVariable UUID profileId,
             @PathVariable UUID scheduleId,
             @Valid @RequestBody WeeklyScheduleRequest request) {
-        return ResponseEntity.ok(scheduleService.updateWeeklySchedule(carwashId, scheduleId, request));
+        return ResponseEntity.ok(scheduleService.updateWeeklySchedule(profileId, scheduleId, request));
     }
 
-    @Operation(summary = "Toggle availability for weekly schedule", tags = {"Car Wash Profile - Schedule - Weekly"})
-    @PatchMapping("/weekly/{scheduleId}/toggle")
-    public ResponseEntity<Void> toggleWeeklyScheduleAvailability(
-            @PathVariable UUID carwashId,
-            @PathVariable UUID scheduleId) {
-        scheduleService.toggleWeeklyScheduleAvailability(carwashId, scheduleId);
-        return ResponseEntity.ok().build();
-    }
-
-    @Operation(summary = "Get all special days", tags = {"Car Wash Profile - Schedule - Special Days"})
+    @Operation(summary = "Get all upcoming special days for a profile", tags = {"Profile Schedule"})
     @GetMapping("/special-days")
-    public ResponseEntity<List<SpecialDayResponse>> getSpecialDays(
-            @PathVariable UUID carwashId,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(defaultValue = "true") boolean activeOnly) {
-
-        if (startDate != null && endDate != null) {
-            return ResponseEntity.ok(scheduleService.getSpecialDaysByDateRange(carwashId, startDate, endDate, activeOnly));
-        }
-        return ResponseEntity.ok(scheduleService.getAllSpecialDays(carwashId, activeOnly));
+    public ResponseEntity<List<SpecialDayResponse>> getSpecialDays(@PathVariable UUID profileId) {
+        return ResponseEntity.ok(scheduleService.getAllSpecialDays(profileId));
     }
 
-    @Operation(summary = "Get a specific special day", tags = {"Car Wash Profile - Schedule - Special Days"})
-    @GetMapping("/special-days/{specialDayId}")
-    public ResponseEntity<SpecialDayResponse> getSpecialDay(
-            @PathVariable UUID carwashId,
-            @PathVariable UUID specialDayId,
-            @RequestParam(defaultValue = "false") boolean includeInactive) {
-        return ResponseEntity.ok(scheduleService.getSpecialDay(carwashId, specialDayId, includeInactive));
-    }
-
-    @Operation(summary = "Create special days", tags = {"Car Wash Profile - Schedule - Special Days"})
+    @Operation(summary = "Create a special day or period for a profile", tags = {"Profile Schedule"})
     @PostMapping("/special-days")
-    public ResponseEntity<List<SpecialDayResponse>> createSpecialDays(
-            @PathVariable UUID carwashId,
-            @Valid @RequestBody List<SpecialDayRequest> requests) {
-        return ResponseEntity.ok(scheduleService.createSpecialDays(carwashId, requests));
+    public ResponseEntity<SpecialDayResponse> createSpecialDay(
+            @PathVariable UUID profileId,
+            @Valid @RequestBody SpecialDayRequest request) {
+        return ResponseEntity.ok(scheduleService.createSpecialDay(profileId, request));
     }
 
-    @Operation(summary = "Update special day", tags = {"Car Wash Profile - Schedule - Special Days"})
+    @Operation(summary = "Update a special day or period for a profile", tags = {"Profile Schedule"})
     @PutMapping("/special-days/{specialDayId}")
     public ResponseEntity<SpecialDayResponse> updateSpecialDay(
-            @PathVariable UUID carwashId,
+            @PathVariable UUID profileId,
             @PathVariable UUID specialDayId,
             @Valid @RequestBody SpecialDayRequest request) {
-        return ResponseEntity.ok(scheduleService.updateSpecialDay(carwashId, specialDayId, request));
+        return ResponseEntity.ok(scheduleService.updateSpecialDay(profileId, specialDayId, request));
     }
 
-    @Operation(summary = "Disable special day", tags = {"Car Wash Profile - Schedule - Special Days"})
+    @Operation(summary = "Deactivate (soft delete) a special day or period", tags = {"Profile Schedule"})
     @DeleteMapping("/special-days/{specialDayId}")
     public ResponseEntity<Void> deleteSpecialDay(
-            @PathVariable UUID carwashId,
+            @PathVariable UUID profileId,
             @PathVariable UUID specialDayId) {
-        scheduleService.deleteSpecialDay(carwashId, specialDayId);
+        scheduleService.deleteSpecialDay(profileId, specialDayId);
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Restore special day", tags = {"Car Wash Profile - Schedule - Special Days"})
-    @PatchMapping("/special-days/{specialDayId}/restore")
-    public ResponseEntity<Void> restoreSpecialDay(
-            @PathVariable UUID carwashId,
-            @PathVariable UUID specialDayId) {
-        scheduleService.restoreSpecialDay(carwashId, specialDayId);
-        return ResponseEntity.ok().build();
-    }
-
-    @Operation(summary = "Get available time slots for a specific date and service duration", tags = {"Car Wash Profile - Schedule - Availability"})
+    @Operation(summary = "Get available time slots for a specific date", tags = {"Profile Schedule"})
     @GetMapping("/availability")
     public ResponseEntity<List<TimeSlotResponse>> getAvailableTimeSlots(
-            @PathVariable UUID carwashId,
+            @PathVariable UUID profileId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam Integer serviceDurationMinutes) { // <-- NOVO PARÂMETRO
-        return ResponseEntity.ok(scheduleService.getAvailableTimeSlots(carwashId, date, serviceDurationMinutes));
+            @RequestParam Integer serviceDurationMinutes) {
+        return ResponseEntity.ok(scheduleService.getAvailableTimeSlots(profileId, date, serviceDurationMinutes));
     }
 
-    @Operation(summary = "Get all dates with available slots in a range", tags = {"Car Wash Profile - Schedule - Availability"})
+    @Operation(summary = "Get all dates with available slots in a range", tags = {"Profile Schedule"})
     @GetMapping("/available-dates")
     public ResponseEntity<List<String>> getAvailableDates(
-            @PathVariable UUID carwashId,
+            @PathVariable UUID profileId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(scheduleService.getAvailableDates(carwashId, startDate, endDate));
+        return ResponseEntity.ok(scheduleService.getAvailableDates(profileId, startDate, endDate));
     }
-
 }

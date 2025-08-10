@@ -1,33 +1,63 @@
 package com.icar.platform.api.dto.response.appointment;
 
+import lombok.Data;
 import com.icar.platform.domain.enums.AppointmentStatus;
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public record AppointmentResponse(
-        UUID id,
-        UUID carwashId,
-        UUID offeringId,
-        UUID addressId,
-        String carWashName,
-        String carWashPhone,
-        String serviceName,
-        List<ExtraServiceInfo> extraServices,
-        int estimatedTime,
-        ZonedDateTime dateTime,
-        String vehicleType,
-        AppointmentStatus status,
-        String paymentMethod,
-        BigDecimal finalPrice,
-        String addressStreet,
-        String addressNumber,
-        String addressCityState,
-        String addressInstructions,
-        Integer minCancelNoticeMinutes,
-        Integer minEditNoticeMinutes,
-        boolean hasBeenReviewed
-) {
-    public record ExtraServiceInfo(UUID id, String name, BigDecimal price, Integer integer) {}
+@Data
+public class AppointmentResponse {
+    private UUID id;
+    private UUID carwashId;
+    private UUID addressId;
+    private String carWashName;
+    private String carWashPhone;
+    private List<ServiceInfo> services;
+    private int totalDurationMinutes;
+    private LocalDateTime dateTime;
+    private String vehicleType;
+    private AppointmentStatus status;
+    private String paymentMethod;
+    private BigDecimal finalPrice;
+    private String addressStreet;
+    private String addressNumber;
+    private String addressCityState;
+    private String addressInstructions;
+    private Integer minCancelNoticeMinutes;
+    private Integer minEditNoticeMinutes;
+    private boolean hasBeenReviewed;
+
+    private CustomerInfo customer;
+
+    @Data
+    public static class CustomerInfo {
+        private UUID id;
+        private String name;
+        private String phone;
+
+        public CustomerInfo(UUID id, String name, String phone) {
+            this.id = id;
+            this.name = name;
+            this.phone = phone;
+        }
+    }
+
+    @Data
+    public static class ServiceInfo {
+        private UUID id;
+        private String name;
+        private BigDecimal price;
+        private Integer time;
+        private String serviceType;
+
+        public ServiceInfo(UUID id, String name, BigDecimal price, Integer time, String serviceType) {
+            this.id = id;
+            this.name = name;
+            this.price = price;
+            this.time = time;
+            this.serviceType = serviceType;
+        }
+    }
 }

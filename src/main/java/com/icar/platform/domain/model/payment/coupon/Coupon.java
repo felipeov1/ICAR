@@ -7,7 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -34,10 +34,10 @@ public class Coupon {
     private BigDecimal discountPercentage;
 
     @Column(name = "valid_from", nullable = false)
-    private ZonedDateTime validFrom;
+    private LocalDateTime validFrom;
 
     @Column(name = "valid_until", nullable = false)
-    private ZonedDateTime validUntil;
+    private LocalDateTime validUntil;
 
     @Column(name = "max_uses")
     private Integer maxUses;
@@ -53,5 +53,5 @@ public class Coupon {
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private ZonedDateTime createdAt;
+    private LocalDateTime createdAt;
 }

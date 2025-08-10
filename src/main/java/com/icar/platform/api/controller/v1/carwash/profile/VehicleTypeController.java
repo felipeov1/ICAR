@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Tag(name = "Car Wash Profile - Vehicle Types", description = "Manage vehicle types accepted by car wash")
 @RestController
-@RequestMapping("/api/v1/carwashes/{profileId}/vehicle-types")
+@RequestMapping("/api/v1/profile/{profileId}/vehicle-types")
 @RequiredArgsConstructor
 public class VehicleTypeController {
 
