@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - production # Mude para 'master' se for o caso
+  workflow_dispatch: # <--- ADICIONE ESTA LINHA
 
 jobs:
   deploy:
