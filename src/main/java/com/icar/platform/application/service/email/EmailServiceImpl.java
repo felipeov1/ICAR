@@ -1,93 +1,133 @@
 package com.icar.platform.application.service.email;
 
-import com.icar.platform.infrastructure.storage.config.StorageProperties;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
-    private final StorageProperties storageProperties;
 
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    @Override
-    public void sendVerificationEmail(String toEmail, String verificationToken) {
-        try {
-            String verificationUrl = "http://192.168.3.8:8080" + "/api/v1/auth/verify-email?token=" + verificationToken;
+    @Value("${app.api-url}")
+    private String apiUrl;
 
+    @Value("${app.logo-url}")
+    private String logoUrl;
+
+    @Override
+    @Async
+    public void sendVerificationEmail(String toEmail, String userName, String verificationToken) {
+        log.info("Iniciando envio de e-mail de verificação para {}", toEmail);
+        try {
+            String verificationUrl = apiUrl + "/api/v1/auth/verify-email?token=" + verificationToken;
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(fromEmail);
+            helper.setFrom(fromEmail, "Equipe iCar");
             helper.setTo(toEmail);
             helper.setSubject("Confirme seu e-mail - iCar");
 
-            String htmlContent = buildEmailHtmlContent(verificationUrl);
+            String htmlContent = buildVerificationEmailHtml(userName, verificationUrl);
             helper.setText(htmlContent, true);
 
             mailSender.send(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException("Falha ao enviar e-mail de verificação", e);
+            log.info("E-mail de verificação enviado com sucesso para {}", toEmail);
+        } catch (Exception e) {
+            log.error("Falha ao enviar e-mail de verificação para {}: {}", toEmail, e.getMessage());
         }
     }
 
-    private String buildEmailHtmlContent(String verificationUrl) {
-        return "<!DOCTYPE html>" +
-                "<html lang=\"pt-BR\">" +
-                "<head>" +
-                "    <meta charset=\"UTF-8\">" +
-                "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">" +
-                "    <title>Confirmação de E-mail - iCar</title>" +
-                "    <style>" +
-                "        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; padding: 0; background-color: #f5f5f5; }" +
-                "        .container { background-color: #ffffff; margin: 20px auto; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }" +
-                "        .header { background-color: #2563eb; padding: 30px 20px; text-align: center; }" +
-                "        .header h1 { color: white; margin: 0; font-size: 28px; font-weight: 600; }" +
-                "        .content { padding: 30px; }" +
-                "        h2 { color: #2563eb; margin-top: 0; font-size: 22px; }" +
-                "        p { margin-bottom: 16px; font-size: 16px; line-height: 1.5; }" +
-                "        .button-container { text-align: center; margin: 30px 0 15px 0; }" +
-                "        .button { display: inline-block; padding: 14px 28px; background-color: #2563eb; color: white; text: white; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; transition: background-color 0.3s; }" +
-                "        .button:hover { background-color: #1d4ed8; }" +
-                "        .link-container { text-align: center; margin-bottom: 30px; }" +
-                "        .link-alternative { display: inline-block; word-break: break-all; color: #6b7280; font-size: 14px; text-decoration: none; border: 1px solid #e5e7eb; padding: 10px 15px; border-radius: 4px; background-color: #f9fafb; max-width: 80%; }" +
-                "        .footer { padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border-top: 1px solid #e5e7eb; }" +
-                "    </style>" +
-                "</head>" +
-                "<body>" +
-                "    <div class=\"container\">" +
-                "        <div class=\"header\">" +
-                "            <h1>iCar</h1>" +
-                "        </div>" +
-                "        <div class=\"content\">" +
-                "            <h2>Confirme seu endereço de e-mail</h2>" +
-                "            <p>Olá,</p>" +
-                "            <p>Obrigado por se cadastrar na iCar. Para ativar sua conta, por favor confirme seu endereço de e-mail clicando no botão abaixo:</p>" +
-                "            <div class=\"button-container\">" +
-                "                <a href=\"" + verificationUrl + "\" class=\"button\">CONFIRMAR E-MAIL</a>" +
-                "            </div>" +
-                "            <div class=\"link-container\">" +
-                "                <span style=\"color: #6b7280; font-size: 14px; display: block; margin-bottom: 8px;\">Ou copie e cole este link:</span>" +
-                "                <a href=\"" + verificationUrl + "\" class=\"link-alternative\">" + verificationUrl + "</a>" +
-                "            </div>" +
-                "            <p>Atenciosamente,<br><strong>Equipe iCar</strong></p>" +
-                "        </div>" +
-                "        <div class=\"footer\">" +
-                "            <p>© " + LocalDate.now().getYear() + " iCar. Todos os direitos reservados.</p>" +
-                "        </div>" +
-                "    </div>" +
-                "</body>" +
-                "</html>";
+    @Override
+    @Async
+    public void sendPasswordResetEmail(String toEmail, String userName, String resetLink) {
+        log.info("Iniciando envio de e-mail de redefinição de senha para {}", toEmail);
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail, "Equipe iCar");
+            helper.setTo(toEmail);
+            helper.setSubject("Redefinição de Senha - iCar");
+
+            String htmlContent = buildPasswordResetHtml(userName, resetLink);
+            helper.setText(htmlContent, true);
+
+            mailSender.send(message);
+            log.info("E-mail de redefinição de senha enviado com sucesso para {}", toEmail);
+        } catch (Exception e) {
+            log.error("Falha ao enviar e-mail de redefinição de senha para {}: {}", toEmail, e.getMessage());
+        }
+    }
+
+    private String getBaseEmailStyle() {
+        String icarBlue = "#0d5188";
+        String icarBlueHover = "#0a3b64";
+        String lightGrayBg = "#f8f9fa";
+        String textColor = "#343a40";
+        String lightTextColor = "#6c757d";
+
+        return "body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: " + textColor + "; width: 100% !important; margin: 0 !important; padding: 0 !important; background-color: " + lightGrayBg + "; }" +
+                ".container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #dee2e6; }" +
+                ".header { padding: 30px; text-align: center; background-color: #ffffff; border-bottom: 1px solid #dee2e6; }" +
+                ".header img { max-width: 140px; }" +
+                ".content { padding: 30px 40px; }" +
+                "h2 { color: " + icarBlue + "; margin-top: 0; font-size: 24px; font-weight: 600; }" +
+                "p { margin-bottom: 20px; font-size: 16px; }" +
+                ".button-container { text-align: center; margin: 30px 0; }" +
+                ".button { display: inline-block; padding: 15px 30px; background-color: " + icarBlue + "; color: #ffffff !important; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: background-color 0.3s; }" +
+                ".button:hover { background-color: " + icarBlueHover + "; }" +
+                ".fallback-link { font-size: 14px; color: " + lightTextColor + "; text-align: center; margin-top: 20px; }" +
+                ".fallback-link a { color: " + icarBlue + "; text-decoration: underline; }" +
+                "hr { border: 0; border-top: 1px solid #dee2e6; margin: 30px 0; }" +
+                ".footer { padding: 30px; text-align: center; font-size: 12px; color: " + lightTextColor + "; background-color: #f8f9fa; }";
+    }
+
+    private String buildVerificationEmailHtml(String userName, String verificationUrl) {
+        return "<!DOCTYPE html><html lang=\"pt-BR\"><head><meta charset=\"UTF-8\"><title>Confirmação de E-mail - iCar</title><style>" + getBaseEmailStyle() + "</style></head>" +
+                "<body><div class=\"container\">" +
+                "<div class=\"header\"><a href=\"https://icarplus.com.br\" target=\"_blank\"><img src=\"" + logoUrl + "\" alt=\"iCar Logo\"></a></div>" +
+                "<div class=\"content\">" +
+                "<h2>Confirme seu endereço de e-mail</h2>" +
+                "<p>Olá " + userName + ",</p>" +
+                "<p>Estamos quase lá! Para garantir a segurança da sua conta, por favor, confirme seu endereço de e-mail clicando no botão abaixo.</p>" +
+                "<div class=\"button-container\"><a href=\"" + verificationUrl + "\" class=\"button\">CONFIRMAR MEU E-MAIL</a></div>" +
+                "<p class=\"fallback-link\">Se o botão não funcionar, <a href=\"" + verificationUrl + "\">clique aqui</a>.</p>" +
+                "<hr>" +
+                "<p>Atenciosamente,<br><strong>Equipe iCar</strong></p>" +
+                "</div>" +
+                "<div class=\"footer\"><p>&copy; " + LocalDate.now().getYear() + " iCar. Todos os direitos reservados.</p></div>" +
+                "</div></body></html>";
+    }
+
+    private String buildPasswordResetHtml(String userName, String resetLink) {
+        return "<!DOCTYPE html><html lang=\"pt-BR\"><head><meta charset=\"UTF-8\"><title>Redefinição de Senha - iCar</title><style>" + getBaseEmailStyle() + "</style></head>" +
+                "<body><div class=\"container\">" +
+                "<div class=\"header\"><a href=\"https://www.icarplus.com.br\" target=\"_blank\"><img src=\"" + logoUrl + "\" alt=\"iCar Logo\"></a></div>" +
+                "<div class=\"content\">" +
+                "<h2>Redefinição de Senha</h2>" +
+                "<p>Olá " + userName + ",</p>" +
+                "<p>Recebemos uma solicitação para redefinir a senha da sua conta iCar. Para criar uma nova senha, clique no botão abaixo. Este link expirará em 60 minutos.</p>" +
+                "<div class=\"button-container\"><a href=\"" + resetLink + "\" class=\"button\">REDEFINIR MINHA SENHA</a></div>" +
+                "<p class=\"fallback-link\">Se o botão não funcionar, <a href=\"" + resetLink + "\">clique aqui</a>.</p>" +
+                "<hr>" +
+                "<p style=\"font-size: 14px; color: #6c757d;\">Se você não solicitou esta alteração, pode ignorar este e-mail com segurança.</p>" +
+                "<p>Atenciosamente,<br><strong>Equipe iCar</strong></p>" +
+                "</div>" +
+                "<div class=\"footer\"><p>&copy; " + LocalDate.now().getYear() + " iCar. Todos os direitos reservados.</p></div>" +
+                "</div></body></html>";
     }
 }

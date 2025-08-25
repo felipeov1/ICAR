@@ -2,6 +2,7 @@ package com.icar.platform.api.controller.v1.customer;
 
 import com.icar.platform.api.dto.request.appointment.AppointmentRequest;
 import com.icar.platform.api.dto.request.appointment.RescheduleRequest;
+import com.icar.platform.api.dto.response.appointment.AppointmentCreationResponse;
 import com.icar.platform.api.dto.response.appointment.AppointmentResponse;
 import com.icar.platform.application.service.appointment.AppointmentService;
 import com.icar.platform.infrastructure.security.service.UserDetailsImpl;
@@ -23,15 +24,23 @@ public class CustomerAppointmentController {
 
     private final AppointmentService appointmentService;
 
+
+    @Operation(summary = "Get a specific appointment by ID")
+    @GetMapping("/{appointmentId}")
+    public ResponseEntity<AppointmentResponse> getAppointmentById(
+            @AuthenticationPrincipal UserDetailsImpl user,
+            @PathVariable UUID appointmentId
+    ) {
+        return ResponseEntity.ok(appointmentService.getAppointmentByIdForCustomer(appointmentId, user.getId()));
+    }
+
     @Operation(summary = "Create a new appointment")
     @PostMapping
-    public ResponseEntity<AppointmentResponse> createAppointment(
-            @AuthenticationPrincipal UserDetailsImpl user,
-            @RequestBody @Valid AppointmentRequest request
+    public ResponseEntity<AppointmentCreationResponse> createAppointment(@AuthenticationPrincipal UserDetailsImpl user, @RequestBody @Valid AppointmentRequest request
     ) {
         UUID customerId = user.getId();
-        AppointmentResponse createdAppointment = appointmentService.createAppointment(customerId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdAppointment);
+        AppointmentCreationResponse creationResponse = appointmentService.createAppointment(customerId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(creationResponse);
     }
 
     @Operation(summary = "Get customer's upcoming appointments")
@@ -69,5 +78,15 @@ public class CustomerAppointmentController {
             @RequestBody @Valid RescheduleRequest request
     ) {
         return ResponseEntity.ok(appointmentService.rescheduleAppointment(appointmentId, user.getId(), request.newDateTime()));
+    }
+
+    @Operation(summary = "Deleta um agendamento pendente após uma falha na criação do pagamento")
+    @DeleteMapping("/{appointmentId}")
+    public ResponseEntity<Void> deletePendingAppointment(
+            @AuthenticationPrincipal UserDetailsImpl user,
+            @PathVariable UUID appointmentId
+    ) {
+        appointmentService.deletePendingAppointment(appointmentId, user.getId());
+        return ResponseEntity.noContent().build();
     }
 }

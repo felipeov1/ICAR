@@ -57,5 +57,10 @@ public class GeneralProfileController {
         return ResponseEntity.ok(carWashProfileService.updateProfile(profileId, request, logo, coverPhoto));
     }
 
+    @GetMapping("/subdomain/{subdomain}")
+    public ResponseEntity<CarWashProfileResponse> getProfileBySubdomain(@PathVariable String subdomain) {
+        CarWashProfileResponse profile = carWashProfileService.getProfileBySubdomain(subdomain);
+        return ResponseEntity.ok(profile);
+    }
 
 }

@@ -12,6 +12,7 @@ public class AppointmentConfigRequest {
     private Integer minAdvanceNoticeMinutes;
     private Integer minEditNoticeMinutes;
     private Integer minCancelNoticeMinutes;
+    private Integer maxAdvanceBookingDays;
     private Integer gapMinutes;
     @NotNull
     private Boolean allowOvertime;

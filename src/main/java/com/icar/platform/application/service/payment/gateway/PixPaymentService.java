@@ -1,0 +1,230 @@
+package com.icar.platform.application.service.payment.gateway;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.gson.Gson;
+import com.icar.platform.api.dto.payment.PixPaymentResponseDTO;
+import com.icar.platform.domain.model.appointment.CarWashAppointment;
+import com.icar.platform.domain.model.customer.Customer;
+import com.icar.platform.domain.model.payment.gateway.PaymentTransaction;
+import com.icar.platform.domain.repository.appointment.CarWashAppointmentRepository;
+import com.icar.platform.domain.repository.payment.gateway.CompanyMercadoPagoConfigRepository;
+import com.icar.platform.shared.exception.BusinessException;
+import com.icar.platform.shared.exception.MercadoPagoException;
+import com.mercadopago.MercadoPagoConfig;
+import com.mercadopago.client.common.IdentificationRequest;
+import com.mercadopago.client.payment.*;
+import com.mercadopago.core.MPRequestOptions;
+import com.mercadopago.exceptions.MPApiException;
+import com.mercadopago.exceptions.MPException;
+import com.mercadopago.resources.payment.Payment;
+import com.mercadopago.resources.payment.PaymentRefund;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class PixPaymentService {
+
+    private final CarWashAppointmentRepository appointmentRepository;
+
+    private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+    public PixPaymentResponseDTO processPixPayment(
+            CarWashAppointment appointment,
+            BigDecimal totalTransactionAmount,
+            String cpf,
+            String sellerAccessToken) {
+        try {
+            MercadoPagoConfig.setAccessToken(sellerAccessToken);
+
+            Customer customer = appointment.getCustomer();
+            if (customer == null) {
+                throw new BusinessException("Agendamento sem cliente associado.");
+            }
+
+            if (cpf == null || cpf.isBlank()) {
+                throw new MercadoPagoException("O CPF do pagador é obrigatório para pagamentos PIX.");
+            }
+
+            PaymentClient client = new PaymentClient();
+
+            IdentificationRequest identificationRequest = IdentificationRequest.builder()
+                    .type("CPF")
+                    .number(cpf)
+                    .build();
+
+            String[] nameParts = customer.getFullName().trim().split("\\s+");
+            String firstName = nameParts.length > 0 ? nameParts[0] : "";
+            String lastName = nameParts.length > 1 ?
+                    Arrays.stream(nameParts).skip(1).collect(Collectors.joining(" ")) : "";
+
+            PaymentPayerRequest payerRequest = PaymentPayerRequest.builder()
+                    .email(customer.getEmail())
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .identification(identificationRequest)
+                    .build();
+
+            PaymentCreateRequest createRequest = PaymentCreateRequest.builder()
+                    .transactionAmount(totalTransactionAmount)
+                    .description("Pagamento para o agendamento #" + appointment.getId())
+                    .externalReference(appointment.getId().toString())
+                    .paymentMethodId("pix")
+                    .payer(payerRequest)
+                    .dateOfExpiration(OffsetDateTime.now().plusMinutes(30))
+                    .build();
+
+            try {
+                log.info("Enviando requisição para o Mercado Pago com o corpo (payload): {}",
+                        objectMapper.writeValueAsString(createRequest));
+            } catch (Exception e) {
+                log.warn("Não foi possível serializar o objeto de requisição para o log: {}", e.getMessage());
+            }
+
+            Payment createdPayment = client.create(createRequest);
+
+            if (createdPayment.getPointOfInteraction() == null || createdPayment.getPointOfInteraction().getTransactionData() == null) {
+                throw new BusinessException("Resposta do gateway de pagamento inválida. Não contém dados do PIX.");
+            }
+
+            PaymentTransaction newTransaction = new PaymentTransaction();
+            newTransaction.setMercadoPagoPaymentId(createdPayment.getId());
+            newTransaction.setStatus(createdPayment.getStatus());
+            newTransaction.setAppointment(appointment);
+            appointment.setPaymentTransaction(newTransaction);
+            appointmentRepository.save(appointment);
+
+            String qrCodeBase64 = createdPayment.getPointOfInteraction().getTransactionData().getQrCodeBase64();
+            String qrCode = createdPayment.getPointOfInteraction().getTransactionData().getQrCode();
+
+            return new PixPaymentResponseDTO(
+                    createdPayment.getId(),
+                    createdPayment.getStatus(),
+                    createdPayment.getStatusDetail(),
+                    qrCodeBase64,
+                    qrCode,
+                    createdPayment.getExternalReference()
+            );
+
+        } catch (MPApiException e) {
+            log.error("Erro da API do Mercado Pago: {}", e.getApiResponse().getContent());
+            throw new BusinessException("Falha ao gerar o pagamento PIX. Por favor, tente novamente.");
+        } catch (MPException e) {
+            log.error("Erro no SDK do Mercado Pago: {}", e.getMessage());
+            throw new BusinessException("Ocorreu um erro interno ao processar o pagamento.");
+        }
+    }
+
+
+    public Payment cancelPendingPayment(Long paymentId) {
+        try {
+            PaymentClient client = new PaymentClient();
+            Payment canceledPayment = client.cancel(paymentId);
+            log.info("Pagamento pendente {} cancelado com sucesso.", paymentId);
+            return canceledPayment;
+        } catch (MPException | MPApiException e) {
+            handleException(e, paymentId);
+            return null;
+        }
+    }
+
+    public PaymentRefund createTotalRefund(Long paymentId, String sellerAccessToken) {
+        try {
+            MercadoPagoConfig.setAccessToken(sellerAccessToken);
+
+            PaymentClient client = new PaymentClient();
+
+            PaymentRefund refund = client.refund(paymentId);
+
+            log.info("Reembolso total para o pagamento {} criado com sucesso. Status: {}", paymentId, refund.getStatus());
+            return refund;
+
+        } catch (MPException | MPApiException e) {
+            handleException(e, paymentId);
+            return null;
+        }
+    }
+
+
+    public PaymentRefund createPartialRefund(Long paymentId, BigDecimal amount) {
+        try {
+            PaymentClient client = new PaymentClient();
+            PaymentRefund refund = client.refund(paymentId, amount);
+
+            log.info("Reembolso parcial de {} para o pagamento {} criado com sucesso. Status: {}", amount, paymentId, refund.getStatus());
+            return refund;
+        } catch (MPException | MPApiException e) {
+            handleException(e, paymentId);
+            return null;
+        }
+    }
+
+
+    private MPRequestOptions buildRequestOptions(String accessToken) {
+        Map<String, String> customHeaders = new HashMap<>();
+        customHeaders.put("x-idempotency-key", UUID.randomUUID().toString());
+        return MPRequestOptions.builder()
+                .accessToken(accessToken)
+                .customHeaders(customHeaders)
+                .build();
+    }
+
+    private PaymentPayerRequest buildPayerRequest(CarWashAppointment appointment, String payerCpf) {
+        Customer customer = appointment.getCustomer();
+        if (customer == null) {
+            throw new IllegalStateException("O agendamento deve ter um cliente associado para processar o pagamento.");
+        }
+
+        String[] nameParts = customer.getFullName().trim().split("\\s+");
+        String firstName = nameParts.length > 0 ? nameParts[0] : "";
+        String lastName = nameParts.length > 1 ?
+                Arrays.stream(nameParts).skip(1).collect(Collectors.joining(" ")) : "";
+
+        String identificationNumber = (payerCpf != null && !payerCpf.isBlank()) ? payerCpf : customer.getIdentificationNumber();
+
+        if (identificationNumber == null || identificationNumber.isBlank()) {
+            throw new MercadoPagoException("O CPF do pagador é obrigatório para pagamentos PIX.");
+        }
+
+        return PaymentPayerRequest.builder()
+                .email(customer.getEmail())
+                .firstName(firstName)
+                .lastName(lastName)
+                .entityType("individual")
+                .identification(
+                        IdentificationRequest.builder()
+                                .type("CPF")
+                                .number(identificationNumber)
+                                .build())
+                .build();
+    }
+
+    private void handleException(Exception e, Long resourceId) {
+        if (e instanceof MPApiException apiException) {
+            String requestId = "N/A";
+            if (apiException.getApiResponse() != null && apiException.getApiResponse().getHeaders() != null) {
+                requestId = apiException.getApiResponse().getHeaders().getOrDefault("x-request-id", List.of("N/A")).getFirst();
+            }
+            log.error("Erro da API do Mercado Pago. Status: {}, Causa: {}, Request-ID: {}",
+                    apiException.getStatusCode(), apiException.getApiResponse().getContent(), requestId);
+            throw new MercadoPagoException(apiException.getApiResponse().getContent());
+
+        } else {
+            log.error("Erro inesperado do SDK do Mercado Pago ao operar no recurso {}: {}", resourceId, e.getMessage());
+            throw new MercadoPagoException(e.getMessage());
+        }
+    }
+}

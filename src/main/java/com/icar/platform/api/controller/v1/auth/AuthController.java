@@ -1,39 +1,33 @@
+// Caminho: com/icar/platform/api/controller/v1/auth/AuthController.java
 package com.icar.platform.api.controller.v1.auth;
 
 import com.icar.platform.api.dto.request.auth.LoginRequest;
+import com.icar.platform.api.dto.request.auth.RefreshTokenRequest;
 import com.icar.platform.api.dto.request.auth.RegisterCustomerRequest;
 import com.icar.platform.api.dto.response.auth.EmailVerificationResponse;
-import com.icar.platform.api.dto.response.customer.AccessTokenResponse;
 import com.icar.platform.api.dto.response.auth.LoginResponse;
 import com.icar.platform.api.dto.response.auth.RegisterCustomerResponse;
+import com.icar.platform.api.dto.response.customer.AccessTokenResponse;
 import com.icar.platform.application.service.auth.AuthService;
+import com.icar.platform.application.service.auth.PasswordResetService;
 import com.icar.platform.application.service.customer.CustomerAuthService;
-import com.icar.platform.application.service.email.EmailService;
-import com.icar.platform.domain.model.customer.Customer;
-import com.icar.platform.domain.model.email.EmailVerification;
-import com.icar.platform.domain.repository.customer.CustomerRepository;
-import com.icar.platform.domain.repository.email.EmailVerificationRepository;
-import com.icar.platform.infrastructure.security.utils.TokenGenerator;
 import com.icar.platform.infrastructure.validation.exception.CustomValidationException;
 import com.icar.platform.shared.exception.BusinessException;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.CookieValue;
-
 
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.UUID;
 
 @Tag(name = "Customer Auth", description = "Security to access and register")
 @RestController
@@ -43,61 +37,38 @@ public class AuthController {
 
     private final AuthService authService;
     private final CustomerAuthService customerAuthService;
-    private final TokenGenerator tokenGenerator;
-    private final CustomerRepository customerRepository;
-    private final EmailVerificationRepository emailVerificationRepository;
-    private final EmailService emailService;
+    private final PasswordResetService passwordResetService;
+
+    private static final String REFRESH_TOKEN_COOKIE = "refresh_token"; // Nome unificado
 
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
-    @Value("${jwt.expiration.access-token}")
-    private long accessTokenExpirationMs;
-
-
-    private static final int THIRTY_DAYS_IN_SECONDS = 2592000;
-
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletResponse response) {
-        LoginResponse loginResponse = authService.authenticate(request);
-
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", loginResponse.getRefreshToken())
-                .httpOnly(true)
-                .path("/")
-                .secure(false)
-                .maxAge(THIRTY_DAYS_IN_SECONDS)
-                .sameSite("Lax")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-
+    public ResponseEntity<LoginResponse> login(
+            @Valid @RequestBody LoginRequest loginRequest,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        LoginResponse loginResponse = authService.authenticate(loginRequest, request, response);
         return ResponseEntity.ok(loginResponse);
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AccessTokenResponse> refreshToken(
-            @CookieValue(name = "refresh_token", required = false) String refreshToken
-    ) {
-        if (refreshToken == null || refreshToken.isBlank()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    public ResponseEntity<LoginResponse> refreshToken(
+            @Valid @RequestBody RefreshTokenRequest request) {
+
+        if (request.refreshToken() == null) {
+            throw new BusinessException("Refresh token não encontrado no corpo da requisição.");
         }
 
-        if (!tokenGenerator.validateToken(refreshToken, null)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        String email = tokenGenerator.getEmailFromToken(refreshToken);
-        Customer customer = customerRepository.findByEmail(email)
-                .orElseThrow(() -> new BusinessException("User not found for the given token"));
-
-        String newAccessToken = tokenGenerator.generateAccessToken(customer);
-        long accessTokenValiditySeconds = accessTokenExpirationMs / 1000;
-
-        return ResponseEntity.ok(
-                new AccessTokenResponse(newAccessToken, (int) accessTokenValiditySeconds)
-        );
+        LoginResponse response = authService.refreshToken(request.refreshToken());
+        return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterCustomerRequest request) {
@@ -110,11 +81,6 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of(
                     "message", e.getMessage(),
                     "error", "business_error"
-            ));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                    "message", "Internal server error",
-                    "error", "internal_error"
             ));
         }
     }
@@ -135,44 +101,30 @@ public class AuthController {
 
     @PostMapping("/resend-confirmation")
     public ResponseEntity<?> resendConfirmationEmail(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        if (email == null || email.isBlank()) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Email is required"));
-        }
-
-        Customer customer = customerRepository.findByEmail(email)
-                .orElseThrow(() -> new BusinessException("Email not found"));
-
-        if (customer.isEmailVerified()) {
-            throw new BusinessException("Email already verified");
-        }
-
-        emailVerificationRepository.findByCustomer(customer).ifPresent(emailVerificationRepository::delete);
-
-        EmailVerification verification = EmailVerification.builder()
-                .customer(customer)
-                .token(UUID.randomUUID().toString())
-                .createdAt(LocalDateTime.now())
-                .expiresAt(LocalDateTime.now().plusHours(1))
-                .build();
-
-        emailVerificationRepository.save(verification);
-        emailService.sendVerificationEmail(customer.getEmail(), verification.getToken());
-
+        // CORRIGIDO: A chamada agora é válida
+        customerAuthService.resendConfirmationEmail(request.get("email"));
         return ResponseEntity.ok(Map.of("message", "Confirmation email resent successfully"));
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletResponse response) {
-        ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
-                .httpOnly(true)
-//                .secure(true)
-                .path("/")
-                .maxAge(0)
-                .sameSite("Strict")
-                .build();
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String userType = request.get("userType");
+        if (email == null || userType == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "E-mail e tipo de usuário são obrigatórios."));
+        }
+        passwordResetService.createPasswordResetRequest(email, userType);
+        return ResponseEntity.ok(Map.of("message", "Se uma conta com este e-mail existir, um link de redefinição foi enviado."));
+    }
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        return ResponseEntity.noContent().build();
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String newPassword = request.get("newPassword");
+        if (token == null || newPassword == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Token e nova senha são obrigatórios."));
+        }
+        passwordResetService.resetPassword(token, newPassword);
+        return ResponseEntity.ok(Map.of("message", "Senha redefinida com sucesso."));
     }
 }

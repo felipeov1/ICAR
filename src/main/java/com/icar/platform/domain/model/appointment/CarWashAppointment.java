@@ -9,7 +9,8 @@ import com.icar.platform.domain.model.carwash.profile.CompanyCustomer;
 import com.icar.platform.domain.model.carwash.profile.Review;
 import com.icar.platform.domain.model.customer.Customer;
 import com.icar.platform.domain.model.customer.CustomerAddress;
-import com.icar.platform.domain.model.payment.coupon.AppliedCoupon;
+import com.icar.platform.domain.model.coupon.AppliedCoupon;
+import com.icar.platform.domain.model.payment.gateway.PaymentTransaction;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +20,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,7 @@ public class CarWashAppointment {
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "customer_id", nullable = true)
     private Customer customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -104,4 +104,7 @@ public class CarWashAppointment {
 
     @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Review review;
+
+    @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private PaymentTransaction paymentTransaction;
 }

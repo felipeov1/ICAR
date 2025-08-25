@@ -13,7 +13,7 @@ public record OnboardingRequest(
     public record OperationPart(List<String> locations, List<String> modalities, List<String> vehicleTypes, String observations) {}
     public record SchedulePart(Map<String, DaySchedulePart> week, AppointmentRulesPart appointmentRules) {}
     public record DaySchedulePart(boolean available, String startTime, String endTime) {}
-    public record AppointmentRulesPart(Integer minAdvanceNoticeMinutes, Integer minEditNoticeMinutes, Integer minCancelNoticeMinutes, boolean allowActionsAtAnyTime, boolean allowOvertime, Integer gapMinutes) {}
+    public record AppointmentRulesPart(Integer minAdvanceNoticeMinutes, Integer maxAdvanceBookingDays, Integer minEditNoticeMinutes, Integer minCancelNoticeMinutes, boolean allowActionsAtAnyTime, boolean allowOvertime, Integer gapMinutes) {}
     public record ServicePart(String name, String description, Map<String, VehicleDetailPart> vehicleDetails) {}
     public record VehicleDetailPart(java.math.BigDecimal price, Integer durationMinutes) {}
 }

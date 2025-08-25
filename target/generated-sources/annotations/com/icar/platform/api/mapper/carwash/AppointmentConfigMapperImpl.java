@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-04T20:30:57-0300",
+    date = "2025-08-24T03:15:32-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -22,12 +22,12 @@ public class AppointmentConfigMapperImpl implements AppointmentConfigMapper {
 
         AppointmentConfigResponse appointmentConfigResponse = new AppointmentConfigResponse();
 
-        appointmentConfigResponse.setMaxAdvanceBookingDays( entity.getMaxAdvanceBookingDays() );
-        appointmentConfigResponse.setGapMinutes( entity.getGapMinutes() );
-        appointmentConfigResponse.setAllowOvertime( entity.isAllowOvertime() );
         appointmentConfigResponse.setMinAdvanceNoticeMinutes( entity.getMinAdvanceNoticeMinutes() );
         appointmentConfigResponse.setMinEditNoticeMinutes( entity.getMinEditNoticeMinutes() );
         appointmentConfigResponse.setMinCancelNoticeMinutes( entity.getMinCancelNoticeMinutes() );
+        appointmentConfigResponse.setMaxAdvanceBookingDays( entity.getMaxAdvanceBookingDays() );
+        appointmentConfigResponse.setGapMinutes( entity.getGapMinutes() );
+        appointmentConfigResponse.setAllowOvertime( entity.isAllowOvertime() );
 
         return appointmentConfigResponse;
     }
@@ -38,10 +38,21 @@ public class AppointmentConfigMapperImpl implements AppointmentConfigMapper {
             return;
         }
 
-        entity.setMinAdvanceNoticeMinutes( request.getMinAdvanceNoticeMinutes() );
-        entity.setMinEditNoticeMinutes( request.getMinEditNoticeMinutes() );
-        entity.setMinCancelNoticeMinutes( request.getMinCancelNoticeMinutes() );
-        entity.setGapMinutes( request.getGapMinutes() );
+        if ( request.getMinAdvanceNoticeMinutes() != null ) {
+            entity.setMinAdvanceNoticeMinutes( request.getMinAdvanceNoticeMinutes() );
+        }
+        if ( request.getMaxAdvanceBookingDays() != null ) {
+            entity.setMaxAdvanceBookingDays( request.getMaxAdvanceBookingDays() );
+        }
+        if ( request.getMinEditNoticeMinutes() != null ) {
+            entity.setMinEditNoticeMinutes( request.getMinEditNoticeMinutes() );
+        }
+        if ( request.getMinCancelNoticeMinutes() != null ) {
+            entity.setMinCancelNoticeMinutes( request.getMinCancelNoticeMinutes() );
+        }
+        if ( request.getGapMinutes() != null ) {
+            entity.setGapMinutes( request.getGapMinutes() );
+        }
         if ( request.getAllowOvertime() != null ) {
             entity.setAllowOvertime( request.getAllowOvertime() );
         }
@@ -58,6 +69,7 @@ public class AppointmentConfigMapperImpl implements AppointmentConfigMapper {
         appointmentConfig.setMinAdvanceNoticeMinutes( request.getMinAdvanceNoticeMinutes() );
         appointmentConfig.setMinEditNoticeMinutes( request.getMinEditNoticeMinutes() );
         appointmentConfig.setMinCancelNoticeMinutes( request.getMinCancelNoticeMinutes() );
+        appointmentConfig.setMaxAdvanceBookingDays( request.getMaxAdvanceBookingDays() );
         appointmentConfig.setGapMinutes( request.getGapMinutes() );
         if ( request.getAllowOvertime() != null ) {
             appointmentConfig.setAllowOvertime( request.getAllowOvertime() );

@@ -9,4 +9,6 @@ public interface CustomerProfileService {
     CustomerProfileResponse getProfile(UUID customerId);
     CustomerProfileResponse updateProfile(UUID customerId, UpdateProfileRequest request);
     void changePassword(UUID customerId, ChangePasswordRequest request);
+    void updateCustomerCpf(UUID customerId, String cpf);
+
 }

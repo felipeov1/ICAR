@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-04T20:30:57-0300",
+    date = "2025-08-19T19:18:39-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -24,15 +24,12 @@ public class CarWashRegistrationMapperImpl implements CarWashRegistrationMapper 
         CarWashRegistration carWashRegistration = new CarWashRegistration();
 
         carWashRegistration.setCnpj( dto.cnpj() );
-        carWashRegistration.setCpf( dto.cpf() );
         carWashRegistration.setLegalName( dto.legalName() );
-        carWashRegistration.setTradeName( dto.tradeName() );
         carWashRegistration.setOwnerName( dto.ownerName() );
         carWashRegistration.setPhone( dto.phone() );
         carWashRegistration.setEmail( dto.email() );
         carWashRegistration.setStreet( dto.street() );
         carWashRegistration.setNumber( dto.number() );
-        carWashRegistration.setComplement( dto.complement() );
         carWashRegistration.setNeighborhood( dto.neighborhood() );
         carWashRegistration.setCity( dto.city() );
         carWashRegistration.setState( dto.state() );
@@ -50,15 +47,12 @@ public class CarWashRegistrationMapperImpl implements CarWashRegistrationMapper 
 
         UUID id = null;
         String cnpj = null;
-        String cpf = null;
         String legalName = null;
-        String tradeName = null;
         String ownerName = null;
         String phone = null;
         String email = null;
         String street = null;
         String number = null;
-        String complement = null;
         String neighborhood = null;
         String city = null;
         String state = null;
@@ -66,21 +60,18 @@ public class CarWashRegistrationMapperImpl implements CarWashRegistrationMapper 
 
         id = entity.getId();
         cnpj = entity.getCnpj();
-        cpf = entity.getCpf();
         legalName = entity.getLegalName();
-        tradeName = entity.getTradeName();
         ownerName = entity.getOwnerName();
         phone = entity.getPhone();
         email = entity.getEmail();
         street = entity.getStreet();
         number = entity.getNumber();
-        complement = entity.getComplement();
         neighborhood = entity.getNeighborhood();
         city = entity.getCity();
         state = entity.getState();
         zipCode = entity.getZipCode();
 
-        CarWashRegistrationResponse carWashRegistrationResponse = new CarWashRegistrationResponse( id, cnpj, cpf, legalName, tradeName, ownerName, phone, email, street, number, complement, neighborhood, city, state, zipCode );
+        CarWashRegistrationResponse carWashRegistrationResponse = new CarWashRegistrationResponse( id, cnpj, legalName, ownerName, phone, email, street, number, neighborhood, city, state, zipCode );
 
         return carWashRegistrationResponse;
     }

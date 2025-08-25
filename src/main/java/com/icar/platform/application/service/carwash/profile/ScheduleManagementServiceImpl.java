@@ -56,7 +56,7 @@ public class ScheduleManagementServiceImpl implements ScheduleManagementService 
     }
 
     @Override
-    public List<TimeSlotResponse> getAvailableTimeSlots(UUID profileId, LocalDate date, Integer serviceDurationMinutes) {
+    public List<TimeSlotResponse> getAvailableTimeSlots(UUID profileId, LocalDate date, Integer serviceDurationMinutes, UUID appointmentIdToIgnore) {
         AppointmentConfig config = appointmentConfigRepository.findByProfile_Id(profileId)
                 .orElseThrow(() -> new IllegalStateException("Configuração de agendamento não encontrada para o perfil: " + profileId));
 
@@ -91,18 +91,24 @@ public class ScheduleManagementServiceImpl implements ScheduleManagementService 
                 return Collections.emptyList();
             }
         }
-        return generateAndFilterTimeSlots(profileId, date, serviceDurationMinutes, config, dayStartTime, dayEndTime, profileZoneId, appointmentIntervalMinutes);
+        return generateAndFilterTimeSlots(profileId, date, serviceDurationMinutes, config, dayStartTime, dayEndTime, profileZoneId, appointmentIntervalMinutes, appointmentIdToIgnore);
     }
 
 
 
 
-    private List<TimeSlotResponse> generateAndFilterTimeSlots(UUID profileId, LocalDate date, int serviceDurationMinutes, AppointmentConfig config, LocalTime startTime, LocalTime endTime, ZoneId zoneId, int appointmentIntervalMinutes) {
+    private List<TimeSlotResponse> generateAndFilterTimeSlots(UUID profileId, LocalDate date, int serviceDurationMinutes, AppointmentConfig config, LocalTime startTime, LocalTime endTime, ZoneId zoneId, int appointmentIntervalMinutes, UUID appointmentIdToIgnore) {
         final int GAP_MINUTES = config.getGapMinutes();
 
         LocalDateTime queryStart = date.atStartOfDay();
         LocalDateTime queryEnd = date.atTime(LocalTime.MAX);
-        List<CarWashAppointment> bookedAppointments = appointmentRepository.findBookedSlotsByProfileIdAndDateRange(profileId, queryStart, queryEnd);
+
+        List<CarWashAppointment> bookedAppointments;
+        if (appointmentIdToIgnore != null) {
+            bookedAppointments = appointmentRepository.findBookedSlotsByProfileIdAndDateRangeExcludingId(profileId, queryStart, queryEnd, appointmentIdToIgnore);
+        } else {
+            bookedAppointments = appointmentRepository.findBookedSlotsByProfileIdAndDateRange(profileId, queryStart, queryEnd);
+        }
 
         List<TimeSlotResponse> availableSlots = new ArrayList<>();
         LocalDateTime earliestBookingTime = LocalDateTime.now(zoneId).plusMinutes(config.getMinAdvanceNoticeMinutes());
@@ -161,7 +167,7 @@ public class ScheduleManagementServiceImpl implements ScheduleManagementService 
 
         return effectiveStartDate.datesUntil(effectiveEndDate.plusDays(1))
                 .parallel()
-                .filter(date -> !getAvailableTimeSlots(profileId, date, DUMMY_SERVICE_DURATION_FOR_CHECK).isEmpty())
+                .filter(date -> !getAvailableTimeSlots(profileId, date, DUMMY_SERVICE_DURATION_FOR_CHECK, null).isEmpty())
                 .map(LocalDate::toString)
                 .collect(Collectors.toList());
     }

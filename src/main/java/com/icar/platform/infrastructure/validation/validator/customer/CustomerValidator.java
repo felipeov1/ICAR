@@ -46,12 +46,6 @@ public class CustomerValidator {
                 "PASSWORD_MISSING_NUMBER"
         );
 
-        validateField(errors, "password", password,
-                value -> !value.matches(".*[!@#$%^&*].*"),
-                "Password must contain at least one special character (!@#$%^&*)",
-                "PASSWORD_MISSING_SPECIAL"
-        );
-
         validateField(errors, "phone", request.phone(),
                 value -> value == null || !value.matches("^\\d{11}$"),
                 "Phone getStreetNumber must contain exactly 11 digits",

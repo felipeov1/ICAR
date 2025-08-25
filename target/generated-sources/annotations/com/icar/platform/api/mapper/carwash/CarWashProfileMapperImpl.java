@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-04T20:30:57-0300",
+    date = "2025-08-19T19:18:39-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -108,7 +108,9 @@ public class CarWashProfileMapperImpl implements CarWashProfileMapper {
         }
         observations = carWashProfile.getObservations();
 
-        CarWashProfileResponse carWashProfileResponse = new CarWashProfileResponse( id, name, description, logo, rating, reviews, modalities, coverPhoto, subdomain, whatsapp, locations, observations );
+        boolean mercadoPagoConnected = carWashProfile.getCarWashRegistration() != null && carWashProfile.getCarWashRegistration().getMercadoPagoConfig() != null;
+
+        CarWashProfileResponse carWashProfileResponse = new CarWashProfileResponse( id, name, description, logo, rating, reviews, modalities, coverPhoto, subdomain, whatsapp, locations, observations, mercadoPagoConnected );
 
         return carWashProfileResponse;
     }

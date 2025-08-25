@@ -6,6 +6,8 @@ import com.icar.platform.api.dto.request.carwash.profile.RescheduleByCompanyRequ
 import com.icar.platform.api.dto.response.appointment.AppointmentResponse;
 import com.icar.platform.api.dto.response.carwash.CompanyAppointmentResponse;
 import com.icar.platform.application.service.appointment.AppointmentService;
+import com.icar.platform.application.service.appointment.AppointmentServiceImpl;
+import com.icar.platform.application.service.payment.gateway.RefundService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,6 +26,8 @@ import java.util.UUID;
 public class CarWashAppointmentController {
 
     private final AppointmentService appointmentService;
+    private final RefundService refundService;
+    private final AppointmentServiceImpl carWashAppointmentService;
 
     @Operation(summary = "Get upcoming appointments (ordered from oldest to newest)")
     @GetMapping("/upcoming")
@@ -99,13 +103,22 @@ public class CarWashAppointmentController {
         return ResponseEntity.status(201).body(appointmentService.createManualAppointment(carWashId, request));
     }
 
-    @Operation(summary = "Confirm that a refund has been processed")
-    @PatchMapping("/{appointmentId}/confirm-refund")
-    public ResponseEntity<AppointmentResponse> confirmRefund(
-            @PathVariable UUID carWashId,
+    @Operation(summary = "Process a full refund for a canceled appointment")
+    @PostMapping("/{appointmentId}/refund")
+    public ResponseEntity<Void> processRefund(
+            @PathVariable("carWashId") UUID profileId,
             @PathVariable UUID appointmentId) {
-        return ResponseEntity.ok(appointmentService.confirmRefund(appointmentId, carWashId));
+        refundService.processRefundForAppointment(appointmentId, profileId);
+        return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "Cancel an appointment by the car wash")
+    @PostMapping("/{appointmentId}/cancel")
+    public ResponseEntity<AppointmentResponse> cancelAppointmentByCarWash(
+            @PathVariable("carWashId") UUID profileId,
+            @PathVariable UUID appointmentId) {
 
+        AppointmentResponse response = carWashAppointmentService.cancelAppointmentByCompany(appointmentId, profileId);
+        return ResponseEntity.ok(response);
+    }
 }

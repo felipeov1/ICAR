@@ -26,7 +26,11 @@ public interface CarWashProfileMapper {
     CarWashProfile toEntity(CarWashProfileRequest request);
     void updateEntity(CarWashProfileUpdateRequest request, @MappingTarget CarWashProfile entity);
 
+
+    @Mapping(target = "mercadoPagoConnected",
+            expression = "java(carWashProfile.getCarWashRegistration() != null && carWashProfile.getCarWashRegistration().getMercadoPagoConfig() != null)")
     CarWashProfileResponse toDto(CarWashProfile carWashProfile);
+
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "carWashRegistration", ignore = true)

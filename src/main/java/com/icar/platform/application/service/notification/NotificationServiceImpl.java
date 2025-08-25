@@ -43,14 +43,11 @@ public class NotificationServiceImpl implements NotificationService {
         Notification notification = new Notification();
         notification.setProfile(appointment.getProfile());
 
-        // <<< CORREÇÃO PRINCIPAL AQUI >>>
-        // Adicionamos a verificação para criar a notificação correta.
         if (appointment.getStatus() == AppointmentStatus.REFUND_PENDING) {
-            notification.setType("REFUND_REQUIRED"); // Tipo específico para reembolso
+            notification.setType("REFUND_REQUIRED");
             notification.setText("Ação necessária: Cancelamento com reembolso para");
             notification.setAppointmentTime(appointment.getDateTime().format(FORMATTER) + ". Efetue o estorno.");
         } else {
-            // Lógica original para cancelamentos normais
             notification.setType("CANCELLATION");
             notification.setText("O agendamento para");
             notification.setAppointmentTime(appointment.getDateTime().format(FORMATTER) + " foi cancelado.");

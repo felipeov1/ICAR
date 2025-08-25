@@ -20,27 +20,31 @@ import java.util.function.Function;
 @Component
 public class TokenGenerator {
 
-    @Value("${jwt.expiration.access-token}")
-    private long accessTokenExpiration;
-
     private static final Logger logger = LoggerFactory.getLogger(TokenGenerator.class);
 
     @Value("${jwt.secret}")
     private String secret;
+
+    @Value("${jwt.expiration.access-token}")
+    private long accessTokenExpiration;
+
+    @Value("#{${application.security.jwt.refresh-token.expiration-days} * 24 * 60 * 60 * 1000}")
+    private long refreshTokenExpirationMs;
+
 
     public String generateAccessToken(Customer customer) {
         return generateToken(customer, accessTokenExpiration);
     }
 
     public String generateRefreshToken(Customer customer) {
-        return generateToken(customer, 2592000000L);
+        return generateToken(customer, refreshTokenExpirationMs);
     }
 
     public String generateTokenForCarWash(CarWashRegistration carWash, long expirationTimeMillis) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", carWash.getId());
         claims.put("email", carWash.getEmail());
-        claims.put("tradeName", carWash.getTradeName());
+        claims.put("tradeName", carWash.getLegalName());
         claims.put("role", "CARWASH");
         claims.put("profileId", carWash.getProfileId());
         claims.put("isProfileComplete", carWash.isProfileComplete());
@@ -62,10 +66,10 @@ public class TokenGenerator {
     public String generateAccessTokenForCarWash(CarWashRegistration carWash) {
         return generateTokenForCarWash(carWash, accessTokenExpiration);
     }
-    public String generateRefreshTokenForCarWash(CarWashRegistration carWash) {
-        return generateTokenForCarWash(carWash, 2592000000L);
-    }
 
+    public String generateRefreshTokenForCarWash(CarWashRegistration carWash) {
+        return generateTokenForCarWash(carWash, refreshTokenExpirationMs);
+    }
 
     private String createToken(Map<String, Object> claims, String subject, long expirationTimeMillis) {
         try {

@@ -12,7 +12,7 @@
 	<groupId>com.icar</groupId>
 	<artifactId>plataform</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>plataform</name>
+	<name>platform</name>
 	<description>Platform for managing marketplace services and scheduling appointments efficiently.</description>
 
 	<properties>
@@ -116,7 +116,7 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
-			<version>5.10.0</version> <!-- Versão compatível com Spring Boot 3.4.4 -->
+			<version>5.10.0</version>
 			<scope>test</scope>
 		</dependency>
 
@@ -154,6 +154,18 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.17.1</version>
 		</dependency>
+
+		<!-- Mercado Pago -->
+		<dependency>
+			<groupId>com.mercadopago</groupId>
+			<artifactId>sdk-java</artifactId>
+			<version>2.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>

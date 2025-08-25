@@ -8,13 +8,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface NotificationService {
-
-    // Métodos para o sistema chamar internamente
     void createNotificationForNewAppointment(CarWashAppointment appointment);
     void createNotificationForCancelledAppointment(CarWashAppointment appointment);
     void createNotificationForEditedAppointment(CarWashAppointment appointment);
-
-    // Métodos para o controller chamar
     Page<NotificationResponse> getNotificationsForProfile(UUID profileId, int page, int size);
     void markAllAsRead(UUID profileId);
 }

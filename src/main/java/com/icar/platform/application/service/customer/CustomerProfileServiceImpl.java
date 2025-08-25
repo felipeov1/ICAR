@@ -7,21 +7,22 @@ import com.icar.platform.domain.model.customer.Customer;
 import com.icar.platform.domain.repository.customer.CustomerRepository;
 import com.icar.platform.shared.exception.BusinessException;
 import com.icar.platform.shared.exception.ResourceNotFoundException;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerProfileServiceImpl implements CustomerProfileService {
+
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional(readOnly = true)
     public CustomerProfileResponse getProfile(UUID customerId) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
@@ -31,10 +32,24 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
                 customer.getFullName(),
                 customer.getEmail(),
                 customer.getPhone(),
+                customer.getIdentificationNumber(),
                 customer.isEmailVerified(),
                 customer.getCreatedAt(),
                 customer.getUpdatedAt()
         );
+    }
+
+    @Override
+    @Transactional
+    public void updateCustomerCpf(UUID customerId, String cpf) {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+
+        if (customer.getIdentificationNumber() == null || customer.getIdentificationNumber().isEmpty()) {
+            customer.setIdentificationType("CPF");
+            customer.setIdentificationNumber(cpf);
+            customerRepository.save(customer);
+        }
     }
 
     @Override
@@ -48,11 +63,13 @@ public class CustomerProfileServiceImpl implements CustomerProfileService {
         customer.setUpdatedAt(LocalDateTime.now());
 
         Customer updated = customerRepository.save(customer);
+
         return new CustomerProfileResponse(
                 updated.getId(),
                 updated.getFullName(),
                 updated.getEmail(),
                 updated.getPhone(),
+                updated.getIdentificationNumber(),
                 updated.isEmailVerified(),
                 updated.getCreatedAt(),
                 updated.getUpdatedAt()

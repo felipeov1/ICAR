@@ -19,8 +19,11 @@ public interface CarWashProfileRepository extends JpaRepository<CarWashProfile, 
     boolean existsById(@NonNull UUID profileId);
 
     boolean existsBySubdomain(String subdomain);
+
     Optional<CarWashProfile> findByCarWashRegistrationId(UUID carWashId);
 
     @Query("SELECT p.id FROM CarWashProfile p WHERE p.carWashRegistration.id = :carWashId")
     Optional<UUID> findProfileIdByRegistrationId(@NonNull @Param("carWashId") UUID carWashId);
+
+    Optional<CarWashProfile> findBySubdomain(String subdomain);
 }

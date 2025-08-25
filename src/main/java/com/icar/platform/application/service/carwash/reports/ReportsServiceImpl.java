@@ -40,22 +40,18 @@ public class ReportsServiceImpl implements ReportsService {
 
         LocalDateTime now = LocalDateTime.now(SAO_PAULO_ZONE);
 
-        // ✨ ALTERAÇÃO: Os métodos de cálculo de intervalo agora retornam LocalDateTime
         DateRange currentRange = calculateDateRange(periodStr, now);
         DateRange previousRange = calculateDateRange(periodStr, now.minus(getPeriod(periodStr)));
 
-        // ✨ ALTERAÇÃO: A chamada ao repositório agora usa LocalDateTime diretamente.
         List<CarWashAppointment> currentAppointments = appointmentRepository
                 .findAllByProfileIdAndStatusAndDateTimeBetween(profileId, AppointmentStatus.COMPLETED, currentRange.start(), currentRange.end());
 
-        // A chamada para buscar reviews já estava correta, mas agora fica mais limpa.
         List<Review> currentReviews = reviewRepository
                 .findByProfileIdAndCreatedAtBetweenOrderByCreatedAtDesc(profileId, currentRange.start(), currentRange.end());
 
         List<CarWashAppointment> previousAppointments = appointmentRepository
                 .findAllByProfileIdAndStatusAndDateTimeBetween(profileId, AppointmentStatus.COMPLETED, previousRange.start(), previousRange.end());
 
-        // O resto da lógica de cálculo permanece a mesma.
         BigDecimal totalRevenue = calculateTotalRevenue(currentAppointments);
         BigDecimal revenueOnline = calculateRevenueByChannel(currentAppointments, CreationChannel.MARKETPLACE);
         BigDecimal revenueLocal = calculateRevenueByChannel(currentAppointments, CreationChannel.MANUAL);
@@ -87,7 +83,6 @@ public class ReportsServiceImpl implements ReportsService {
                 .build();
     }
 
-    // Métodos auxiliares de cálculo (sem alterações)
     private BigDecimal calculateTotalRevenue(List<CarWashAppointment> appointments) {
         return appointments.stream().map(CarWashAppointment::getAmountPaid).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -104,8 +99,6 @@ public class ReportsServiceImpl implements ReportsService {
         return reviews.stream().map(review -> new SimpleReviewDTO(review.getId(), review.getRating(), review.getCreatedAt(), review.getComment())).collect(Collectors.toList());
     }
 
-
-    // ✨ MÉTODO ATUALIZADO para trabalhar com LocalDateTime
     private DateRange calculateDateRange(String period, LocalDateTime anchorDate) {
         LocalDateTime start, end;
         LocalDate anchorLocalDate = anchorDate.toLocalDate();
@@ -136,7 +129,5 @@ public class ReportsServiceImpl implements ReportsService {
             default: return Period.ofWeeks(1);
         }
     }
-
-    // ✨ RECORD ATUALIZADO para usar LocalDateTime
     private record DateRange(LocalDateTime start, LocalDateTime end) {}
 }

@@ -1,6 +1,7 @@
 package com.icar.platform.domain.model.carwash.legal;
 
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
+import com.icar.platform.domain.model.payment.gateway.CompanyMercadoPagoConfig;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
@@ -32,9 +33,6 @@ public class CarWashRegistration {
     @Column(name = "legal_name", nullable = false, length = 255)
     private String legalName;
 
-    @Column(name = "trade_name", length = 255)
-    private String tradeName;
-
     @Column(name = "owner_name", nullable = false, length = 255)
     private String ownerName;
 
@@ -49,9 +47,6 @@ public class CarWashRegistration {
 
     @Column(name = "number")
     private String number;
-
-    @Column(name = "complement")
-    private String complement;
 
     @Column(name = "neighborhood", nullable = false)
     private String neighborhood;
@@ -82,6 +77,9 @@ public class CarWashRegistration {
     @OneToOne(mappedBy = "carWashRegistration", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private CarWashProfile profile;
 
+    @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private CompanyMercadoPagoConfig mercadoPagoConfig;
+
     public UUID getProfileId() {
         return profile != null ? profile.getId() : null;
     }
@@ -90,4 +88,3 @@ public class CarWashRegistration {
         return profile != null && profile.isComplete();
     }
 }
-

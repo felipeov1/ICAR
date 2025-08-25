@@ -16,23 +16,6 @@ public record CarWashProfileResponse(
         String subdomain,
         String whatsapp,
         String[] locations,
-        String observations
-) {
-
-    public static CarWashProfileResponse fromProfile(CarWashProfile profile) {
-        return new CarWashProfileResponse(
-                profile.getId(),
-                profile.getName(),
-                profile.getDescription(),
-                profile.getLogo(),
-                profile.getRating(),
-                profile.getReviews(),
-                profile.getModalities(),
-                profile.getCoverPhoto(),
-                profile.getSubdomain(),
-                profile.getWhatsapp(),
-                profile.getLocations(),
-                profile.getObservations()
-        );
-    }
-}
+        String observations,
+        boolean mercadoPagoConnected
+) {}

@@ -37,6 +37,12 @@ public class Customer {
     @Column(nullable = false, length = 255)
     private String password;
 
+    @Column(name = "identification_type", length = 10)
+    private String identificationType;
+
+    @Column(name = "identification_number", length = 20)
+    private String identificationNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserStatus status;

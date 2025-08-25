@@ -74,13 +74,13 @@ public class ScheduleController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Get available time slots for a specific date", tags = {"Profile Schedule"})
     @GetMapping("/availability")
     public ResponseEntity<List<TimeSlotResponse>> getAvailableTimeSlots(
             @PathVariable UUID profileId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @RequestParam Integer serviceDurationMinutes) {
-        return ResponseEntity.ok(scheduleService.getAvailableTimeSlots(profileId, date, serviceDurationMinutes));
+            @RequestParam Integer serviceDurationMinutes,
+            @RequestParam(required = false) UUID appointmentIdToIgnore) {
+        return ResponseEntity.ok(scheduleService.getAvailableTimeSlots(profileId, date, serviceDurationMinutes, appointmentIdToIgnore));
     }
 
     @Operation(summary = "Get all dates with available slots in a range", tags = {"Profile Schedule"})

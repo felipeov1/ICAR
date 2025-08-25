@@ -42,6 +42,15 @@ public interface CarWashAppointmentRepository extends JpaRepository<CarWashAppoi
             @Param("end") LocalDateTime end
     );
 
+    @Query("SELECT a FROM CarWashAppointment a WHERE a.profile.id = :profileId AND a.id <> :appointmentIdToIgnore AND a.dateTime >= :start AND a.dateTime < :end AND a.status <> 'CANCELED'")
+    List<CarWashAppointment> findBookedSlotsByProfileIdAndDateRangeExcludingId(
+            @Param("profileId") UUID profileId,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end,
+            @Param("appointmentIdToIgnore") UUID appointmentIdToIgnore
+    );
+
+
     Optional<CarWashAppointment> findByIdAndCustomerId(UUID appointmentId, UUID customerId);
 
     @Query(value = "SELECT * FROM car_wash_appointment a WHERE a.profile_id = :profileId " +
@@ -108,4 +117,6 @@ public interface CarWashAppointmentRepository extends JpaRepository<CarWashAppoi
 
     long countByProfileIdAndStatus(UUID profileId, AppointmentStatus status);
 
+    @Query("SELECT a.customer.id FROM CarWashAppointment a WHERE a.id = :appointmentId")
+    Optional<UUID> findCustomerIdById(@Param("appointmentId") UUID appointmentId);
 }

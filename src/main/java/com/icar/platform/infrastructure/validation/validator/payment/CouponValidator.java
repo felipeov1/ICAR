@@ -1,6 +1,6 @@
 package com.icar.platform.infrastructure.validation.validator.payment;
 
-import com.icar.platform.domain.model.payment.coupon.Coupon;
+import com.icar.platform.domain.model.coupon.Coupon;
 import com.icar.platform.shared.exception.BusinessException;
 import org.springframework.stereotype.Component;
 

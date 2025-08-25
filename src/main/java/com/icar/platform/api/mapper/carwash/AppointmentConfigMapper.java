@@ -6,16 +6,21 @@ import com.icar.platform.domain.model.carwash.profile.AppointmentConfig;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface AppointmentConfigMapper {
 
-    @Mapping(source = "maxAdvanceBookingDays", target = "maxAdvanceBookingDays")
-    @Mapping(source = "gapMinutes", target = "gapMinutes")
-    @Mapping(source = "allowOvertime", target = "allowOvertime")
     AppointmentConfigResponse toResponse(AppointmentConfig entity);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(source = "minAdvanceNoticeMinutes", target = "minAdvanceNoticeMinutes")
+    @Mapping(source = "maxAdvanceBookingDays", target = "maxAdvanceBookingDays")
+    @Mapping(source = "minEditNoticeMinutes", target = "minEditNoticeMinutes")
+    @Mapping(source = "minCancelNoticeMinutes", target = "minCancelNoticeMinutes")
+    @Mapping(source = "gapMinutes", target = "gapMinutes")
+    @Mapping(source = "allowOvertime", target = "allowOvertime")
     void updateFromRequest(AppointmentConfigRequest request, @MappingTarget AppointmentConfig entity);
 
     @Mapping(target = "id", ignore = true)

@@ -98,13 +98,11 @@ public class AdvertisementService {
     }
 
     private AdvertisementResponse toDto(Advertisement ad) {
-        String fullImageUrl = "/files/" + ad.getImageUrl();
 
         return AdvertisementResponse.builder()
                 .id(ad.getId())
                 .title(ad.getTitle())
                 .description(ad.getDescription())
-                .imageUrl(fullImageUrl)
                 .link(ad.getLinkUrl())
                 .build();
     }

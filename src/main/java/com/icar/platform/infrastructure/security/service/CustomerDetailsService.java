@@ -3,12 +3,14 @@ package com.icar.platform.infrastructure.security.service;
 import com.icar.platform.domain.model.customer.Customer;
 import com.icar.platform.domain.repository.customer.CustomerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@Primary
 @RequiredArgsConstructor
 public class CustomerDetailsService implements UserDetailsService {
 

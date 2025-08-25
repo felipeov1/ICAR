@@ -24,7 +24,8 @@ public class CompanyAppointmentResponse {
     private String addressStreet;
     private String addressNumber;
     private String addressCityState;
-
+    private BigDecimal originalPrice;
+    private BigDecimal discountAmount;
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

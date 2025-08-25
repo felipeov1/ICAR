@@ -28,7 +28,8 @@ public class AppointmentResponse {
     private Integer minCancelNoticeMinutes;
     private Integer minEditNoticeMinutes;
     private boolean hasBeenReviewed;
-
+    private BigDecimal originalPrice;
+    private BigDecimal discountAmount;
     private CustomerInfo customer;
 
     @Data

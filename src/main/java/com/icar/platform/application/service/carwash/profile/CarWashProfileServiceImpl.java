@@ -11,6 +11,7 @@ import com.icar.platform.domain.repository.carwash.profile.CarWashProfileReposit
 import com.icar.platform.infrastructure.storage.FileSystemStorageService;
 import com.icar.platform.shared.exception.DuplicateEntityException;
 import com.icar.platform.shared.exception.ResourceNotFoundException;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
     private final CarWashRegistrationDataRepository registrationRepository;
     private final CarWashProfileMapper mapper;
     private final FileSystemStorageService fileStorageService;
+    private final EntityManager entityManager;
 
     @Override
     @Transactional
@@ -48,9 +50,10 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
     @Override
     @Transactional(readOnly = true)
     public CarWashProfileResponse getProfileByCarWashRegistrationId(UUID carWashId) {
-        return profileRepository.findByCarWashRegistrationId(carWashId)
-                .map(mapper::toDto)
-                .orElseThrow(() -> new ResourceNotFoundException("Perfil não encontrado para o lava-rápido com ID: " + carWashId));
+        CarWashProfile profile = profileRepository.findByCarWashRegistrationId(carWashId)
+                .orElseThrow(() -> new ResourceNotFoundException("..."));
+        entityManager.refresh(profile.getCarWashRegistration());
+        return mapper.toDto(profile);
     }
 
     @Override
@@ -117,6 +120,14 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
         return profileRepository.findAll().stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CarWashProfileResponse getProfileBySubdomain(String subdomain) {
+        CarWashProfile profile = profileRepository.findBySubdomain(subdomain)
+                .orElseThrow(() -> new ResourceNotFoundException("Profile not found for subdomain: " + subdomain));
+        return mapper.toDto(profile);
     }
 
 

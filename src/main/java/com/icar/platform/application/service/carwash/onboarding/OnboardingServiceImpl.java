@@ -14,6 +14,8 @@ import com.icar.platform.domain.enums.PhotoType;
 import com.icar.platform.infrastructure.security.utils.TokenGenerator;
 import com.icar.platform.shared.exception.BusinessException;
 import com.icar.platform.shared.exception.ResourceNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +44,15 @@ public class OnboardingServiceImpl implements OnboardingService {
 
     @Override
     @Transactional
-    public LoginResponse processOnboarding(UUID carWashId, OnboardingRequest request, MultipartFile logo, MultipartFile coverPhoto, List<MultipartFile> galleryFiles) {
+    public LoginResponse processOnboarding(
+            UUID carWashId,
+            OnboardingRequest request,
+            MultipartFile logo,
+            MultipartFile coverPhoto,
+            List<MultipartFile> galleryFiles,
+            HttpServletRequest httpServletRequest,
+            HttpServletResponse httpServletResponse) {
+
         CarWashRegistration registration = registrationRepository.findById(carWashId)
                 .orElseThrow(() -> new ResourceNotFoundException("CarWashRegistration not found with id: " + carWashId));
 
@@ -106,7 +116,7 @@ public class OnboardingServiceImpl implements OnboardingService {
         config.setMinCancelNoticeMinutes(rules.minCancelNoticeMinutes());
         config.setAllowOvertime(rules.allowOvertime());
         config.setGapMinutes(rules.gapMinutes());
-        config.setMaxAdvanceBookingDays(30);
+        config.setMaxAdvanceBookingDays(rules.maxAdvanceBookingDays());
         appointmentConfigRepository.save(config);
     }
 

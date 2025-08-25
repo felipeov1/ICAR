@@ -64,7 +64,6 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
         existing.setCnpj(request.cnpj());
         existing.setCpf(request.cpf());
         existing.setLegalName(request.legalName());
-        existing.setTradeName(request.tradeName());
         existing.setOwnerName(request.ownerName());
         existing.setPhone(request.phone());
         existing.setEmail(request.email());
@@ -106,6 +105,14 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
                     .build());
         }
 
+        if (request.cpf() != null && !request.cpf().isBlank() && !isValidCpf(request.cpf())) {
+            errors.add(ValidationError.builder()
+                    .field("cpf")
+                    .message("Formato de CPF inválido")
+                    .errorCode("invalid_cpf")
+                    .build());
+        }
+
         if (request.email() == null || request.email().isBlank() || !isValidEmail(request.email())) {
             errors.add(ValidationError.builder()
                     .field("email")
@@ -129,6 +136,10 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
 
     private boolean isValidCnpj(String cnpj) {
         return cnpj.matches("\\d{14}");
+    }
+
+    private boolean isValidCpf(String cpf) {
+        return cpf.matches("\\d{11}");
     }
 
     private boolean isValidEmail(String email) {

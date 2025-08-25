@@ -31,7 +31,6 @@ public abstract class AppointmentMapper {
     @Mapping(target = "addressId", source = "address.id")
     @Mapping(target = "carWashPhone", source = "entity.profile.carWashRegistration.phone")
     @Mapping(target = "vehicleType", source = "entity.carType")
-    @Mapping(target = "finalPrice", source = "entity.amountPaid")
     @Mapping(target = "addressStreet", source = "entity.address.street")
     @Mapping(target = "addressNumber", source = "entity.address.streetNumber")
     @Mapping(target = "addressCityState", expression = "java(entity.getAddress().getCity() + \"/\" + entity.getAddress().getState())")
@@ -41,18 +40,48 @@ public abstract class AppointmentMapper {
     @Mapping(target = "minEditNoticeMinutes", source = "entity", qualifiedByName = "getMinEditNotice")
     @Mapping(target = "hasBeenReviewed", source = "entity", qualifiedByName = "checkIfReviewed")
     @Mapping(target = "services", source = "entity", qualifiedByName = "mapServices")
+    @Mapping(target = "originalPrice", source = "entity", qualifiedByName = "mapOriginalPrice")
+    @Mapping(target = "discountAmount", source = "entity", qualifiedByName = "mapDiscountAmount")
+    @Mapping(target = "finalPrice", source = "entity", qualifiedByName = "mapFinalPrice")
     public abstract AppointmentResponse toResponse(CarWashAppointment entity);
 
 
     @Mapping(target = "status", expression = "java(entity.getStatus().name())")
     @Mapping(target = "paymentMethod", expression = "java(entity.getPaymentMethod().name())")
-    @Mapping(target = "finalPrice", source = "amountPaid")
     @Mapping(target = "vehicleType", source = "carType")
     @Mapping(target = "services", source = "entity", qualifiedByName = "mapCompanyServices")
     @Mapping(target = "addressStreet", source = "entity.address.street")
     @Mapping(target = "addressNumber", source = "entity.address.streetNumber")
     @Mapping(target = "addressCityState", expression = "java(entity.getAddress().getCity() + \"/\" + entity.getAddress().getState())")
+    @Mapping(target = "originalPrice", source = "entity", qualifiedByName = "mapOriginalPrice")
+    @Mapping(target = "discountAmount", source = "entity", qualifiedByName = "mapDiscountAmount")
+    @Mapping(target = "finalPrice", source = "entity", qualifiedByName = "mapFinalPrice")
     public abstract CompanyAppointmentResponse toCompanyResponse(CarWashAppointment entity);
+
+    @Named("mapOriginalPrice")
+    public BigDecimal mapOriginalPrice(CarWashAppointment appointment) {
+        if (appointment.getAppliedCoupons() != null && !appointment.getAppliedCoupons().isEmpty()) {
+            return appointment.getAppliedCoupons().iterator().next().getOriginalAmount();
+        }
+        return appointment.getOriginalAmount();
+    }
+
+    @Named("mapDiscountAmount")
+    public BigDecimal mapDiscountAmount(CarWashAppointment appointment) {
+        if (appointment.getAppliedCoupons() != null && !appointment.getAppliedCoupons().isEmpty()) {
+            return appointment.getAppliedCoupons().iterator().next().getDiscountApplied();
+        }
+        return null;
+    }
+
+    @Named("mapFinalPrice")
+    public BigDecimal mapFinalPrice(CarWashAppointment appointment) {
+        if (appointment.getAppliedCoupons() != null && !appointment.getAppliedCoupons().isEmpty()) {
+            return appointment.getAppliedCoupons().iterator().next().getFinalAmount();
+        }
+        return appointment.getOriginalAmount();
+    }
+
 
     @Named("mapCompanyServices")
     public List<CompanyAppointmentResponse.ServiceInfo> mapCompanyServices(CarWashAppointment appointment) {

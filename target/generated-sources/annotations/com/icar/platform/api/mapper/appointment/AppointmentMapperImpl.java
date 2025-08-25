@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-04T20:30:58-0300",
+    date = "2025-08-25T09:44:55-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -32,7 +32,6 @@ public class AppointmentMapperImpl extends AppointmentMapper {
         appointmentResponse.setAddressId( entityAddressId( entity ) );
         appointmentResponse.setCarWashPhone( entityProfileCarWashRegistrationPhone( entity ) );
         appointmentResponse.setVehicleType( entity.getCarType() );
-        appointmentResponse.setFinalPrice( entity.getAmountPaid() );
         appointmentResponse.setAddressStreet( entityAddressStreet( entity ) );
         appointmentResponse.setAddressNumber( entityAddressStreetNumber( entity ) );
         appointmentResponse.setAddressInstructions( entityAddressAdditionalInstructions( entity ) );
@@ -43,6 +42,9 @@ public class AppointmentMapperImpl extends AppointmentMapper {
         appointmentResponse.setMinEditNoticeMinutes( getMinEditNotice( entity ) );
         appointmentResponse.setHasBeenReviewed( checkIfReviewed( entity ) );
         appointmentResponse.setServices( mapServices( entity ) );
+        appointmentResponse.setOriginalPrice( mapOriginalPrice( entity ) );
+        appointmentResponse.setDiscountAmount( mapDiscountAmount( entity ) );
+        appointmentResponse.setFinalPrice( mapFinalPrice( entity ) );
         appointmentResponse.setId( entity.getId() );
         appointmentResponse.setDateTime( entity.getDateTime() );
         appointmentResponse.setStatus( entity.getStatus() );
@@ -66,11 +68,13 @@ public class AppointmentMapperImpl extends AppointmentMapper {
 
         CompanyAppointmentResponse companyAppointmentResponse = new CompanyAppointmentResponse();
 
-        companyAppointmentResponse.setFinalPrice( entity.getAmountPaid() );
         companyAppointmentResponse.setVehicleType( entity.getCarType() );
         companyAppointmentResponse.setServices( mapCompanyServices( entity ) );
         companyAppointmentResponse.setAddressStreet( entityAddressStreet( entity ) );
         companyAppointmentResponse.setAddressNumber( entityAddressStreetNumber( entity ) );
+        companyAppointmentResponse.setOriginalPrice( mapOriginalPrice( entity ) );
+        companyAppointmentResponse.setDiscountAmount( mapDiscountAmount( entity ) );
+        companyAppointmentResponse.setFinalPrice( mapFinalPrice( entity ) );
         companyAppointmentResponse.setId( entity.getId() );
         companyAppointmentResponse.setDateTime( entity.getDateTime() );
         if ( entity.getTotalDurationMinutes() != null ) {
