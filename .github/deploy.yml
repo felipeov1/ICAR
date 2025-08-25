@@ -1,0 +1,30 @@
+# Nome do fluxo de trabalho
+name: Deploy Unificado para Produção
+
+# Gatilho: roda em push para a branch 'main'
+on:
+  push:
+    branches:
+      - production # Mude para 'master' se for o caso
+
+jobs:
+  deploy:
+    name: Deploy no Servidor
+    runs-on: ubuntu-latest
+
+    steps:
+      # Este passo não é estritamente necessário para este script,
+      # mas é uma boa prática manter.
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Conecta no seu servidor via SSH e executa o script de deploy
+      - name: Executar script de deploy no servidor
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Executa o script de deploy que criamos
+            /opt/icarplus/backend/deploy.sh
