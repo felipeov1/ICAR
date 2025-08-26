@@ -10,7 +10,7 @@ FRONTEND_DIR="/var/www/icarplus.com.br"
 
 # --- Configurações do Backend ---
 JAR_NAME="plataform-0.0.1-SNAPSHOT.jar"
-ENV_FILE="$BACKEND_DIR/.env"
+ENV_FILE="/opt/icarplus/.env"
 APP_LOG_FILE="$BACKEND_DIR/backend.log"
 APP_PORT=8080
 
