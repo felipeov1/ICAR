@@ -96,11 +96,11 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOriginPatterns(Arrays.asList(
-                "http://localhost:5173",
-                "http://app.localhost:5173",
-                "http://gestao.localhost:5173",
-                "http://*.localhost:5173",
-                "http://192.168.3.8:5173",
+                "http://localhost:5174",
+                "http://app.localhost:5174",
+                "http://gestao.localhost:5174",
+                "http://*.localhost:5174",
+                "http://192.168.3.8:5174",
                 "https://1549acb017ff.ngrok-free.app",
 
 
