@@ -41,9 +41,11 @@ build/                   # Gradle build directory
 .env.local
 .env*.local
 
+
 ### Configuration Files ###
 /config/application-*.properties  # Ignore all environment-specific property files
 !application.properties           # Keep main application.properties
 
 ### Node.js ###
 **/node_modules/         # Node.js dependencies
+
