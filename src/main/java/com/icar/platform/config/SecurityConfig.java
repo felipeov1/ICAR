@@ -1,12 +1,15 @@
 package com.icar.platform.config;
 
 import com.icar.platform.infrastructure.security.filter.JwtAuthenticationFilter;
+import com.icar.platform.infrastructure.security.service.CustomerDetailsService; // <--- IMPORT NECESSÁRIO
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider; // <--- IMPORT NECESSÁRIO
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider; // <--- IMPORT NECESSÁRIO
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -30,6 +33,7 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomerDetailsService customerDetailsService;
 
     private static final String[] SWAGGER_WHITELIST = {
             "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**",
@@ -47,6 +51,16 @@ public class SecurityConfig {
             "/api/v1/notifications/mercado-pago",
             "/api/v1/mercado-pago/**",
     };
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        // Aponta para o seu UserDetailsService (o CustomerDetailsService com @Primary)
+        authProvider.setUserDetailsService(customerDetailsService);
+        // Define o codificador de senhas
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
 
     @Bean
     public static PasswordEncoder passwordEncoder() {
@@ -70,6 +84,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
 
