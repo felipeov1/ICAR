@@ -5,6 +5,7 @@ import com.icar.platform.domain.model.email.EmailVerification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -19,5 +20,5 @@ public interface EmailVerificationRepository extends JpaRepository<EmailVerifica
     @Transactional
     @Modifying
     @Query("DELETE FROM EmailVerification e WHERE e.customer = :customer")
-    void deleteByCustomer(Customer customer);
+    void deleteByCustomer(@Param("customer") Customer customer);
 }
