@@ -1,27 +1,25 @@
 #!/bin/bash
-
-# Garante que o script pare imediatamente em caso de erro
 set -e
 
 # --- Caminhos dos Projetos ---
 BACKEND_DIR="/opt/icarplus/backend"
-FRONTEND_SRC_DIR="/opt/icarplus/frontend-src" # Verifique se este caminho existe e está correto
+FRONTEND_SRC_DIR="/opt/icarplus/frontend-src"
 FRONTEND_PUBLISH_DIR="/var/www/icarplus.com.br"
 APP_CLIENTE_DIR="/var/www/app-cliente"
 APP_GESTAO_DIR="/var/www/app-gestao"
 
 # --- Configurações do Backend ---
-JAR_NAME="plataform-0.0.1-SNAPSHOT.jar" 
+JAR_NAME="plataform-0.0.1-SNAPSHOT.jar"
 ENV_FILE="/opt/icarplus/.env"
 APP_LOG_FILE="$BACKEND_DIR/backend.log"
 APP_PORT=8080
+TEMP_SPRING_PROFILE="production"
 
-# --- Início do Deploy ---
 echo "=================================================="
 echo "🚀 Iniciando deploy unificado em: $(date)"
 echo "=================================================="
 
-# === ETAPA 1: DEPLOY DO BACKEND ===
+# --- ETAPA 1: DEPLOY DO BACKEND ---
 echo "--- Iniciando deploy do Backend ---"
 cd $BACKEND_DIR
 echo "🔄 Atualizando o código-fonte do Backend..."
@@ -42,18 +40,15 @@ else
   echo "    -> Nenhuma aplicação antiga rodando."
 fi
 
-echo "▶️  Iniciando a nova versão da aplicação (Backend)..."
-if [ ! -f "$ENV_FILE" ]; then
-    echo "❌ ERRO: Arquivo de credenciais '$ENV_FILE' não encontrado."
-    exit 1
+# --- Carrega variáveis do .env ---
+if [ -f "$ENV_FILE" ]; then
+    echo "🔑 Carregando variáveis de ambiente do $ENV_FILE..."
+    export $(grep -v '^#' $ENV_FILE | xargs)
+else
+    echo "⚠️  Arquivo $ENV_FILE não encontrado. Continuando sem carregar variáveis de ambiente."
 fi
 
-# PASSO DE DEBUG: Vamos verificar o valor da variável antes de executar
-echo "    -> [DEBUG] Verificando o perfil antes de iniciar..."
-TEMP_SPRING_PROFILE="production"
-echo "    -> [DEBUG] A variável SPRING_PROFILES_ACTIVE será definida como: $TEMP_SPRING_PROFILE"
-
-# Abordagem final e mais robusta
+echo "▶️  Iniciando a nova versão da aplicação (Backend)..."
 nohup java -jar "$BACKEND_DIR/target/$JAR_NAME" --spring.profiles.active="$TEMP_SPRING_PROFILE" > "$APP_LOG_FILE" 2>&1 &
 
 sleep 15
@@ -62,16 +57,12 @@ NEW_PID=$(lsof -t -i:$APP_PORT || echo "")
 if [ -n "$NEW_PID" ]; then
   echo "✅ Sucesso! Backend rodando com o novo PID: $NEW_PID"
 else
-  # CORREÇÃO: Mostra um log mais detalhado em caso de falha
-  echo "❌ ERRO: O Backend falhou ao iniciar. Exibindo as últimas 100 linhas do log:"
-  echo "--------------------- INÍCIO DO LOG DE ERRO ---------------------"
+  echo "❌ ERRO: O Backend falhou ao iniciar. Últimas 100 linhas do log:"
   tail -n 100 "$APP_LOG_FILE"
-  echo "---------------------- FIM DO LOG DE ERRO ----------------------"
   exit 1
 fi
 
-# === ETAPA 2: DEPLOY DO FRONTEND ===
-# Verifique se o diretório de origem do frontend existe antes de prosseguir
+# --- ETAPA 2: DEPLOY DO FRONTEND ---
 if [ -d "$FRONTEND_SRC_DIR" ]; then
     echo ""
     echo "--- Iniciando deploy do Frontend ---"
@@ -95,7 +86,7 @@ if [ -d "$FRONTEND_SRC_DIR" ]; then
 
     echo "✅ Sucesso! Frontend atualizado."
 else
-    echo "⚠️  AVISO: Diretório do frontend ($FRONTEND_SRC_DIR) não encontrado. Pulando deploy do frontend."
+    echo "⚠️  Diretório do frontend ($FRONTEND_SRC_DIR) não encontrado. Pulando deploy do frontend."
 fi
 
 echo "=================================================="
