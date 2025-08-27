@@ -15,13 +15,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Converte o caminho do storageLocation em um URI
         String uploadPathUri = Paths.get(storageLocation).toAbsolutePath().toUri().toString();
 
-        registry.addResourceHandler("/uploads/**")
-                .addResourceLocations(uploadPathUri);
+        registry.addResourceHandler("/uploads/static/**")
+                .addResourceLocations(uploadPathUri + "static/");
 
-        registry.addResourceHandler("/carwash/**")
+        registry.addResourceHandler("/uploads/carwash/**")
                 .addResourceLocations(uploadPathUri + "carwash/");
     }
 }
