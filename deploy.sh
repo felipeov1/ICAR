@@ -34,7 +34,7 @@ OLD_PID=$(sudo lsof -t -i:$APP_PORT || echo "")
 
 if [ -n "$OLD_PID" ]; then
   echo "   -> Porta $APP_PORT ocupada pelo PID $OLD_PID. Tentando encerrar..."
-  
+
   # 1. Tente um desligamento gracioso primeiro (SIGTERM)
   sudo kill -15 $OLD_PID
   echo "   -> Enviado sinal de desligamento gracioso (SIGTERM). Aguardando 10 segundos..."
@@ -47,7 +47,7 @@ if [ -n "$OLD_PID" ]; then
     sudo kill -9 $OLD_PID
     sleep 2
   fi
-  
+
   echo "   -> Processo anterior encerrado."
 else
   echo "   -> Porta $APP_PORT livre."
@@ -64,7 +64,7 @@ fi
 export $(grep -v '^#' $ENV_FILE | xargs)
 
 TEMP_SPRING_PROFILE="production"
-nohup java -jar "$BACKEND_DIR/target/$JAR_NAME" --spring.profiles.active="$TEMP_SPRING_PROFILE" > "$APP_LOG_FILE" 2>&1 &
+nohup java -jar "$BACKEND_DIR/target/$JAR_NAME" --spring.profiles.active="$TEMP_SPRING_PROFILE" --logging.level.root=DEBUG > "$APP_LOG_FILE" 2>&1 &
 
 sleep 15
 NEW_PID=$(lsof -t -i:$APP_PORT || echo "")
