@@ -36,12 +36,12 @@ public class EmailServiceImpl implements EmailService {
     public void sendVerificationEmail(String toEmail, String userName, String verificationToken) {
         log.info("Iniciando envio de e-mail de verificação para {}", toEmail);
         try {
-            String verificationUrl = frontendUrl + "/confirmar-email?token=" + verificationToken;
+            String verificationUrl = frontendUrl + "/confirmacao-email?token=" + verificationToken;
 
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(fromEmail, "Equipe iCar");
+            helper.setFrom(fromEmail, "Suporte iCar");
             helper.setTo(toEmail);
             helper.setSubject("Confirme seu e-mail - iCar");
 
@@ -63,7 +63,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(fromEmail, "Equipe iCar");
+            helper.setFrom(fromEmail, "Suporte iCar");
             helper.setTo(toEmail);
             helper.setSubject("Redefinição de Senha - iCar");
 
