@@ -13,7 +13,10 @@ echo "=================================================="
 
 # === ETAPA 1: DEPLOY DO BACKEND ===
 echo "--- Iniciando deploy do Backend ---"
+
 cd $BACKEND_DIR
+sudo chown -R felipe:felipe $BACKEND_DIR
+
 git fetch --all
 git reset --hard origin/production
 git clean -dfx
