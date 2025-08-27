@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-24T03:15:32-0300",
-    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
+    date = "2025-08-27T17:40:15+0000",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.8 (Eclipse Adoptium)"
 )
 @Component
 public class AppointmentConfigMapperImpl implements AppointmentConfigMapper {
