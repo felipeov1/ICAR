@@ -107,12 +107,13 @@ public class PhotoServiceImpl implements PhotoService {
         switch (type) {
             case LOGO:
                 return profile.getLogo() != null ?
-                        List.of(new PhotoDTO(profile.getLogo())) : List.of();
+                        List.of(new PhotoDTO(buildFullUrl(profile.getLogo()))) : List.of();
             case COVER:
                 return profile.getCoverPhoto() != null ?
-                        List.of(new PhotoDTO(profile.getCoverPhoto())) : List.of();
+                        List.of(new PhotoDTO(buildFullUrl(profile.getCoverPhoto()))) : List.of();
             case SERVICE:
                 return profile.getPhotos().stream()
+                        .map(this::buildFullUrl)
                         .map(PhotoDTO::new)
                         .collect(Collectors.toList());
             default:
@@ -151,7 +152,7 @@ public class PhotoServiceImpl implements PhotoService {
         if (relativePath == null || relativePath.isBlank()) {
             return null;
         }
-        return storageProperties.getBaseUrl() + "/files/" + relativePath;
+        return storageProperties.getBaseUrl() + "/uploads/" + relativePath;
     }
 
 
