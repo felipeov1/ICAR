@@ -33,24 +33,24 @@ echo "🛑 Verificando se a porta $APP_PORT está ocupada..."
 OLD_PID=$(sudo lsof -t -i:$APP_PORT || echo "")
 
 if [ -n "$OLD_PID" ]; then
-  echo "   -> Porta $APP_PORT ocupada pelo PID $OLD_PID. Tentando encerrar..."
+    echo "    -> Porta $APP_PORT ocupada pelo PID $OLD_PID. Tentando encerrar..."
 
-  # 1. Tente um desligamento gracioso primeiro (SIGTERM)
-  sudo kill -15 $OLD_PID
-  echo "   -> Enviado sinal de desligamento gracioso (SIGTERM). Aguardando 10 segundos..."
-  sleep 10
+    # 1. Tente um desligamento gracioso primeiro (SIGTERM)
+    sudo kill -15 $OLD_PID
+    echo "    -> Enviado sinal de desligamento gracioso (SIGTERM). Aguardando 10 segundos..."
+    sleep 10
 
-  # 2. Verifique se o processo ainda existe
-  if ps -p $OLD_PID > /dev/null; then
-    echo "   -> Processo ainda está rodando. Forçando o encerramento (SIGKILL)..."
-    # 3. Se ainda estiver vivo, force o encerramento (SIGKILL)
-    sudo kill -9 $OLD_PID
-    sleep 2
-  fi
+    # 2. Verifique se o processo ainda existe
+    if ps -p $OLD_PID > /dev/null; then
+        echo "    -> Processo ainda está rodando. Forçando o encerramento (SIGKILL)..."
+        # 3. Se ainda estiver vivo, force o encerramento (SIGKILL)
+        sudo kill -9 $OLD_PID
+        sleep 2
+    fi
 
-  echo "   -> Processo anterior encerrado."
+    echo "    -> Processo anterior encerrado."
 else
-  echo "   -> Porta $APP_PORT livre."
+    echo "    -> Porta $APP_PORT livre."
 fi
 
 # --- Inicia o backend ---
@@ -72,16 +72,24 @@ else
 fi
 
 TEMP_SPRING_PROFILE="production"
-nohup java -jar "$BACKEND_DIR/target/$JAR_NAME" --spring.profiles.active="$TEMP_SPRING_PROFILE" --logging.level.root=DEBUG > "$APP_LOG_FILE" 2>&1 &
+
+# --- LINHA CORRIGIDA ---
+nohup java \
+    -Dspring.profiles.active="$TEMP_SPRING_PROFILE" \
+    -Dspring.datasource.url="$PROD_DB_URL" \
+    -Dspring.datasource.username="$PROD_DB_USERNAME" \
+    -Dspring.datasource.password="$PROD_DB_PASSWORD" \
+    -jar "$BACKEND_DIR/target/$JAR_NAME" \
+    --logging.level.root=DEBUG > "$APP_LOG_FILE" 2>&1 &
 
 sleep 15
 NEW_PID=$(lsof -t -i:$APP_PORT || echo "")
 if [ -n "$NEW_PID" ]; then
-  echo "✅ Sucesso! Backend rodando com PID: $NEW_PID"
+    echo "✅ Sucesso! Backend rodando com PID: $NEW_PID"
 else
-  echo "❌ ERRO: Backend falhou ao iniciar. Últimas 100 linhas do log:"
-  tail -n 100 "$APP_LOG_FILE"
-  exit 1
+    echo "❌ ERRO: Backend falhou ao iniciar. Últimas 100 linhas do log:"
+    tail -n 100 "$APP_LOG_FILE"
+    exit 1
 fi
 
 # === ETAPA 2: DEPLOY DO FRONTEND ===
