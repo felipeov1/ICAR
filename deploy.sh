@@ -60,8 +60,16 @@ if [ ! -f "$ENV_FILE" ]; then
     exit 1
 fi
 
-# Carrega variáveis do .env
-export $(grep -v '^#' $ENV_FILE | xargs)
+# Carrega variáveis do .env e verifica se PROD_DB_URL foi carregada
+echo "🔍 Carregando variáveis de ambiente do '$ENV_FILE'..."
+export $(grep -v '^#' "$ENV_FILE" | xargs)
+
+if [ -z "$PROD_DB_URL" ]; then
+    echo "❌ ERRO: Variável PROD_DB_URL não encontrada. O arquivo .env pode estar com problema de formato ou permissão."
+    exit 1
+else
+    echo "✅ Variáveis carregadas com sucesso!"
+fi
 
 TEMP_SPRING_PROFILE="production"
 nohup java -jar "$BACKEND_DIR/target/$JAR_NAME" --spring.profiles.active="$TEMP_SPRING_PROFILE" --logging.level.root=DEBUG > "$APP_LOG_FILE" 2>&1 &
