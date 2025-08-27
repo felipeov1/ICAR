@@ -62,8 +62,11 @@ NEW_PID=$(lsof -t -i:$APP_PORT || echo "")
 if [ -n "$NEW_PID" ]; then
   echo "✅ Sucesso! Backend rodando com o novo PID: $NEW_PID"
 else
-  echo "❌ ERRO: O Backend falhou ao iniciar. Verifique o log em: $APP_LOG_FILE"
-  tail -n 20 $APP_LOG_FILE
+  # CORREÇÃO: Mostra um log mais detalhado em caso de falha
+  echo "❌ ERRO: O Backend falhou ao iniciar. Exibindo as últimas 100 linhas do log:"
+  echo "--------------------- INÍCIO DO LOG DE ERRO ---------------------"
+  tail -n 100 "$APP_LOG_FILE"
+  echo "---------------------- FIM DO LOG DE ERRO ----------------------"
   exit 1
 fi
 
