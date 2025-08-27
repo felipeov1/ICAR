@@ -1,4 +1,3 @@
-sudo bash -c "cat > /opt/icarplus/backend/deploy.sh" << 'EOF'
 #!/bin/bash
 
 # Garante que o script pare imediatamente em caso de erro
@@ -49,8 +48,10 @@ if [ ! -f "$ENV_FILE" ]; then
     exit 1
 fi
 
-# Ativa o perfil de produção e inicia a aplicação
-nohup bash -c "source $ENV_FILE && export SPRING_PROFILES_ACTIVE=prod && java -jar $BACKEND_DIR/target/$JAR_NAME" > "$APP_LOG_FILE" 2>&1 &
+# ===== LINHA CORRIGIDA ABAIXO =====
+# Adicionado "set -a" para garantir que as variáveis do .env sejam EXPORTADAS
+# para o processo Java.
+nohup bash -c "set -a && source $ENV_FILE && export SPRING_PROFILES_ACTIVE=prod && java -jar $BACKEND_DIR/target/$JAR_NAME" > "$APP_LOG_FILE" 2>&1 &
 
 sleep 15
 echo "🔎 Verificando o status da nova aplicação (Backend)..."
@@ -89,4 +90,3 @@ echo "✅ Sucesso! Frontend atualizado."
 echo "=================================================="
 echo "🎉 Deploy unificado finalizado com sucesso!"
 echo "=================================================="
-EOF
