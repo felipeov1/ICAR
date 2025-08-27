@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-19T19:18:39-0300",
-    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
+    date = "2025-08-27T17:43:59+0000",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.8 (Eclipse Adoptium)"
 )
 @Component
 public class CarWashRegistrationMapperImpl implements CarWashRegistrationMapper {
@@ -24,6 +24,7 @@ public class CarWashRegistrationMapperImpl implements CarWashRegistrationMapper 
         CarWashRegistration carWashRegistration = new CarWashRegistration();
 
         carWashRegistration.setCnpj( dto.cnpj() );
+        carWashRegistration.setCpf( dto.cpf() );
         carWashRegistration.setLegalName( dto.legalName() );
         carWashRegistration.setOwnerName( dto.ownerName() );
         carWashRegistration.setPhone( dto.phone() );
