@@ -5,8 +5,8 @@ name: Deploy Unificado para Produção
 on:
   push:
     branches:
-      - production # Mude para 'master' se for o caso
-  workflow_dispatch: # <--- ADICIONE ESTA LINHA
+      - production
+  workflow_dispatch:
 
 jobs:
   deploy:
