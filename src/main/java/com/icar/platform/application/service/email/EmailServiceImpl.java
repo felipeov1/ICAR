@@ -118,7 +118,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private String buildPasswordResetHtml(String userName, String resetLink) {
-        return "<!DOCTYPE html><html lang=\"pt-BR\"><head><meta charset=\"UTF-8\"><title>Redefinição de Senha - iCar</title><style>" + getBaseEmailStyle() + "</style></head>" +
+        return "<!DOCTYPE html><html lang=\"pt-BR\"><head><meta charset=\"UTF-8\"><title>Redefinição de Senha - iCar Suporte</title><style>" + getBaseEmailStyle() + "</style></head>" +
                 "<body><div class=\"container\">" +
                 "<div class=\"header\"><a href=\"https://www.icarplus.com.br\" target=\"_blank\"><img src=\"" + logoUrl + "\" alt=\"iCar Logo\"></a></div>" +
                 "<div class=\"content\">" +
