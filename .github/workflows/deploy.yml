@@ -1,7 +1,6 @@
 # Nome do fluxo de trabalho
 name: Deploy Unificado para Produção
 
-# Gatilho: roda em push para a branch 'main'
 on:
   push:
     branches:
