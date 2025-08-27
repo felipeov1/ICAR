@@ -83,6 +83,13 @@ nohup java \
     -Dspring.mail.port="$SMTP_PORT" \
     -Dspring.mail.username="$SMTP_USERNAME" \
     -Dspring.mail.password="$SMTP_PASSWORD" \
+    -Dapp.api-url="https://api.icarplus.com.br" \
+    -Dapp.frontend-url="https://app.icarplus.com.br" \
+    -Dapp.gestao-url="https://gestao.icarplus.com.br" \
+    -Dapp.logo-url="https://api.icarplus.com.br/uploads/static/logo-icar-email.png" \
+    -Dmercadopago.redirect-uri="https://api.icarplus.com.br/api/v1/mercado-pago/callback" \
+    -Dstorage.base-url="https://api.icarplus.com.br" \
+    -Dstorage.location="/var/www/icarplus/uploads" \
     -jar "$BACKEND_DIR/target/$JAR_NAME" \
     --logging.level.root=DEBUG > "$APP_LOG_FILE" 2>&1 &
 
