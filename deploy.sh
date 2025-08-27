@@ -3,13 +3,6 @@ set -e
 
 # --- Caminhos dos Projetos ---
 BACKEND_DIR="/opt/icarplus/backend"
-FRONTEND_SRC_DIR="/opt/icarplus/frontend-src"
-FRONTEND_PUBLISH_DIR="/var/www/icarplus.com.br"
-APP_CLIENTE_DIR="/var/www/app-cliente"
-APP_GESTAO_DIR="/var/www/app-gestao"
-
-# --- Configurações do Backend ---
-JAR_NAME="plataform-0.0.1-SNAPSHOT.jar"
 ENV_FILE="/opt/icarplus/.env"
 APP_LOG_FILE="$BACKEND_DIR/backend.log"
 APP_PORT=8080
@@ -34,20 +27,14 @@ OLD_PID=$(sudo lsof -t -i:$APP_PORT || echo "")
 
 if [ -n "$OLD_PID" ]; then
     echo "    -> Porta $APP_PORT ocupada pelo PID $OLD_PID. Tentando encerrar..."
-
-    # 1. Tente um desligamento gracioso primeiro (SIGTERM)
     sudo kill -15 $OLD_PID
     echo "    -> Enviado sinal de desligamento gracioso (SIGTERM). Aguardando 10 segundos..."
     sleep 10
-
-    # 2. Verifique se o processo ainda existe
     if ps -p $OLD_PID > /dev/null; then
         echo "    -> Processo ainda está rodando. Forçando o encerramento (SIGKILL)..."
-        # 3. Se ainda estiver vivo, force o encerramento (SIGKILL)
         sudo kill -9 $OLD_PID
         sleep 2
     fi
-
     echo "    -> Processo anterior encerrado."
 else
     echo "    -> Porta $APP_PORT livre."
@@ -60,7 +47,6 @@ if [ ! -f "$ENV_FILE" ]; then
     exit 1
 fi
 
-# Carrega variáveis do .env e verifica se PROD_DB_URL foi carregada
 echo "🔍 Carregando variáveis de ambiente do '$ENV_FILE'..."
 export $(grep -v '^#' "$ENV_FILE" | xargs)
 
@@ -73,7 +59,6 @@ fi
 
 TEMP_SPRING_PROFILE="production"
 
-# --- LINHA CORRIGIDA ---
 nohup java \
     -Dspring.profiles.active="$TEMP_SPRING_PROFILE" \
     -Dspring.datasource.url="$PROD_DB_URL" \
@@ -102,33 +87,6 @@ else
     tail -n 100 "$APP_LOG_FILE"
     exit 1
 fi
-
-# === ETAPA 2: DEPLOY DO FRONTEND ===
-echo ""
-echo "--- Iniciando deploy do Frontend ---"
-
-if [ ! -d "$FRONTEND_SRC_DIR/.git" ]; then
-    echo "⚠️ Repositório do frontend não encontrado. Clonando..."
-    sudo rm -rf "$FRONTEND_SRC_DIR"
-    sudo git clone https://github.com/felipeov1/icar-frontend.git "$FRONTEND_SRC_DIR"
-fi
-
-cd "$FRONTEND_SRC_DIR"
-git fetch --all
-git reset --hard origin/production
-git clean -dfx
-
-echo "⚙️ Instalando dependências e compilando..."
-sudo npm install
-sudo npm run build
-
-echo "📂 Publicando build..."
-sudo rsync -av --delete dist/ $FRONTEND_PUBLISH_DIR/
-sudo rsync -av --delete dist/ $APP_CLIENTE_DIR/
-sudo rsync -av --delete dist/ $APP_GESTAO_DIR/
-
-sudo chown -R www-data:www-data $FRONTEND_PUBLISH_DIR $APP_CLIENTE_DIR $APP_GESTAO_DIR
-echo "✅ Frontend atualizado."
 
 echo "=================================================="
 echo "🎉 Deploy finalizado com sucesso!"
