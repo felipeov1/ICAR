@@ -79,6 +79,10 @@ nohup java \
     -Dspring.datasource.url="$PROD_DB_URL" \
     -Dspring.datasource.username="$PROD_DB_USERNAME" \
     -Dspring.datasource.password="$PROD_DB_PASSWORD" \
+    -Dspring.mail.host="$SMTP_HOST" \
+    -Dspring.mail.port="$SMTP_PORT" \
+    -Dspring.mail.username="$SMTP_USERNAME" \
+    -Dspring.mail.password="$SMTP_PASSWORD" \
     -jar "$BACKEND_DIR/target/$JAR_NAME" \
     --logging.level.root=DEBUG > "$APP_LOG_FILE" 2>&1 &
 
