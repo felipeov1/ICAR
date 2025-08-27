@@ -48,6 +48,7 @@ public class SecurityConfig {
             "/error",
             "/carwash/**",
             "/ads/**",
+            "/uploads/**",
             "/api/v1/notifications/mercado-pago",
             "/api/v1/mercado-pago/**",
     };
@@ -55,9 +56,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        // Aponta para o seu UserDetailsService (o CustomerDetailsService com @Primary)
         authProvider.setUserDetailsService(customerDetailsService);
-        // Define o codificador de senhas
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
@@ -101,7 +100,12 @@ public class SecurityConfig {
                 "http://gestao.localhost:5174",
                 "http://*.localhost:5174",
                 "http://192.168.3.8:5174",
-                "https://1549acb017ff.ngrok-free.app",
+
+                "http://localhost:5173",
+                "http://app.localhost:5173",
+                "http://gestao.localhost:5173",
+                "http://*.localhost:5173",
+                "http://192.168.3.8:5173",
 
 
                 "https://icarplus.com.br",
