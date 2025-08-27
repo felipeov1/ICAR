@@ -59,6 +59,8 @@ fi
 
 TEMP_SPRING_PROFILE="production"
 
+echo "Running JAR file from path: $BACKEND_DIR/target/$JAR_NAME"
+
 nohup java \
     -Dspring.profiles.active="$TEMP_SPRING_PROFILE" \
     -Dspring.datasource.url="$PROD_DB_URL" \
