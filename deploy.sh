@@ -104,27 +104,31 @@ else
 fi
 
 # === ETAPA 2: DEPLOY DO FRONTEND ===
-if [ -d "$FRONTEND_SRC_DIR" ]; then
-    echo ""
-    echo "--- Iniciando deploy do Frontend ---"
-    cd $FRONTEND_SRC_DIR
-    git fetch --all
-    git reset --hard origin/production
-    git clean -dfx
+echo ""
+echo "--- Iniciando deploy do Frontend ---"
 
-    npm install
-    npm run build
-
-    echo "📂 Publicando build..."
-    sudo rsync -av --delete dist/ $FRONTEND_PUBLISH_DIR/
-    sudo rsync -av --delete dist/ $APP_CLIENTE_DIR/
-    sudo rsync -av --delete dist/ $APP_GESTAO_DIR/
-
-    sudo chown -R www-data:www-data $FRONTEND_PUBLISH_DIR $APP_CLIENTE_DIR $APP_GESTAO_DIR
-    echo "✅ Frontend atualizado."
-else
-    echo "⚠️ Diretório do frontend não encontrado. Pulando deploy."
+if [ ! -d "$FRONTEND_SRC_DIR/.git" ]; then
+    echo "⚠️ Repositório do frontend não encontrado. Clonando..."
+    sudo rm -rf "$FRONTEND_SRC_DIR"
+    sudo git clone https://github.com/felipeov1/icar-frontend.git "$FRONTEND_SRC_DIR"
 fi
+
+cd "$FRONTEND_SRC_DIR"
+git fetch --all
+git reset --hard origin/production
+git clean -dfx
+
+echo "⚙️ Instalando dependências e compilando..."
+sudo npm install
+sudo npm run build
+
+echo "📂 Publicando build..."
+sudo rsync -av --delete dist/ $FRONTEND_PUBLISH_DIR/
+sudo rsync -av --delete dist/ $APP_CLIENTE_DIR/
+sudo rsync -av --delete dist/ $APP_GESTAO_DIR/
+
+sudo chown -R www-data:www-data $FRONTEND_PUBLISH_DIR $APP_CLIENTE_DIR $APP_GESTAO_DIR
+echo "✅ Frontend atualizado."
 
 echo "=================================================="
 echo "🎉 Deploy finalizado com sucesso!"
