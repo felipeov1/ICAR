@@ -30,13 +30,27 @@ echo "☕ Compilando a aplicação com Maven..."
 
 # --- Verifica se a porta está ocupada e encerra o processo antigo ---
 echo "🛑 Verificando se a porta $APP_PORT está ocupada..."
-OLD_PID=$(lsof -t -i:$APP_PORT || echo "")
+OLD_PID=$(sudo lsof -t -i:$APP_PORT || echo "")
+
 if [ -n "$OLD_PID" ]; then
-  echo "    -> Porta $APP_PORT ocupada pelo PID $OLD_PID. Encerrando..."
-  kill -15 $OLD_PID
-  sleep 5
+  echo "   -> Porta $APP_PORT ocupada pelo PID $OLD_PID. Tentando encerrar..."
+  
+  # 1. Tente um desligamento gracioso primeiro (SIGTERM)
+  sudo kill -15 $OLD_PID
+  echo "   -> Enviado sinal de desligamento gracioso (SIGTERM). Aguardando 10 segundos..."
+  sleep 10
+
+  # 2. Verifique se o processo ainda existe
+  if ps -p $OLD_PID > /dev/null; then
+    echo "   -> Processo ainda está rodando. Forçando o encerramento (SIGKILL)..."
+    # 3. Se ainda estiver vivo, force o encerramento (SIGKILL)
+    sudo kill -9 $OLD_PID
+    sleep 2
+  fi
+  
+  echo "   -> Processo anterior encerrado."
 else
-  echo "    -> Porta $APP_PORT livre."
+  echo "   -> Porta $APP_PORT livre."
 fi
 
 # --- Inicia o backend ---
