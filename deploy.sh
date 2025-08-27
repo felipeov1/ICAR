@@ -1,3 +1,4 @@
+sudo bash -c "cat > /opt/icarplus/backend/deploy.sh" << 'EOF'
 #!/bin/bash
 
 # Garante que o script pare imediatamente em caso de erro
@@ -5,8 +6,8 @@ set -e
 
 # --- Caminhos dos Projetos ---
 BACKEND_DIR="/opt/icarplus/backend"
-FRONTEND_SRC_DIR="/opt/icarplus/frontend-src"     # <-- Pasta do CÓDIGO-FONTE do Frontend
-FRONTEND_PUBLISH_DIR="/var/www/icarplus.com.br"  # <-- Pasta de PUBLICAÇÃO do Frontend
+FRONTEND_SRC_DIR="/opt/icarplus/frontend-src"
+FRONTEND_PUBLISH_DIR="/var/www/icarplus.com.br"
 APP_CLIENTE_DIR="/var/www/app-cliente"
 APP_GESTAO_DIR="/var/www/app-gestao"
 
@@ -47,10 +48,10 @@ if [ ! -f "$ENV_FILE" ]; then
     echo "❌ ERRO: Arquivo de credenciais '$ENV_FILE' não encontrado."
     exit 1
 fi
-set -o allexport
-source $ENV_FILE
-set +o allexport
-nohup java -jar "$BACKEND_DIR/target/$JAR_NAME" > "$APP_LOG_FILE" 2>&1 &
+
+# Ativa o perfil de produção e inicia a aplicação
+nohup bash -c "source $ENV_FILE && export SPRING_PROFILES_ACTIVE=prod && java -jar $BACKEND_DIR/target/$JAR_NAME" > "$APP_LOG_FILE" 2>&1 &
+
 sleep 15
 echo "🔎 Verificando o status da nova aplicação (Backend)..."
 NEW_PID=$(lsof -t -i:$APP_PORT || echo "")
@@ -65,11 +66,10 @@ fi
 # === ETAPA 2: DEPLOY DO FRONTEND ===
 echo ""
 echo "--- Iniciando deploy do Frontend ---"
-# NAVEGA PARA A PASTA DE CÓDIGO-FONTE CORRETA
 cd $FRONTEND_SRC_DIR
 echo "🔄 Atualizando o código-fonte do Frontend..."
 git fetch --all
-git reset --hard origin/production # 👈 Verifique se 'production' é a branch correta do frontend
+git reset --hard origin/production
 git clean -dfx
 
 echo "📦 Instalando dependências e compilando o Frontend..."
@@ -77,7 +77,6 @@ npm install
 npm run build
 
 echo "📂 Publicando a nova build para os 3 sites..."
-# COPIA o resultado da build da pasta de código-fonte (dist/) para as pastas de publicação (/var/www/...)
 sudo rsync -av --delete dist/ $FRONTEND_PUBLISH_DIR/
 sudo rsync -av --delete dist/ $APP_CLIENTE_DIR/
 sudo rsync -av --delete dist/ $APP_GESTAO_DIR/
@@ -90,3 +89,4 @@ echo "✅ Sucesso! Frontend atualizado."
 echo "=================================================="
 echo "🎉 Deploy unificado finalizado com sucesso!"
 echo "=================================================="
+EOF
