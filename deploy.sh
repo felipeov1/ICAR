@@ -48,11 +48,13 @@ if [ ! -f "$ENV_FILE" ]; then
     exit 1
 fi
 
-# CORREÇÃO FINAL: Inicia a aplicação num subshell para garantir que as variáveis de ambiente e os argumentos sejam aplicados corretamente.
-(
-  source "$ENV_FILE"
-  java -jar "$BACKEND_DIR/target/$JAR_NAME" --spring.profiles.active=production > "$APP_LOG_FILE" 2>&1
-) &
+# PASSO DE DEBUG: Vamos verificar o valor da variável antes de executar
+echo "    -> [DEBUG] Verificando o perfil antes de iniciar..."
+TEMP_SPRING_PROFILE="production"
+echo "    -> [DEBUG] A variável SPRING_PROFILES_ACTIVE será definida como: $TEMP_SPRING_PROFILE"
+
+# Abordagem final e mais robusta
+nohup java -jar "$BACKEND_DIR/target/$JAR_NAME" --spring.profiles.active="$TEMP_SPRING_PROFILE" > "$APP_LOG_FILE" 2>&1 &
 
 sleep 15
 echo "🔎 Verificando o status da nova aplicação (Backend)..."
