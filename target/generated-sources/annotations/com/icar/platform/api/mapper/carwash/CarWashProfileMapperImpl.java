@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-27T22:47:25+0000",
-    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.8 (Eclipse Adoptium)"
+    date = "2025-08-27T21:30:13-0300",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
 public class CarWashProfileMapperImpl implements CarWashProfileMapper {
@@ -79,11 +79,9 @@ public class CarWashProfileMapperImpl implements CarWashProfileMapper {
         UUID id = null;
         String name = null;
         String description = null;
-        String logo = null;
         BigDecimal rating = null;
         Integer reviews = null;
         String[] modalities = null;
-        String coverPhoto = null;
         String subdomain = null;
         String whatsapp = null;
         String[] locations = null;
@@ -92,14 +90,12 @@ public class CarWashProfileMapperImpl implements CarWashProfileMapper {
         id = carWashProfile.getId();
         name = carWashProfile.getName();
         description = carWashProfile.getDescription();
-        logo = carWashProfile.getLogo();
         rating = carWashProfile.getRating();
         reviews = carWashProfile.getReviews();
         String[] modalities1 = carWashProfile.getModalities();
         if ( modalities1 != null ) {
             modalities = Arrays.copyOf( modalities1, modalities1.length );
         }
-        coverPhoto = carWashProfile.getCoverPhoto();
         subdomain = carWashProfile.getSubdomain();
         whatsapp = carWashProfile.getWhatsapp();
         String[] locations1 = carWashProfile.getLocations();
@@ -109,6 +105,8 @@ public class CarWashProfileMapperImpl implements CarWashProfileMapper {
         observations = carWashProfile.getObservations();
 
         boolean mercadoPagoConnected = carWashProfile.getCarWashRegistration() != null && carWashProfile.getCarWashRegistration().getMercadoPagoConfig() != null;
+        String logo = carWashProfile.getLogo() != null ? "https://api.icarplus.com.br/uploads/" + carWashProfile.getLogo() : null;
+        String coverPhoto = carWashProfile.getCoverPhoto() != null ? "https://api.icarplus.com.br/uploads/" + carWashProfile.getCoverPhoto() : null;
 
         CarWashProfileResponse carWashProfileResponse = new CarWashProfileResponse( id, name, description, logo, rating, reviews, modalities, coverPhoto, subdomain, whatsapp, locations, observations, mercadoPagoConnected );
 

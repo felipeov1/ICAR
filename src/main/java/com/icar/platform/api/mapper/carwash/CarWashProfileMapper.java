@@ -12,6 +12,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface CarWashProfileMapper {
 
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "carWashRegistration", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -29,6 +30,10 @@ public interface CarWashProfileMapper {
 
     @Mapping(target = "mercadoPagoConnected",
             expression = "java(carWashProfile.getCarWashRegistration() != null && carWashProfile.getCarWashRegistration().getMercadoPagoConfig() != null)")
+    @Mapping(target = "logo",
+            expression = "java(carWashProfile.getLogo() != null ? \"https://api.icarplus.com.br/uploads/\" + carWashProfile.getLogo() : null)")
+    @Mapping(target = "coverPhoto",
+            expression = "java(carWashProfile.getCoverPhoto() != null ? \"https://api.icarplus.com.br/uploads/\" + carWashProfile.getCoverPhoto() : null)")
     CarWashProfileResponse toDto(CarWashProfile carWashProfile);
 
 
