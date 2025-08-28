@@ -55,6 +55,7 @@ public class PhotoServiceImpl implements PhotoService {
         CarWashProfile profile = getProfileByCarWashId(carWashId);
         Hibernate.initialize(profile.getPhotos());
 
+        // Corrected code for getServicePhotos
         return profile.getPhotos().stream()
                 .map(url -> new PhotoServicesResponse(
                         buildFullUrl(url),
