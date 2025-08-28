@@ -48,6 +48,7 @@ public class PhotoServiceImpl implements PhotoService {
         return responses;
     }
 
+    // Corrected code
     @Override
     @Transactional(readOnly = true)
     public List<PhotoServicesResponse> getServicePhotos(UUID carWashId) {
@@ -56,7 +57,7 @@ public class PhotoServiceImpl implements PhotoService {
 
         return profile.getPhotos().stream()
                 .map(url -> new PhotoServicesResponse(
-                        url,
+                        buildFullUrl(url),
                         "Service photo",
                         profile.getUpdatedAt() != null ? profile.getUpdatedAt() : LocalDateTime.now()
                 ))
