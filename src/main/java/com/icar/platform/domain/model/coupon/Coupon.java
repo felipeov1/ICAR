@@ -36,7 +36,7 @@ public class Coupon {
     @Column(name = "valid_from", nullable = false)
     private LocalDateTime validFrom;
 
-    @Column(name = "valid_until", nullable = false)
+    @Column(name = "valid_until")
     private LocalDateTime validUntil;
 
     @Column(name = "max_uses")

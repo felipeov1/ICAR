@@ -28,7 +28,7 @@ public class TokenGenerator {
     @Value("${jwt.expiration.access-token}")
     private long accessTokenExpiration;
 
-    @Value("#{${application.security.jwt.refresh-token.expiration-days} * 24 * 60 * 60 * 1000}")
+    @Value("${jwt.expiration.refresh-token}")
     private long refreshTokenExpirationMs;
 
 
