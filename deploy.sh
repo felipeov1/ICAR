@@ -29,18 +29,18 @@ echo "🛑 Verificando se a porta $APP_PORT está ocupada..."
 OLD_PID=$(sudo lsof -t -i:$APP_PORT || echo "")
 
 if [ -n "$OLD_PID" ]; then
-    echo "    -> Porta $APP_PORT ocupada pelo PID $OLD_PID. Tentando encerrar..."
+    echo "   -> Porta $APP_PORT ocupada pelo PID $OLD_PID. Tentando encerrar..."
     sudo kill -15 $OLD_PID
-    echo "    -> Enviado sinal de desligamento gracioso (SIGTERM). Aguardando 10 segundos..."
+    echo "   -> Enviado sinal de desligamento gracioso (SIGTERM). Aguardando 10 segundos..."
     sleep 10
     if ps -p $OLD_PID > /dev/null; then
-        echo "    -> Processo ainda está rodando. Forçando o encerramento (SIGKILL)..."
+        echo "   -> Processo ainda está rodando. Forçando o encerramento (SIGKILL)..."
         sudo kill -9 $OLD_PID
         sleep 2
     fi
-    echo "    -> Processo anterior encerrado."
+    echo "   -> Processo anterior encerrado."
 else
-    echo "    -> Porta $APP_PORT livre."
+    echo "   -> Porta $APP_PORT livre."
 fi
 
 # --- Inicia o backend ---
@@ -54,7 +54,7 @@ echo "🔍 Carregando variáveis de ambiente do '$ENV_FILE'..."
 export $(grep -v '^#' "$ENV_FILE" | xargs)
 
 if [ -z "$PROD_DB_URL" ]; then
-    echo "❌ ERRO: Variável PROD_DB_URL não encontrada. O arquivo .env pode estar com problema de formato ou permissão."
+    echo "❌ ERRO: Variável PROD_DB_URL não encontrada."
     exit 1
 else
     echo "✅ Variáveis carregadas com sucesso!"
@@ -62,9 +62,9 @@ fi
 
 TEMP_SPRING_PROFILE="production"
 
-echo "Running JAR file from path: $BACKEND_DIR/target/$JAR_NAME"
-
 nohup java \
+    -Xms512m \
+    -Xmx1024m \
     -Dmercadopago.webhook-secret-key="$MP_WEBHOOK_SECRET" \
     -Dspring.profiles.active="$TEMP_SPRING_PROFILE" \
     -Dspring.datasource.url="$PROD_DB_URL" \
@@ -82,14 +82,14 @@ nohup java \
     -Dstorage.base-url="https://api.icarplus.com.br" \
     -Dstorage.location="/var/www/icarplus/uploads" \
     -jar /opt/icarplus/backend/target/plataform-0.0.1-SNAPSHOT.jar \
-    --logging.level.root=DEBUG > "$APP_LOG_FILE" 2>&1 &
+    --logging.level.root=INFO > "$APP_LOG_FILE" 2>&1 &
 
 sleep 15
 NEW_PID=$(lsof -t -i:$APP_PORT || echo "")
 if [ -n "$NEW_PID" ]; then
     echo "✅ Sucesso! Backend rodando com PID: $NEW_PID"
 else
-    echo "❌ ERRO: Backend falhou ao iniciar. Últimas 100 linhas do log:"
+    echo "❌ ERRO: Backend falhou ao iniciar. Verifique o log:"
     tail -n 100 "$APP_LOG_FILE"
     exit 1
 fi
