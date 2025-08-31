@@ -65,6 +65,7 @@ TEMP_SPRING_PROFILE="production"
 echo "Running JAR file from path: $BACKEND_DIR/target/$JAR_NAME"
 
 nohup java \
+    -Dmercadopago.webhook-secret-key="$MP_WEBHOOK_SECRET" \
     -Dspring.profiles.active="$TEMP_SPRING_PROFILE" \
     -Dspring.datasource.url="$PROD_DB_URL" \
     -Dspring.datasource.username="$PROD_DB_USERNAME" \
