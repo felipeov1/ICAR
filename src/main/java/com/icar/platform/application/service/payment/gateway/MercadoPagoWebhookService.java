@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant; // <-- IMPORT NECESSÁRIO
+import java.time.Instant;
 import java.util.Objects;
 
 @Slf4j
@@ -55,12 +55,8 @@ public class MercadoPagoWebhookService {
     @Transactional
     private void processPaymentNotification(Long paymentId) {
         try {
-            // NOTA: Para o SDK do Mercado Pago funcionar corretamente no servidor,
-            // ele precisa do Access Token. Vamos garantir que ele está sendo configurado.
-            // Esta parte da lógica depende de como você obtém o Access Token do vendedor.
-            // Assumindo que a transação tenha o appointment e o appointment tenha o perfil.
             PaymentTransaction tempTransaction = transactionRepository.findByMercadoPagoPaymentIdWithAppointment(paymentId)
-                    .orElseThrow(() -> new RuntimeException("Transação não encontrada para obter Access Token"));
+                    .orElseThrow(() -> new RuntimeException("Transação não encontrada para obter Access Token do vendedor."));
             String sellerAccessToken = tempTransaction.getAppointment().getProfile().getCarWashRegistration().getMercadoPagoConfig().getAccessToken();
             com.mercadopago.MercadoPagoConfig.setAccessToken(sellerAccessToken);
 
@@ -115,21 +111,6 @@ public class MercadoPagoWebhookService {
             String[] parts = signatureHeader.split(",");
             String tsPart = parts[0].split("=")[1];
             String v1Part = parts[1].split("=")[1];
-            long timestampNotificacao = Long.parseLong(tsPart);
-
-            // <-- MUDANÇA 1: Usando Instant.now() para garantir que a hora está em UTC
-            long timestampServidor = Instant.now().getEpochSecond();
-
-            // <-- MUDANÇA 2: Adicionado log de depuração detalhado
-            log.info("Validando timestamp. Servidor (UTC): {}, Notificação (UTC): {}, Diferença (s): {}",
-                    timestampServidor,
-                    timestampNotificacao,
-                    (timestampServidor - timestampNotificacao));
-
-            if ((timestampServidor - timestampNotificacao) > (SIGNATURE_TOLERANCE_MS / 1000)) {
-                log.warn("Timestamp da notificação é muito antigo.");
-                return false;
-            }
 
             String signedTemplate = String.format("id:%s;request-id:%s;ts:%s;",
                     notification.getData().getId(),
