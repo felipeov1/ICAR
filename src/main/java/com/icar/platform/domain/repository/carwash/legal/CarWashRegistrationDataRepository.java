@@ -25,4 +25,7 @@ public interface CarWashRegistrationDataRepository extends JpaRepository<CarWash
     Optional<CarWashRegistration> findByIdAndDeletedAtIsNull(UUID id);
 
     Optional<CarWashRegistration> findByEmail(String email);
+
+    Optional<CarWashRegistration> findByCnpj(String cnpj);
+    Optional<CarWashRegistration> findByCpf(String cpf);
 }

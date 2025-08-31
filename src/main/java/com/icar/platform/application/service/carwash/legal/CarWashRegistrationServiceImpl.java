@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -59,7 +60,7 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
         CarWashRegistration existing = repository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Lavagem de carro não encontrada ou inativa"));
 
-        validateRequest(request);
+        validateRequest(request, id);
 
         existing.setCnpj(request.cnpj());
         existing.setCpf(request.cpf());
@@ -67,6 +68,15 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
         existing.setOwnerName(request.ownerName());
         existing.setPhone(request.phone());
         existing.setEmail(request.email());
+
+        existing.setCity(request.city());
+        existing.setState(request.state());
+        existing.setZipCode(request.zipCode());
+
+        // Opcional: permitir atualização de senha
+        if (request.password() != null && !request.password().isBlank()) {
+            existing.setPassword(passwordEncoder.encode(request.password()));
+        }
 
         existing = repository.save(existing);
         return mapper.toDto(existing);
@@ -84,7 +94,15 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
     @Override
     @Transactional
     public CarWashRegistrationResponse create(CarWashRegistrationRequest request) {
-        validateRequest(request);
+        validateRequest(request, null);
+
+        if (request.password() == null || request.password().isBlank()) {
+            throw new CustomValidationException(List.of(ValidationError.builder()
+                    .field("password")
+                    .message("A senha é obrigatória para criar um novo registro.")
+                    .errorCode("required")
+                    .build()));
+        }
 
         CarWashRegistration entity = mapper.toEntity(request);
         entity.setPassword(passwordEncoder.encode(request.password()));
@@ -94,39 +112,42 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
         return mapper.toDto(entity);
     }
 
-    private void validateRequest(CarWashRegistrationRequest request) {
+    private void validateRequest(CarWashRegistrationRequest request, UUID existingId) {
         List<ValidationError> errors = new ArrayList<>();
-
-        if (request.cnpj() != null && !request.cnpj().isBlank() && !isValidCnpj(request.cnpj())) {
-            errors.add(ValidationError.builder()
-                    .field("cnpj")
-                    .message("Formato de CNPJ inválido")
-                    .errorCode("invalid_cnpj")
-                    .build());
-        }
-
-        if (request.cpf() != null && !request.cpf().isBlank() && !isValidCpf(request.cpf())) {
-            errors.add(ValidationError.builder()
-                    .field("cpf")
-                    .message("Formato de CPF inválido")
-                    .errorCode("invalid_cpf")
-                    .build());
-        }
+        boolean isCreating = existingId == null;
 
         if (request.email() == null || request.email().isBlank() || !isValidEmail(request.email())) {
-            errors.add(ValidationError.builder()
-                    .field("email")
-                    .message("Formato de email inválido")
-                    .errorCode("invalid_email")
-                    .build());
+            errors.add(buildError("email", "Formato de email inválido", "invalid_email"));
+        } else {
+            repository.findByEmail(request.email()).ifPresent(user -> {
+                if (isCreating || !Objects.equals(user.getId(), existingId)) {
+                    errors.add(buildError("email", "Este e-mail já está em uso", "duplicate_email"));
+                }
+            });
         }
 
-        if (request.password() == null || request.password().isBlank()) {
-            errors.add(ValidationError.builder()
-                    .field("senha")
-                    .message("A senha é obrigatória")
-                    .errorCode("required")
-                    .build());
+        if (request.cnpj() != null && !request.cnpj().isBlank()) {
+            if (!isValidCnpj(request.cnpj())) {
+                errors.add(buildError("cnpj", "Formato de CNPJ inválido", "invalid_cnpj"));
+            } else {
+                repository.findByCnpj(request.cnpj()).ifPresent(user -> {
+                    if (isCreating || !Objects.equals(user.getId(), existingId)) {
+                        errors.add(buildError("cnpj", "Este CNPJ já está em uso", "duplicate_cnpj"));
+                    }
+                });
+            }
+        }
+
+        if (request.cpf() != null && !request.cpf().isBlank()) {
+            if (!isValidCpf(request.cpf())) {
+                errors.add(buildError("cpf", "Formato de CPF inválido", "invalid_cpf"));
+            } else {
+                repository.findByCpf(request.cpf()).ifPresent(user -> {
+                    if (isCreating || !Objects.equals(user.getId(), existingId)) {
+                        errors.add(buildError("cpf", "Este CPF já está em uso", "duplicate_cpf"));
+                    }
+                });
+            }
         }
 
         if (!errors.isEmpty()) {
@@ -134,15 +155,26 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
         }
     }
 
+    // Método auxiliar para criar erros de validação
+    private ValidationError buildError(String field, String message, String errorCode) {
+        return ValidationError.builder()
+                .field(field)
+                .message(message)
+                .errorCode(errorCode)
+                .build();
+    }
+
     private boolean isValidCnpj(String cnpj) {
-        return cnpj.matches("\\d{14}");
+        String cleanedCnpj = cnpj.replaceAll("\\D", "");
+        return cleanedCnpj.length() == 14;
     }
 
     private boolean isValidCpf(String cpf) {
-        return cpf.matches("\\d{11}");
+        String cleanedCpf = cpf.replaceAll("\\D", "");
+        return cleanedCpf.length() == 11;
     }
 
     private boolean isValidEmail(String email) {
-        return email.matches("^[\\w-.]+@[\\w-]+\\.[a-zA-Z]{2,}$");
+        return email.matches("^[\\w\\-.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
     }
 }
