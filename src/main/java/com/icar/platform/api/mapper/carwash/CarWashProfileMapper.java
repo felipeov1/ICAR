@@ -34,6 +34,8 @@ public interface CarWashProfileMapper {
             expression = "java(carWashProfile.getLogo() != null ? \"https://api.icarplus.com.br/uploads/\" + carWashProfile.getLogo() : null)")
     @Mapping(target = "coverPhoto",
             expression = "java(carWashProfile.getCoverPhoto() != null ? \"https://api.icarplus.com.br/uploads/\" + carWashProfile.getCoverPhoto() : null)")
+    @Mapping(target = "mercadoPagoPublicKey",
+            expression = "java(carWashProfile.getCarWashRegistration() != null && carWashProfile.getCarWashRegistration().getMercadoPagoConfig() != null ? carWashProfile.getCarWashRegistration().getMercadoPagoConfig().getPublicKey() : null)")
     CarWashProfileResponse toDto(CarWashProfile carWashProfile);
 
 

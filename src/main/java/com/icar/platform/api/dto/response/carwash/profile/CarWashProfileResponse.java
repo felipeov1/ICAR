@@ -1,6 +1,5 @@
 package com.icar.platform.api.dto.response.carwash.profile;
 
-import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -17,5 +16,6 @@ public record CarWashProfileResponse(
         String whatsapp,
         String[] locations,
         String observations,
-        boolean mercadoPagoConnected
+        boolean mercadoPagoConnected,
+        String mercadoPagoPublicKey
 ) {}

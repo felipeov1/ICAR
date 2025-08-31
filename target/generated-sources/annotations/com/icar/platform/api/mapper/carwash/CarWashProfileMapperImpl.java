@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-08-31T18:24:59-0300",
+    date = "2025-08-31T19:41:09-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -107,8 +107,9 @@ public class CarWashProfileMapperImpl implements CarWashProfileMapper {
         boolean mercadoPagoConnected = carWashProfile.getCarWashRegistration() != null && carWashProfile.getCarWashRegistration().getMercadoPagoConfig() != null;
         String logo = carWashProfile.getLogo() != null ? "https://api.icarplus.com.br/uploads/" + carWashProfile.getLogo() : null;
         String coverPhoto = carWashProfile.getCoverPhoto() != null ? "https://api.icarplus.com.br/uploads/" + carWashProfile.getCoverPhoto() : null;
+        String mercadoPagoPublicKey = carWashProfile.getCarWashRegistration() != null && carWashProfile.getCarWashRegistration().getMercadoPagoConfig() != null ? carWashProfile.getCarWashRegistration().getMercadoPagoConfig().getPublicKey() : null;
 
-        CarWashProfileResponse carWashProfileResponse = new CarWashProfileResponse( id, name, description, logo, rating, reviews, modalities, coverPhoto, subdomain, whatsapp, locations, observations, mercadoPagoConnected );
+        CarWashProfileResponse carWashProfileResponse = new CarWashProfileResponse( id, name, description, logo, rating, reviews, modalities, coverPhoto, subdomain, whatsapp, locations, observations, mercadoPagoConnected, mercadoPagoPublicKey );
 
         return carWashProfileResponse;
     }
