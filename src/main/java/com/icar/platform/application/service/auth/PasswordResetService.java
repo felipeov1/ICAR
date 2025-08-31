@@ -42,7 +42,7 @@ public class PasswordResetService {
                     .orElseThrow(() -> new BusinessException("Nenhuma conta de empresa encontrada com este e-mail."));
             userId = carWash.getId();
             userEmail = carWash.getEmail();
-            userName = carWash.getLegalName();
+            userName = carWash.getTradeName();
         } else {
             Customer customer = customerRepository.findByEmail(email)
                     .orElseThrow(() -> new BusinessException("Nenhuma conta de cliente encontrada com este e-mail."));

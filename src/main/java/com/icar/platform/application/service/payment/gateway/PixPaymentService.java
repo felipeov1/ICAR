@@ -2,13 +2,12 @@ package com.icar.platform.application.service.payment.gateway;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.gson.Gson;
 import com.icar.platform.api.dto.payment.PixPaymentResponseDTO;
 import com.icar.platform.domain.model.appointment.CarWashAppointment;
+import com.icar.platform.domain.model.carwash.offering.CarWashOffering;
 import com.icar.platform.domain.model.customer.Customer;
 import com.icar.platform.domain.model.payment.gateway.PaymentTransaction;
 import com.icar.platform.domain.repository.appointment.CarWashAppointmentRepository;
-import com.icar.platform.domain.repository.payment.gateway.CompanyMercadoPagoConfigRepository;
 import com.icar.platform.shared.exception.BusinessException;
 import com.icar.platform.shared.exception.MercadoPagoException;
 import com.mercadopago.MercadoPagoConfig;
@@ -21,16 +20,11 @@ import com.mercadopago.resources.payment.Payment;
 import com.mercadopago.resources.payment.PaymentRefund;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -46,7 +40,9 @@ public class PixPaymentService {
             CarWashAppointment appointment,
             BigDecimal totalTransactionAmount,
             String cpf,
-            String sellerAccessToken) {
+            String sellerAccessToken,
+            String statementDescriptor
+    ) {
         try {
             MercadoPagoConfig.setAccessToken(sellerAccessToken);
 
@@ -78,12 +74,36 @@ public class PixPaymentService {
                     .identification(identificationRequest)
                     .build();
 
+            List<PaymentItemRequest> items = new ArrayList<>();
+            for (CarWashOffering service : appointment.getSelectedServices()) {
+                BigDecimal unitPrice = service.getVehicleDetails().get(appointment.getCarType()).getPrice();
+                PaymentItemRequest item = PaymentItemRequest.builder()
+                        .id(service.getId().toString())
+                        .title(service.getName())
+                        .description(service.getDescription())
+                        .categoryId("services")
+                        .quantity(1)
+                        .unitPrice(unitPrice)
+                        .build();
+                items.add(item);
+            }
+
+            PaymentAdditionalInfoRequest additionalInfo = PaymentAdditionalInfoRequest.builder()
+                    .items(items)
+                    .payer(PaymentAdditionalInfoPayerRequest.builder()
+                            .firstName(firstName)
+                            .lastName(lastName)
+                            .build())
+                    .build();
+
             PaymentCreateRequest createRequest = PaymentCreateRequest.builder()
                     .transactionAmount(totalTransactionAmount)
-                    .description("Pagamento para o agendamento #" + appointment.getId())
+                    .description("Serviços em " + appointment.getProfile().getCarWashRegistration().getTradeName())
                     .externalReference(appointment.getId().toString())
                     .paymentMethodId("pix")
                     .payer(payerRequest)
+                    .additionalInfo(additionalInfo)
+                    .statementDescriptor(statementDescriptor)
                     .dateOfExpiration(OffsetDateTime.now().plusMinutes(30))
                     .build();
 

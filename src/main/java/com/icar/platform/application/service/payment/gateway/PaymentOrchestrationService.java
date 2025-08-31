@@ -32,6 +32,9 @@ public class PaymentOrchestrationService {
     @Value("${icar.marketplace.convenience-fee:0.99}")
     private BigDecimal convenienceFee;
 
+    @Value("${icar.marketplace.name:ICAR}")
+    private String marketplaceName;
+
     @Transactional
     public PixPaymentResponseDTO createPixPaymentForAppointment(UUID appointmentId, String cpf) {
         log.info("Orquestrando pagamento para o agendamento {}", appointmentId);
@@ -61,6 +64,14 @@ public class PaymentOrchestrationService {
 
         String sellerAccessToken = companyConfig.getAccessToken();
 
+        // NOVO: Criando o statement_descriptor dinâmico
+        String companyTradeName = appointment.getProfile().getCarWashRegistration().getTradeName();
+        String statementDescriptor = String.format("%s*%s",
+                marketplaceName.substring(0, Math.min(marketplaceName.length(), 4)),
+                companyTradeName.substring(0, Math.min(companyTradeName.length(), 17))
+        ).toUpperCase().replaceAll("[^A-Z0-9*]", "");
+
+
         log.info("Valores calculados para Agendamento {}. Valor do serviço: {}, Cupom: {}, Taxa Conveniência: {}, Valor Final Cliente: {}",
                 appointment.getId(), serviceValue, couponDiscount, convenienceFee, finalAmountForCustomer);
 
@@ -70,7 +81,8 @@ public class PaymentOrchestrationService {
                 appointment,
                 finalAmountForCustomer,
                 cpf,
-                sellerAccessToken
+                sellerAccessToken,
+                statementDescriptor
         );
     }
 }

@@ -30,8 +30,8 @@ public class CarWashRegistration {
     @Column(name = "cpf", length = 11, unique = true, nullable = true)
     private String cpf;
 
-    @Column(name = "legal_name", nullable = false, length = 255)
-    private String legalName;
+    @Column(name = "trade_name", nullable = false, length = 255)
+    private String tradeName;
 
     @Column(name = "owner_name", nullable = false, length = 255)
     private String ownerName;
@@ -41,15 +41,6 @@ public class CarWashRegistration {
 
     @Column(name = "email", nullable = false, length = 255, unique = true)
     private String email;
-
-    @Column(name = "street", nullable = false)
-    private String street;
-
-    @Column(name = "number")
-    private String number;
-
-    @Column(name = "neighborhood", nullable = false)
-    private String neighborhood;
 
     @Column(name = "city", nullable = false)
     private String city;

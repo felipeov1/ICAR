@@ -63,7 +63,7 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
 
         existing.setCnpj(request.cnpj());
         existing.setCpf(request.cpf());
-        existing.setLegalName(request.legalName());
+        existing.setTradeName(request.tradeName());
         existing.setOwnerName(request.ownerName());
         existing.setPhone(request.phone());
         existing.setEmail(request.email());

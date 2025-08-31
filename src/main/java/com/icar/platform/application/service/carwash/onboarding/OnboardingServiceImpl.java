@@ -97,7 +97,7 @@ public class OnboardingServiceImpl implements OnboardingService {
         CarWashProfile profile = new CarWashProfile();
         profile.setCarWashRegistration(registration);
         profile.setName(request.profile().name());
-        profile.setSubdomain(registration.getLegalName().replaceAll("\\s+", "-").toLowerCase());
+        profile.setSubdomain(registration.getTradeName().replaceAll("\\s+", "-").toLowerCase());
         profile.setWhatsapp(request.profile().whatsapp());
         profile.setDescription(request.profile().description());
         profile.setLocations(request.operation().locations().toArray(new String[0]));

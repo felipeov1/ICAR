@@ -44,7 +44,7 @@ public class TokenGenerator {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", carWash.getId());
         claims.put("email", carWash.getEmail());
-        claims.put("tradeName", carWash.getLegalName());
+        claims.put("tradeName", carWash.getTradeName());
         claims.put("role", "CARWASH");
         claims.put("profileId", carWash.getProfileId());
         claims.put("isProfileComplete", carWash.isProfileComplete());
