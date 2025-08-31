@@ -14,6 +14,6 @@ public record OnboardingRequest(
     public record SchedulePart(Map<String, DaySchedulePart> week, AppointmentRulesPart appointmentRules) {}
     public record DaySchedulePart(boolean available, String startTime, String endTime) {}
     public record AppointmentRulesPart(Integer minAdvanceNoticeMinutes, Integer maxAdvanceBookingDays, Integer minEditNoticeMinutes, Integer minCancelNoticeMinutes, boolean allowActionsAtAnyTime, boolean allowOvertime, Integer gapMinutes) {}
-    public record ServicePart(String name, String description, Map<String, VehicleDetailPart> vehicleDetails) {}
+    public record ServicePart(String name, String description, String serviceType, Map<String, VehicleDetailPart> vehicleDetails) {}
     public record VehicleDetailPart(java.math.BigDecimal price, Integer durationMinutes) {}
 }

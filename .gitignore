@@ -49,3 +49,6 @@ build/                   # Gradle build directory
 ### Node.js ###
 **/node_modules/         # Node.js dependencies
 
+
+uploads/
+

@@ -14,11 +14,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Obtenha o caminho de armazenamento do seu StorageProperties
         String uploadPath = "file:" + storageProperties.getLocation() + "/";
 
-        // Mapeie a URL "/uploads/**" para o diretório de uploads configurado
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations(uploadPath);
+
+
     }
+
 }

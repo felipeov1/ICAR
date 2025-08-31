@@ -11,6 +11,8 @@ public interface CarWashOfferingService {
     List<CarWashOfferingResponse> findAllByProfileId(UUID profileId);
     List<CarWashOfferingResponse> findByProfileIdAndVehicleType(UUID profileId, String vehicleType);
     CarWashOfferingResponse update(UUID offeringId, CarWashOfferingRequest request);
+
     void deactivate(UUID offeringId);
     void activate(UUID offeringId);
+
 }

@@ -164,7 +164,7 @@ public class OnboardingServiceImpl implements OnboardingService {
             offering.setProfile(profile);
             offering.setName(serviceDto.name());
             offering.setDescription(serviceDto.description());
-            offering.setServiceType("WASHING");
+            offering.setServiceType(serviceDto.serviceType());
 
             Map<String, VehicleOfferingDetail> details = new HashMap<>();
             for (Map.Entry<String, OnboardingRequest.VehicleDetailPart> entry : serviceDto.vehicleDetails().entrySet()) {

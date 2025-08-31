@@ -60,7 +60,7 @@ public class OfferingController {
     }
 
     @Operation(summary = "Deactivate an offering")
-    @DeleteMapping("/{offeringId}")
+    @PostMapping("/{offeringId}/deactivate")
     public ResponseEntity<Void> deactivateOffering(
             @PathVariable UUID profileId,
             @PathVariable UUID offeringId) {

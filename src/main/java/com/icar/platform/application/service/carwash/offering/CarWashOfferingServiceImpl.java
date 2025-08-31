@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -64,16 +65,17 @@ public class CarWashOfferingServiceImpl implements CarWashOfferingService {
     public List<CarWashOfferingResponse> findAllByProfileId(UUID profileId) {
         return offeringRepository.findByProfile_Id(profileId).stream()
                 .map(mapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<CarWashOfferingResponse> findByProfileIdAndVehicleType(UUID profileId, String vehicleType) {
         return offeringRepository.findByProfile_Id(profileId).stream()
+                .filter(CarWashOffering::isActive)
                 .filter(offering -> offering.getVehicleDetails().containsKey(vehicleType))
                 .map(mapper::toDto)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
