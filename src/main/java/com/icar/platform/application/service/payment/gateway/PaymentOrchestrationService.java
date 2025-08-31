@@ -36,7 +36,7 @@ public class PaymentOrchestrationService {
     private String marketplaceName;
 
     @Transactional
-    public PixPaymentResponseDTO createPixPaymentForAppointment(UUID appointmentId, String cpf) {
+    public PixPaymentResponseDTO createPixPaymentForAppointment(UUID appointmentId, String cpf, String deviceId) {
         log.info("Orquestrando pagamento para o agendamento {}", appointmentId);
 
         CarWashAppointment appointment = appointmentRepository.findById(appointmentId)
@@ -82,7 +82,8 @@ public class PaymentOrchestrationService {
                 finalAmountForCustomer,
                 cpf,
                 sellerAccessToken,
-                statementDescriptor
+                statementDescriptor,
+                deviceId
         );
     }
 }

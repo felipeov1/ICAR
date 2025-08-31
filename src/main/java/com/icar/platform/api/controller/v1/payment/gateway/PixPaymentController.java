@@ -54,7 +54,8 @@ public class PixPaymentController {
 
         PixPaymentResponseDTO paymentDetails = paymentOrchestrationService.createPixPaymentForAppointment(
                 appointmentId,
-                paymentRequest.getCpf()
+                paymentRequest.getCpf(),
+                paymentRequest.getDeviceId()
         );
         return ResponseEntity.ok(paymentDetails);
     }

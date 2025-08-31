@@ -20,6 +20,7 @@ import com.mercadopago.resources.payment.Payment;
 import com.mercadopago.resources.payment.PaymentRefund;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -34,6 +35,8 @@ public class PixPaymentService {
 
     private final CarWashAppointmentRepository appointmentRepository;
 
+    @Value("${app.api-url}")
+    private String apiBaseUrl;
     private static final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     public PixPaymentResponseDTO processPixPayment(
@@ -41,12 +44,12 @@ public class PixPaymentService {
             BigDecimal totalTransactionAmount,
             String cpf,
             String sellerAccessToken,
-            String statementDescriptor
-    ) {
+            String statementDescriptor,
+            String deviceId) {
         try {
             MercadoPagoConfig.setAccessToken(sellerAccessToken);
-
             Customer customer = appointment.getCustomer();
+
             if (customer == null) {
                 throw new BusinessException("Agendamento sem cliente associado.");
             }
@@ -88,6 +91,11 @@ public class PixPaymentService {
                 items.add(item);
             }
 
+            Map<String, Object> metadata = new HashMap<>();
+            if (deviceId != null && !deviceId.isBlank()) {
+                metadata.put("device_id", deviceId);
+            }
+
             PaymentAdditionalInfoRequest additionalInfo = PaymentAdditionalInfoRequest.builder()
                     .items(items)
                     .payer(PaymentAdditionalInfoPayerRequest.builder()
@@ -96,13 +104,17 @@ public class PixPaymentService {
                             .build())
                     .build();
 
+            String notificationUrl = apiBaseUrl + "/api/v1/notifications/mercado-pago";
+
             PaymentCreateRequest createRequest = PaymentCreateRequest.builder()
                     .transactionAmount(totalTransactionAmount)
                     .description("Serviços em " + appointment.getProfile().getCarWashRegistration().getTradeName())
                     .externalReference(appointment.getId().toString())
+                    .notificationUrl(notificationUrl)
                     .paymentMethodId("pix")
                     .payer(payerRequest)
                     .additionalInfo(additionalInfo)
+                    .metadata(metadata)
                     .statementDescriptor(statementDescriptor)
                     .dateOfExpiration(OffsetDateTime.now().plusMinutes(30))
                     .build();
@@ -147,7 +159,6 @@ public class PixPaymentService {
             throw new BusinessException("Ocorreu um erro interno ao processar o pagamento.");
         }
     }
-
 
     public Payment cancelPendingPayment(Long paymentId) {
         try {
