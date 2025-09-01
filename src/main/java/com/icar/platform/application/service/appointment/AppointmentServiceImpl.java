@@ -36,6 +36,9 @@ import com.icar.platform.shared.exception.BusinessException;
 import com.icar.platform.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,10 +47,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -432,39 +432,33 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CompanyAppointmentResponse> getUpcomingAppointmentsForCarWash(UUID profileId) {
-        return appointmentRepository.findUpcomingByProfileId(profileId)
-                .stream()
-                .map(appointmentMapper::toCompanyResponse)
-                .collect(Collectors.toList());
+    public Page<CompanyAppointmentResponse> getUpcomingAppointmentsForCarWash(UUID profileId, Pageable pageable) {
+        return appointmentRepository.findUpcomingByProfileId(profileId, pageable)
+                .map(appointmentMapper::toCompanyResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CompanyAppointmentResponse> getCompletedAppointmentsForCarWash(UUID profileId) {
-        return appointmentRepository.findByProfileIdAndStatus(profileId, AppointmentStatus.COMPLETED)
-                .stream()
-                .map(appointmentMapper::toCompanyResponse)
-                .collect(Collectors.toList());
+    public Page<CompanyAppointmentResponse> getCompletedAppointmentsForCarWash(UUID profileId, Pageable pageable) {
+        return appointmentRepository.findByProfileIdAndStatus(profileId, AppointmentStatus.COMPLETED, pageable)
+                .map(appointmentMapper::toCompanyResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CompanyAppointmentResponse> getCanceledAppointmentsForCarWash(UUID profileId) {
-        return appointmentRepository.findByProfileIdAndStatus(profileId, AppointmentStatus.CANCELED)
-                .stream()
-                .map(appointmentMapper::toCompanyResponse)
-                .collect(Collectors.toList());
+    public Page<CompanyAppointmentResponse> getCanceledAppointmentsForCarWash(UUID profileId, Pageable pageable) {
+        return appointmentRepository.findByProfileIdAndStatus(profileId, AppointmentStatus.CANCELED, pageable)
+                .map(appointmentMapper::toCompanyResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<CompanyAppointmentResponse> getRefundPendingAppointmentsForCarWash(UUID profileId) {
-        return appointmentRepository.findByProfileIdAndStatus(profileId, AppointmentStatus.REFUND_PENDING)
-                .stream()
-                .map(appointmentMapper::toCompanyResponse)
-                .collect(Collectors.toList());
+    public Page<CompanyAppointmentResponse> getRefundPendingAppointmentsForCarWash(UUID profileId, Pageable pageable) {
+        return appointmentRepository.findByProfileIdAndStatus(profileId, AppointmentStatus.REFUND_PENDING, pageable)
+                .map(appointmentMapper::toCompanyResponse);
     }
+
+
 
     @Override
     @Transactional(readOnly = true)
@@ -635,5 +629,18 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         appointmentRepository.delete(appointment);
         log.info("Agendamento pendente {} foi deletado com sucesso.", appointmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<AppointmentResponse> getAppointmentToReview(UUID customerId) {
+        Pageable limit = PageRequest.of(0, 1);
+        List<CarWashAppointment> appointments = appointmentRepository.findLatestCompletedAppointmentToReview(customerId, limit);
+
+        if (appointments.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(appointmentMapper.toResponse(appointments.get(0)));
     }
 }

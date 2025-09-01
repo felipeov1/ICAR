@@ -89,4 +89,17 @@ public class CustomerAppointmentController {
         appointmentService.deletePendingAppointment(appointmentId, user.getId());
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(summary = "Get the last completed appointment needing a review")
+    @GetMapping("/review-service")
+    public ResponseEntity<AppointmentResponse> getAppointmentToReview(
+            @AuthenticationPrincipal UserDetailsImpl user
+    ) {
+        UUID customerId = user.getId();
+
+        return appointmentService.getAppointmentToReview(customerId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
+    }
 }
+

@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -117,8 +119,20 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
     @Override
     @Transactional(readOnly = true)
     public List<CarWashProfileResponse> findAllForMarketplace() {
+
+        Comparator<CarWashProfileResponse> marketplaceSort = Comparator
+                .comparingInt((CarWashProfileResponse company) -> {
+                    boolean isNewAndUnrated = company.reviews() == 0 && company.createdAt().isAfter(LocalDateTime.now().minusDays(30));
+                    return isNewAndUnrated ? 0 : 1;
+                })
+                .thenComparing(CarWashProfileResponse::createdAt, Comparator.reverseOrder())
+                .thenComparing(CarWashProfileResponse::rating, Comparator.nullsLast(Comparator.reverseOrder()))
+                .thenComparing(CarWashProfileResponse::reviews, Comparator.nullsLast(Comparator.reverseOrder()))
+                .thenComparing(CarWashProfileResponse::name);
+
         return profileRepository.findAll().stream()
                 .map(mapper::toDto)
+                .sorted(marketplaceSort)
                 .collect(Collectors.toList());
     }
 
@@ -129,6 +143,4 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
                 .orElseThrow(() -> new ResourceNotFoundException("Profile not found for subdomain: " + subdomain));
         return mapper.toDto(profile);
     }
-
-
 }

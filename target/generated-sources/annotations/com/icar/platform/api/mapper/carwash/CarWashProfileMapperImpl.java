@@ -5,6 +5,7 @@ import com.icar.platform.api.dto.request.carwash.profile.CarWashProfileUpdateReq
 import com.icar.platform.api.dto.response.carwash.profile.CarWashProfileResponse;
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-01T06:00:27-0300",
+    date = "2025-09-01T20:38:41-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -81,6 +82,7 @@ public class CarWashProfileMapperImpl implements CarWashProfileMapper {
         String description = null;
         BigDecimal rating = null;
         Integer reviews = null;
+        LocalDateTime createdAt = null;
         String[] modalities = null;
         String subdomain = null;
         String whatsapp = null;
@@ -92,6 +94,7 @@ public class CarWashProfileMapperImpl implements CarWashProfileMapper {
         description = carWashProfile.getDescription();
         rating = carWashProfile.getRating();
         reviews = carWashProfile.getReviews();
+        createdAt = carWashProfile.getCreatedAt();
         String[] modalities1 = carWashProfile.getModalities();
         if ( modalities1 != null ) {
             modalities = Arrays.copyOf( modalities1, modalities1.length );
@@ -109,7 +112,7 @@ public class CarWashProfileMapperImpl implements CarWashProfileMapper {
         String coverPhoto = carWashProfile.getCoverPhoto() != null ? "https://api.icarplus.com.br/uploads/" + carWashProfile.getCoverPhoto() : null;
         String mercadoPagoPublicKey = carWashProfile.getCarWashRegistration() != null && carWashProfile.getCarWashRegistration().getMercadoPagoConfig() != null ? carWashProfile.getCarWashRegistration().getMercadoPagoConfig().getPublicKey() : null;
 
-        CarWashProfileResponse carWashProfileResponse = new CarWashProfileResponse( id, name, description, logo, rating, reviews, modalities, coverPhoto, subdomain, whatsapp, locations, observations, mercadoPagoConnected, mercadoPagoPublicKey );
+        CarWashProfileResponse carWashProfileResponse = new CarWashProfileResponse( id, name, description, logo, rating, reviews, createdAt, modalities, coverPhoto, subdomain, whatsapp, locations, observations, mercadoPagoConnected, mercadoPagoPublicKey );
 
         return carWashProfileResponse;
     }

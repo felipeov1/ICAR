@@ -2,6 +2,8 @@ package com.icar.platform.domain.repository.appointment;
 
 import com.icar.platform.domain.enums.AppointmentStatus;
 import com.icar.platform.domain.model.appointment.CarWashAppointment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -78,11 +80,13 @@ public interface CarWashAppointmentRepository extends JpaRepository<CarWashAppoi
             @Param("endTime") LocalDateTime endTime,
             @Param("appointmentIdToIgnore") UUID appointmentIdToIgnore);
 
-    @Query("SELECT a FROM CarWashAppointment a WHERE a.profile.id = :profileId AND a.status = 'CONFIRMED' ORDER BY a.dateTime ASC")
-    List<CarWashAppointment> findUpcomingByProfileId(@Param("profileId") UUID profileId);
+    @Query(value = "SELECT a FROM CarWashAppointment a WHERE a.profile.id = :profileId AND a.status = 'CONFIRMED' ORDER BY a.dateTime ASC",
+            countQuery = "SELECT count(a) FROM CarWashAppointment a WHERE a.profile.id = :profileId AND a.status = 'CONFIRMED'")
+    Page<CarWashAppointment> findUpcomingByProfileId(@Param("profileId") UUID profileId, Pageable pageable);
 
-    @Query("SELECT a FROM CarWashAppointment a WHERE a.profile.id = :profileId AND a.status = :status ORDER BY a.dateTime DESC")
-    List<CarWashAppointment> findByProfileIdAndStatus(@Param("profileId") UUID profileId, @Param("status") AppointmentStatus status);
+    @Query(value = "SELECT a FROM CarWashAppointment a WHERE a.profile.id = :profileId AND a.status = :status ORDER BY a.dateTime DESC",
+            countQuery = "SELECT count(a) FROM CarWashAppointment a WHERE a.profile.id = :profileId AND a.status = :status")
+    Page<CarWashAppointment> findByProfileIdAndStatus(@Param("profileId") UUID profileId, @Param("status") AppointmentStatus status, Pageable pageable);
 
     @Query("SELECT a FROM CarWashAppointment a " +
             "WHERE a.profile.id = :profileId " +
@@ -119,4 +123,11 @@ public interface CarWashAppointmentRepository extends JpaRepository<CarWashAppoi
 
     @Query("SELECT a.customer.id FROM CarWashAppointment a WHERE a.id = :appointmentId")
     Optional<UUID> findCustomerIdById(@Param("appointmentId") UUID appointmentId);
+
+    @Query("SELECT a FROM CarWashAppointment a LEFT JOIN a.review r " +
+            "WHERE a.customer.id = :customerId " +
+            "AND a.status = com.icar.platform.domain.enums.AppointmentStatus.COMPLETED " +
+            "AND r IS NULL " +
+            "ORDER BY a.dateTime DESC")
+    List<CarWashAppointment> findLatestCompletedAppointmentToReview(@Param("customerId") UUID customerId, Pageable pageable);
 }

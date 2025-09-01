@@ -12,6 +12,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,29 +34,29 @@ public class CarWashAppointmentController {
 
     @Operation(summary = "Get upcoming appointments (ordered from oldest to newest)")
     @GetMapping("/upcoming")
-    public ResponseEntity<List<CompanyAppointmentResponse>> getUpcomingAppointments(
-            @PathVariable UUID carWashId) {
-        return ResponseEntity.ok(appointmentService.getUpcomingAppointmentsForCarWash(carWashId));
+    public ResponseEntity<Page<CompanyAppointmentResponse>> getUpcomingAppointments(
+            @PathVariable UUID carWashId, @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(appointmentService.getUpcomingAppointmentsForCarWash(carWashId, pageable));
     }
 
     @Operation(summary = "Get completed appointments (ordered from newest to oldest)")
     @GetMapping("/completed")
-    public ResponseEntity<List<CompanyAppointmentResponse>> getCompletedAppointments(
-            @PathVariable UUID carWashId) {
-        return ResponseEntity.ok(appointmentService.getCompletedAppointmentsForCarWash(carWashId));
+    public ResponseEntity<Page<CompanyAppointmentResponse>> getCompletedAppointments(
+            @PathVariable UUID carWashId, @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(appointmentService.getCompletedAppointmentsForCarWash(carWashId, pageable));
     }
 
     @Operation(summary = "Get canceled appointments (ordered from newest to oldest)")
     @GetMapping("/canceled")
-    public ResponseEntity<List<CompanyAppointmentResponse>> getCanceledAppointments(
-            @PathVariable UUID carWashId) {
-        return ResponseEntity.ok(appointmentService.getCanceledAppointmentsForCarWash(carWashId));
+    public ResponseEntity<Page<CompanyAppointmentResponse>> getCanceledAppointments(
+            @PathVariable UUID carWashId, @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(appointmentService.getCanceledAppointmentsForCarWash(carWashId, pageable));
     }
     @Operation(summary = "Get refund pending appointments (ordered from newest to oldest)")
     @GetMapping("/refund-pending")
-    public ResponseEntity<List<CompanyAppointmentResponse>> getRefundPendingAppointments(
-            @PathVariable UUID carWashId) {
-        return ResponseEntity.ok(appointmentService.getRefundPendingAppointmentsForCarWash(carWashId));
+    public ResponseEntity<Page<CompanyAppointmentResponse>> getRefundPendingAppointments(
+            @PathVariable UUID carWashId, @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(appointmentService.getRefundPendingAppointmentsForCarWash(carWashId, pageable));
     }
 
     @Operation(summary = "Get count of refund pending appointments")
