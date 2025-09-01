@@ -84,7 +84,7 @@ public class PixPaymentService {
                         .id(service.getId().toString())
                         .title(service.getName())
                         .description(service.getDescription())
-                        .categoryId("services")
+                        .categoryId("car_wash_services")
                         .quantity(1)
                         .unitPrice(unitPrice)
                         .build();
@@ -93,7 +93,7 @@ public class PixPaymentService {
 
             PaymentAdditionalInfoRequest additionalInfo = PaymentAdditionalInfoRequest.builder()
                     .items(items)
-                    .payer(PaymentAdditionalInfoPayerRequest.builder()
+                    .payer(PaymentAdditionalInfoPayerRequest.builder() // Incluir dados do pagador também aqui
                             .firstName(firstName)
                             .lastName(lastName)
                             .build())
@@ -113,6 +113,7 @@ public class PixPaymentService {
                     .dateOfExpiration(OffsetDateTime.now().plusMinutes(30))
                     .build();
 
+
             Map<String, String> customHeaders = new HashMap<>();
             if (deviceId != null && !deviceId.isBlank()) {
                 customHeaders.put("X-meli-session-id", deviceId);
@@ -122,17 +123,7 @@ public class PixPaymentService {
                     .customHeaders(customHeaders)
                     .build();
 
-
-            try {
-                log.info("Enviando requisição para o Mercado Pago com o corpo (payload): {}",
-                        objectMapper.writeValueAsString(createRequest));
-                if (deviceId != null) {
-                    log.info("Enviando com o cabeçalho X-meli-session-id: {}", deviceId);
-                }
-            } catch (Exception e) {
-                log.warn("Não foi possível serializar o objeto de requisição para o log: {}", e.getMessage());
-            }
-
+            log.info("Enviando requisição de pagamento para o Mercado Pago para o agendamento {}", appointment.getId());
             Payment createdPayment = client.create(createRequest, requestOptions);
 
             if (createdPayment.getPointOfInteraction() == null || createdPayment.getPointOfInteraction().getTransactionData() == null) {
