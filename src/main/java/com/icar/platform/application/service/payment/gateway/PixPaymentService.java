@@ -91,11 +91,6 @@ public class PixPaymentService {
                 items.add(item);
             }
 
-            Map<String, Object> metadata = new HashMap<>();
-            if (deviceId != null && !deviceId.isBlank()) {
-                metadata.put("device_id", deviceId);
-            }
-
             PaymentAdditionalInfoRequest additionalInfo = PaymentAdditionalInfoRequest.builder()
                     .items(items)
                     .payer(PaymentAdditionalInfoPayerRequest.builder()
@@ -114,19 +109,31 @@ public class PixPaymentService {
                     .paymentMethodId("pix")
                     .payer(payerRequest)
                     .additionalInfo(additionalInfo)
-                    .metadata(metadata)
                     .statementDescriptor(statementDescriptor)
                     .dateOfExpiration(OffsetDateTime.now().plusMinutes(30))
                     .build();
 
+            Map<String, String> customHeaders = new HashMap<>();
+            if (deviceId != null && !deviceId.isBlank()) {
+                customHeaders.put("X-meli-session-id", deviceId);
+            }
+
+            MPRequestOptions requestOptions = MPRequestOptions.builder()
+                    .customHeaders(customHeaders)
+                    .build();
+
+
             try {
                 log.info("Enviando requisição para o Mercado Pago com o corpo (payload): {}",
                         objectMapper.writeValueAsString(createRequest));
+                if (deviceId != null) {
+                    log.info("Enviando com o cabeçalho X-meli-session-id: {}", deviceId);
+                }
             } catch (Exception e) {
                 log.warn("Não foi possível serializar o objeto de requisição para o log: {}", e.getMessage());
             }
 
-            Payment createdPayment = client.create(createRequest);
+            Payment createdPayment = client.create(createRequest, requestOptions);
 
             if (createdPayment.getPointOfInteraction() == null || createdPayment.getPointOfInteraction().getTransactionData() == null) {
                 throw new BusinessException("Resposta do gateway de pagamento inválida. Não contém dados do PIX.");
