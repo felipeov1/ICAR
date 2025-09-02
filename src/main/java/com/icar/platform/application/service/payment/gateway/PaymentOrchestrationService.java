@@ -29,9 +29,8 @@ public class PaymentOrchestrationService {
     private final CarWashAppointmentRepository appointmentRepository;
     private final CompanyMercadoPagoConfigRepository configRepository;
 
-    @Value("${icar.marketplace.convenience-fee:0.99}")
-    private BigDecimal convenienceFee;
-
+    @Value("${icar.marketplace.convenience-fee-percentage:0.0099}")
+    private BigDecimal convenienceFeePercentage;
     @Value("${icar.marketplace.name:ICAR}")
     private String marketplaceName;
 
@@ -52,8 +51,12 @@ public class PaymentOrchestrationService {
                 .map(AppliedCoupon::getDiscountApplied)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal finalAmountForCustomer = serviceValue.add(convenienceFee).subtract(couponDiscount)
+        BigDecimal convenienceFeeValue = serviceValue.multiply(convenienceFeePercentage)
                 .setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal finalAmountForCustomer = serviceValue.subtract(couponDiscount).add(convenienceFeeValue)
+                .setScale(2, RoundingMode.HALF_UP);
+
 
         finalAmountForCustomer = finalAmountForCustomer.max(BigDecimal.ONE);
 
@@ -64,7 +67,6 @@ public class PaymentOrchestrationService {
 
         String sellerAccessToken = companyConfig.getAccessToken();
 
-        // NOVO: Criando o statement_descriptor dinâmico
         String companyTradeName = appointment.getProfile().getCarWashRegistration().getTradeName();
         String statementDescriptor = String.format("%s*%s",
                 marketplaceName.substring(0, Math.min(marketplaceName.length(), 4)),
@@ -73,7 +75,7 @@ public class PaymentOrchestrationService {
 
 
         log.info("Valores calculados para Agendamento {}. Valor do serviço: {}, Cupom: {}, Taxa Conveniência: {}, Valor Final Cliente: {}",
-                appointment.getId(), serviceValue, couponDiscount, convenienceFee, finalAmountForCustomer);
+                appointment.getId(), serviceValue, couponDiscount, convenienceFeeValue, finalAmountForCustomer);
 
         appointment.setAmountPaid(finalAmountForCustomer);
 
