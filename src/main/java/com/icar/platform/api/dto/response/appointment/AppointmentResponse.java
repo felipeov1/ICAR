@@ -30,6 +30,7 @@ public class AppointmentResponse {
     private boolean hasBeenReviewed;
     private BigDecimal originalPrice;
     private BigDecimal discountAmount;
+    private BigDecimal convenienceFee;
     private CustomerInfo customer;
 
     @Data

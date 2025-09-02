@@ -2,6 +2,7 @@ package com.icar.platform.api.mapper.appointment;
 
 import com.icar.platform.api.dto.response.appointment.AppointmentResponse;
 import com.icar.platform.api.dto.response.carwash.CompanyAppointmentResponse;
+import com.icar.platform.domain.enums.PaymentMethod;
 import com.icar.platform.domain.model.appointment.CarWashAppointment;
 import com.icar.platform.domain.model.carwash.offering.VehicleOfferingDetail;
 import com.icar.platform.domain.model.carwash.profile.AppointmentConfig;
@@ -61,7 +62,7 @@ public abstract class AppointmentMapper {
     @Named("mapOriginalPrice")
     public BigDecimal mapOriginalPrice(CarWashAppointment appointment) {
         if (appointment.getAppliedCoupons() != null && !appointment.getAppliedCoupons().isEmpty()) {
-            return appointment.getAppliedCoupons().iterator().next().getOriginalAmount();
+            return appointment.getAppliedCoupons().getFirst().getOriginalAmount();
         }
         return appointment.getOriginalAmount();
     }
@@ -71,15 +72,38 @@ public abstract class AppointmentMapper {
         if (appointment.getAppliedCoupons() != null && !appointment.getAppliedCoupons().isEmpty()) {
             return appointment.getAppliedCoupons().iterator().next().getDiscountApplied();
         }
-        return null;
+        return BigDecimal.ZERO;
+    }
+
+    @Named("mapConvenienceFee")
+    public BigDecimal mapConvenienceFee(CarWashAppointment appointment) {
+        if (appointment.getPaymentMethod() != PaymentMethod.PLATFORM || appointment.getAmountPaid() == null || appointment.getAmountPaid().compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal finalPrice = appointment.getAmountPaid();
+        BigDecimal originalPrice = appointment.getOriginalAmount();
+        BigDecimal discountAmount = mapDiscountAmount(appointment);
+
+        BigDecimal priceBeforeFee = originalPrice.subtract(discountAmount);
+        BigDecimal convenienceFee = finalPrice.subtract(priceBeforeFee);
+
+        return convenienceFee.max(BigDecimal.ZERO);
     }
 
     @Named("mapFinalPrice")
     public BigDecimal mapFinalPrice(CarWashAppointment appointment) {
-        if (appointment.getAppliedCoupons() != null && !appointment.getAppliedCoupons().isEmpty()) {
-            return appointment.getAppliedCoupons().iterator().next().getFinalAmount();
+        BigDecimal amountPaid = appointment.getAmountPaid();
+
+        if (amountPaid == null || amountPaid.compareTo(BigDecimal.ZERO) <= 0) {
+            if (appointment.getPaymentMethod() == PaymentMethod.ON_SITE) {
+                return appointment.getOriginalAmount().subtract(mapDiscountAmount(appointment));
+            }
+
+            return appointment.getOriginalAmount().subtract(mapDiscountAmount(appointment));
         }
-        return appointment.getOriginalAmount();
+
+        return amountPaid;
     }
 
 
