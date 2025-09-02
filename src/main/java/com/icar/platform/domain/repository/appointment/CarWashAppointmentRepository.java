@@ -84,7 +84,7 @@ public interface CarWashAppointmentRepository extends JpaRepository<CarWashAppoi
             countQuery = "SELECT count(a) FROM CarWashAppointment a WHERE a.profile.id = :profileId AND a.status = 'CONFIRMED'")
     Page<CarWashAppointment> findUpcomingByProfileId(@Param("profileId") UUID profileId, Pageable pageable);
 
-    @Query(value = "SELECT a FROM CarWashAppointment a WHERE a.profile.id = :profileId AND a.status = :status ORDER BY a.dateTime DESC",
+    @Query(value = "SELECT a FROM CarWashAppointment a WHERE a.profile.id = :profileId AND a.status = :status ORDER BY a.updatedAt DESC NULLS LAST, a.createdAt DESC",
             countQuery = "SELECT count(a) FROM CarWashAppointment a WHERE a.profile.id = :profileId AND a.status = :status")
     Page<CarWashAppointment> findByProfileIdAndStatus(@Param("profileId") UUID profileId, @Param("status") AppointmentStatus status, Pageable pageable);
 

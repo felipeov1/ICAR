@@ -1,5 +1,0 @@
-ALTER TABLE car_wash_profile_weekly_schedule
-DROP COLUMN break_start_time;
-
-ALTER TABLE car_wash_profile_weekly_schedule
-DROP COLUMN break_end_time;
