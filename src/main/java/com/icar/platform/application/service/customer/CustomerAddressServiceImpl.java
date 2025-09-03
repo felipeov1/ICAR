@@ -55,8 +55,10 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
         address.setZipCode(request.zipCode());
         address.setCity(request.city());
         address.setState(request.state());
+
         address.setStreet(request.street());
-        address.setStreet(request.neighborhood());
+        address.setNeighborhood(request.neighborhood()); 
+
         address.setStreetNumber(request.streetNumber());
         address.setAdditionalInstructions(request.additionalInstructions());
 
