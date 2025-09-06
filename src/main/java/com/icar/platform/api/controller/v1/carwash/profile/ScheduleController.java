@@ -79,16 +79,17 @@ public class ScheduleController {
             @PathVariable UUID profileId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam Integer serviceDurationMinutes,
-            @RequestParam(required = false) UUID appointmentIdToIgnore) {
-        return ResponseEntity.ok(scheduleService.getAvailableTimeSlots(profileId, date, serviceDurationMinutes, appointmentIdToIgnore));
+            @RequestParam(required = false) UUID appointmentIdToIgnore,
+            @RequestParam(required = false, defaultValue = "false") boolean isAdminContext) {
+        return ResponseEntity.ok(scheduleService.getAvailableTimeSlots(profileId, date, serviceDurationMinutes, appointmentIdToIgnore, isAdminContext));
     }
 
-    @Operation(summary = "Get all dates with available slots in a range", tags = {"Profile Schedule"})
     @GetMapping("/available-dates")
     public ResponseEntity<List<String>> getAvailableDates(
             @PathVariable UUID profileId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(scheduleService.getAvailableDates(profileId, startDate, endDate));
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(required = false, defaultValue = "false") boolean isAdminContext) { // NOVO PARÂMETRO
+        return ResponseEntity.ok(scheduleService.getAvailableDates(profileId, startDate, endDate, isAdminContext));
     }
 }

@@ -39,7 +39,7 @@ public class AuthController {
     private final CustomerAuthService customerAuthService;
     private final PasswordResetService passwordResetService;
 
-    private static final String REFRESH_TOKEN_COOKIE = "refresh_token"; // Nome unificado
+    private static final String REFRESH_TOKEN_COOKIE = "refresh_token";
 
     @Value("${app.frontend-url}")
     private String frontendUrl;

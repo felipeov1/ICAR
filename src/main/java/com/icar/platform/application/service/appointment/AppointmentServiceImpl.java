@@ -36,6 +36,7 @@ import com.icar.platform.shared.exception.BusinessException;
 import com.icar.platform.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.splitmap.AbstractIterableGetMapDecorator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -89,6 +90,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (selectedOfferings.isEmpty() || selectedOfferings.size() != request.offeringIds().size()) {
             throw new ResourceNotFoundException("Um ou mais serviços selecionados são inválidos.");
         }
+        
 
         BigDecimal totalPrice = BigDecimal.ZERO;
         int totalTime = 0;
@@ -289,12 +291,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (appointment.getStatus() == AppointmentStatus.PENDING_PAYMENT) {
             appointment.setStatus(AppointmentStatus.CANCELED);
             log.info("Agendamento {} (PENDING_PAYMENT) cancelado diretamente.", appointmentId);
-        }
-        else if (appointment.getPaymentMethod() == PaymentMethod.PLATFORM && appointment.getStatus() == AppointmentStatus.CONFIRMED) {
+        } else if (appointment.getPaymentMethod() == PaymentMethod.PLATFORM && appointment.getStatus() == AppointmentStatus.CONFIRMED) {
             appointment.setStatus(AppointmentStatus.REFUND_PENDING);
             log.info("Agendamento {} (CONFIRMED) movido para REFUND_PENDING.", appointmentId);
-        }
-        else {
+        } else {
             appointment.setStatus(AppointmentStatus.CANCELED);
             log.info("Agendamento {} ({}) cancelado.", appointmentId, appointment.getStatus());
         }
@@ -336,7 +336,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         return appointmentMapper.toResponse(appointment);
     }
-
 
 
     @Override
@@ -459,7 +458,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
 
-
     @Override
     @Transactional(readOnly = true)
     public Map<String, Long> getRefundPendingCountForCarWash(UUID profileId) {
@@ -541,7 +539,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new BusinessException("A duração total dos serviços é inválida e não pode ser zero.");
         }
 
-        validateAppointmentTime(request.startTime(), profile.getId(), totalTime);
+        validateAdminAppointmentTime(request.startTime(), profileId, totalTime, null);
 
         CustomerAddress address = getCustomerAddress(companyCustomer);
         address = addressRepository.save(address);
@@ -596,7 +594,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (totalDuration == null || totalDuration <= 0) {
             throw new BusinessException("A duração do agendamento é inválida e não pode ser reagendado.");
         }
-        validateAppointmentTime(newDateTime, profileId, totalDuration, appointmentId);
+
+        validateAdminAppointmentTime(newDateTime, profileId, totalDuration, appointmentId);
 
         appointment.setDateTime(newDateTime);
         appointment.setUpdatedAt(LocalDateTime.now(BRASILIA_ZONE_ID));
@@ -642,5 +641,37 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         return Optional.of(appointmentMapper.toResponse(appointments.get(0)));
+    }
+
+    private void validateAdminAppointmentTime(LocalDateTime appointmentTime, UUID profileId, Integer estimatedTime, UUID appointmentIdToIgnore) {
+
+        AppointmentConfig config = appointmentConfigRepository.findByProfile_Id(profileId)
+                .orElseThrow(() -> new BusinessException("Configuração de agendamento não encontrada."));
+
+        final int GAP_MINUTES = config.getGapMinutes();
+        LocalDateTime startTimeWithGap = appointmentTime.minusMinutes(GAP_MINUTES);
+        LocalDateTime endTimeWithGap = appointmentTime.plusMinutes(estimatedTime).plusMinutes(GAP_MINUTES);
+
+        List<CarWashAppointment> conflictingAppointments;
+
+        if (appointmentIdToIgnore != null) {
+            conflictingAppointments = appointmentRepository.findConflictingAppointmentsExcludingId(
+                    profileId,
+                    AppointmentStatus.CANCELED.name(),
+                    startTimeWithGap,
+                    endTimeWithGap,
+                    appointmentIdToIgnore);
+        } else {
+            conflictingAppointments = appointmentRepository.findConflictingAppointments(
+                    profileId,
+                    AppointmentStatus.CANCELED.name(),
+                    startTimeWithGap,
+                    endTimeWithGap
+            );
+        }
+
+        if (!conflictingAppointments.isEmpty()) {
+            throw new BusinessException("Este horário já está ocupado ou em conflito. Por favor, escolha outro.");
+        }
     }
 }

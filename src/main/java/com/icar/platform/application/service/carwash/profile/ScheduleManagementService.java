@@ -34,7 +34,7 @@ public interface ScheduleManagementService {
 
     void deleteSpecialDay(UUID profileId, UUID specialDayId);
 
-    List<TimeSlotResponse> getAvailableTimeSlots(UUID profileId, LocalDate date, Integer serviceDurationMinutes, UUID appointmentIdToIgnore);
+    List<TimeSlotResponse> getAvailableTimeSlots(UUID profileId, LocalDate date, Integer serviceDurationMinutes, UUID appointmentIdToIgnore, boolean isAdminContext);
 
-    List<String> getAvailableDates(UUID profileId, LocalDate startDate, LocalDate endDate);
+    List<String> getAvailableDates(UUID profileId, LocalDate startDate, LocalDate endDate, boolean isAdminContext);
 }
