@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.Instant; // MUDANÇA AQUI
 import java.util.UUID;
 
 @Getter
@@ -37,5 +37,5 @@ public class Notification {
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 }

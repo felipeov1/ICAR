@@ -2,14 +2,14 @@ package com.icar.platform.api.mapper.notification;
 
 import com.icar.platform.api.dto.response.notification.NotificationResponse;
 import com.icar.platform.domain.model.notification.Notification;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-01T20:38:41-0300",
+    date = "2025-09-06T18:10:47-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -26,7 +26,7 @@ public class NotificationMapperImpl implements NotificationMapper {
         String type = null;
         String text = null;
         String appointmentTime = null;
-        LocalDateTime createdAt = null;
+        Instant createdAt = null;
 
         read = notification.isRead();
         id = notification.getId();

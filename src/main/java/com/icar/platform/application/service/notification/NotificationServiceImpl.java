@@ -13,7 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.Instant; // MUDANÇA AQUI
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
@@ -33,7 +33,7 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setType("NEW_APPOINTMENT");
         notification.setText("Novo agendamento recebido para");
         notification.setAppointmentTime(appointment.getDateTime().format(FORMATTER));
-        notification.setCreatedAt(LocalDateTime.now());
+        notification.setCreatedAt(Instant.now());
         notificationRepository.save(notification);
     }
 
@@ -53,7 +53,7 @@ public class NotificationServiceImpl implements NotificationService {
             notification.setAppointmentTime(appointment.getDateTime().format(FORMATTER) + " foi cancelado.");
         }
 
-        notification.setCreatedAt(LocalDateTime.now());
+        notification.setCreatedAt(Instant.now());
         notificationRepository.save(notification);
     }
 
@@ -65,7 +65,7 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setType("EDITION");
         notification.setText("O agendamento para");
         notification.setAppointmentTime(appointment.getDateTime().format(FORMATTER) + " foi alterado.");
-        notification.setCreatedAt(LocalDateTime.now());
+        notification.setCreatedAt(Instant.now());
         notificationRepository.save(notification);
     }
 

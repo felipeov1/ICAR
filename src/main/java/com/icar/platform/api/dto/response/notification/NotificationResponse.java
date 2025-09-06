@@ -1,6 +1,6 @@
 package com.icar.platform.api.dto.response.notification;
 
-import java.time.LocalDateTime;
+import java.time.Instant; // MUDANÇA AQUI
 import java.util.UUID;
 
 public record NotificationResponse(
@@ -9,5 +9,5 @@ public record NotificationResponse(
         String text,
         String appointmentTime,
         boolean read,
-        LocalDateTime createdAt
+        Instant createdAt
 ) {}
