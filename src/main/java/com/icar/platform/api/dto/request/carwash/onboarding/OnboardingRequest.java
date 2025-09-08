@@ -9,7 +9,7 @@ public record OnboardingRequest(
         SchedulePart schedule,
         List<ServicePart> services
 ) {
-    public record ProfilePart(String name, String whatsapp, String description) {}
+    public record ProfilePart(String name, String whatsapp, String subdomain, String description) {}
     public record OperationPart(List<String> locations, List<String> modalities, List<String> vehicleTypes, String observations) {}
     public record SchedulePart(Map<String, DaySchedulePart> week, AppointmentRulesPart appointmentRules) {}
     public record DaySchedulePart(boolean available, String startTime, String endTime) {}
