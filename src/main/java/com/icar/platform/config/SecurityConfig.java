@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer; // <-- IMPORTE ADICIONADO
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -75,7 +74,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -101,14 +100,11 @@ public class SecurityConfig {
                 "http://gestao.localhost:5174",
                 "http://*.localhost:5174",
                 "http://192.168.3.8:5174",
-
                 "http://localhost:5173",
                 "http://app.localhost:5173",
                 "http://gestao.localhost:5173",
                 "http://*.localhost:5173",
                 "http://192.168.3.8:5173",
-
-
                 "https://icarplus.com.br",
                 "https://www.icarplus.com.br",
                 "https://app.icarplus.com.br",
