@@ -2,8 +2,9 @@ package com.icar.platform.api.controller.v1.carwash.auth;
 
 import com.icar.platform.api.dto.request.auth.LoginRequest;
 import com.icar.platform.api.dto.request.auth.RefreshTokenRequest;
+import com.icar.platform.api.dto.request.carwash.auth.ChangePasswordRequest;
 import com.icar.platform.api.dto.response.auth.LoginResponse;
-import com.icar.platform.api.dto.response.customer.AccessTokenResponse;
+// MUDANÇA AQUI: importe a INTERFACE, não a implementação
 import com.icar.platform.application.service.carwash.auth.CarWashAuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +45,13 @@ public class CarWashAuthController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
         carWashAuthService.logout();
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/change-password")
+    @PreAuthorize("hasRole('CARWASH')")
+    public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        carWashAuthService.changePassword(request);
         return ResponseEntity.ok().build();
     }
 }

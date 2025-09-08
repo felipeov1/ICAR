@@ -1,4 +1,3 @@
-// Caminho: com/icar/platform/api/controller/v1/auth/AuthController.java
 package com.icar.platform.api.controller.v1.auth;
 
 import com.icar.platform.api.dto.request.auth.LoginRequest;
