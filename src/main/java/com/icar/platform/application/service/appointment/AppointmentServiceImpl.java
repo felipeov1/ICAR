@@ -286,22 +286,31 @@ public class AppointmentServiceImpl implements AppointmentService {
         CarWashAppointment appointment = appointmentRepository.findByIdAndCustomerId(appointmentId, customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado."));
 
-        validateActionDeadline(appointment, "cancel");
-
         if (appointment.getStatus() == AppointmentStatus.PENDING_PAYMENT) {
             appointment.setStatus(AppointmentStatus.CANCELED);
-            log.info("Agendamento {} (PENDING_PAYMENT) cancelado diretamente.", appointmentId);
-        } else if (appointment.getPaymentMethod() == PaymentMethod.PLATFORM && appointment.getStatus() == AppointmentStatus.CONFIRMED) {
-            appointment.setStatus(AppointmentStatus.REFUND_PENDING);
-            log.info("Agendamento {} (CONFIRMED) movido para REFUND_PENDING.", appointmentId);
+            log.info("Agendamento {} (PENDING_PAYMENT) cancelado diretamente por desistência do usuário.", appointmentId);
+
+        } else if (appointment.getStatus() == AppointmentStatus.CONFIRMED) {
+            validateActionDeadline(appointment, "cancel");
+
+            if (appointment.getPaymentMethod() == PaymentMethod.PLATFORM) {
+                appointment.setStatus(AppointmentStatus.REFUND_PENDING);
+                log.info("Agendamento {} (CONFIRMED) movido para REFUND_PENDING.", appointmentId);
+            } else {
+                appointment.setStatus(AppointmentStatus.CANCELED);
+                log.info("Agendamento {} (CONFIRMED - ON_SITE) cancelado.", appointmentId);
+            }
         } else {
-            appointment.setStatus(AppointmentStatus.CANCELED);
-            log.info("Agendamento {} ({}) cancelado.", appointmentId, appointment.getStatus());
+            throw new BusinessException("Este agendamento não pode ser cancelado pois seu status é '" + appointment.getStatus() + "'.");
         }
 
         appointment.setUpdatedAt(LocalDateTime.now(BRASILIA_ZONE_ID));
         CarWashAppointment updatedAppointment = appointmentRepository.save(appointment);
-        notificationService.createNotificationForCancelledAppointment(updatedAppointment);
+
+        if (appointment.getStatus() != AppointmentStatus.PENDING_PAYMENT) {
+            notificationService.createNotificationForCancelledAppointment(updatedAppointment);
+        }
+
         return appointmentMapper.toResponse(updatedAppointment);
     }
 
