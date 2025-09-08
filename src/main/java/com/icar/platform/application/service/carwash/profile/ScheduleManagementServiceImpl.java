@@ -122,8 +122,12 @@ public class ScheduleManagementServiceImpl implements ScheduleManagementService 
         int stepMinutes = appointmentIntervalMinutes > 0 ? appointmentIntervalMinutes : 15;
 
         LocalDateTime earliestBookingTime = null;
-        if (!isAdminContext && date.isEqual(LocalDate.now(zoneId))) {
-            earliestBookingTime = LocalDateTime.now(zoneId).plusMinutes(config.getMinAdvanceNoticeMinutes());
+        if (date.isEqual(LocalDate.now(zoneId))) {
+            if (!isAdminContext) {
+                earliestBookingTime = LocalDateTime.now(zoneId).plusMinutes(config.getMinAdvanceNoticeMinutes());
+            } else {
+                earliestBookingTime = LocalDateTime.now(zoneId);
+            }
         }
 
 
