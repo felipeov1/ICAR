@@ -67,3 +67,4 @@ jobs:
             # --- Executar deploy do Backend ---
             echo "☕ Executando script de deploy do Backend..."
             /opt/icarplus/backend/deploy.sh
+
