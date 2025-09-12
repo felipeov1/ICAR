@@ -60,6 +60,17 @@ else
     echo "✅ Variáveis carregadas com sucesso!"
 fi
 
+JAR_FILE=$(find "$BACKEND_DIR/target" -name "plataform-*.jar" -print -quit)
+
+if [ -z "$JAR_FILE" ]; then
+    echo "❌ ERRO: Nenhum arquivo .jar encontrado no diretório '$BACKEND_DIR/target/'."
+    echo "   Verifique se a compilação do Maven foi bem-sucedida."
+    exit 1
+fi
+
+echo "✅ Arquivo .jar encontrado: $JAR_FILE"
+
+
 TEMP_SPRING_PROFILE="production"
 
 setsid nohup java \
@@ -81,7 +92,7 @@ setsid nohup java \
     -Dmercadopago.redirect-uri="https://api.icarplus.com.br/api/v1/mercado-pago/callback" \
     -Dstorage.base-url="https://api.icarplus.com.br" \
     -Dstorage.location="/var/www/icarplus/uploads" \
-    -jar /opt/icarplus/backend/target/plataform-0.0.1-SNAPSHOT.jar > "$APP_LOG_FILE" 2>&1 &
+    -jar "$JAR_FILE" > "$APP_LOG_FILE" 2>&1 &
 
 sleep 15
 NEW_PID=$(lsof -t -i:$APP_PORT || echo "")
