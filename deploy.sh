@@ -62,7 +62,7 @@ fi
 
 TEMP_SPRING_PROFILE="production"
 
-nohup java \
+setsid nohup java \
     -Xms512m \
     -Xmx1024m \
     -Dmercadopago.webhook-secret-key="$MP_WEBHOOK_SECRET" \
