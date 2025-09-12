@@ -1,5 +1,6 @@
 package com.icar.platform.infrastructure.security.utils;
 
+import com.icar.platform.domain.model.admin.Admin;
 import com.icar.platform.domain.model.carwash.legal.CarWashRegistration;
 import com.icar.platform.domain.model.customer.Customer;
 import io.jsonwebtoken.*;
@@ -147,5 +148,23 @@ public class TokenGenerator {
             logger.error("An unexpected error occurred during token validation", e);
         }
         return false;
+    }
+
+    public String generateAccessTokenForAdmin(Admin admin) {
+        return generateTokenForAdmin(admin, accessTokenExpiration);
+    }
+
+    public String generateRefreshTokenForAdmin(Admin admin) {
+        return generateTokenForAdmin(admin, refreshTokenExpirationMs);
+    }
+
+    private String generateTokenForAdmin(Admin admin, long expirationTimeMillis) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", admin.getId());
+        claims.put("email", admin.getEmail());
+        claims.put("role", "ADMIN");
+        claims.put("fullName", admin.getFullName());
+
+        return createToken(claims, admin.getEmail(), expirationTimeMillis);
     }
 }

@@ -1,5 +1,6 @@
 package com.icar.platform.api.mapper.appointment;
 
+import com.icar.platform.api.dto.response.admin.DashboardStatsResponse;
 import com.icar.platform.api.dto.response.appointment.AppointmentResponse;
 import com.icar.platform.api.dto.response.carwash.CompanyAppointmentResponse;
 import com.icar.platform.domain.enums.PaymentMethod;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
@@ -58,6 +58,36 @@ public abstract class AppointmentMapper {
     @Mapping(target = "discountAmount", source = "entity", qualifiedByName = "mapDiscountAmount")
     @Mapping(target = "finalPrice", source = "entity", qualifiedByName = "mapFinalPrice")
     public abstract CompanyAppointmentResponse toCompanyResponse(CarWashAppointment entity);
+
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "customerName", source = "entity", qualifiedByName = "mapCustomerName")
+    @Mapping(target = "contactInfo", source = "entity", qualifiedByName = "mapContactInfo")
+    @Mapping(target = "partnerName", source = "profile.name")
+    @Mapping(target = "paymentStatus", source = "paymentMethod")
+    @Mapping(target = "date", source = "dateTime")
+    public abstract DashboardStatsResponse.DetailItemDto toDetailItemDto(CarWashAppointment entity);
+
+    @Named("mapCustomerName")
+    String mapCustomerName(CarWashAppointment appointment) {
+        if (appointment.getCompanyCustomer() != null) {
+            return appointment.getCompanyCustomer().getFullName();
+        }
+        if (appointment.getCustomer() != null) {
+            return appointment.getCustomer().getFullName();
+        }
+        return "N/A";
+    }
+
+    @Named("mapContactInfo")
+    String mapContactInfo(CarWashAppointment appointment) {
+        if (appointment.getCompanyCustomer() != null) {
+            return appointment.getCompanyCustomer().getPhone();
+        }
+        if (appointment.getCustomer() != null) {
+            return appointment.getCustomer().getPhone();
+        }
+        return "N/A";
+    }
 
     @Named("mapOriginalPrice")
     public BigDecimal mapOriginalPrice(CarWashAppointment appointment) {

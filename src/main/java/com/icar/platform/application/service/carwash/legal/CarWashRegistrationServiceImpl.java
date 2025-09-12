@@ -73,7 +73,6 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
         existing.setState(request.state());
         existing.setZipCode(request.zipCode());
 
-        // Opcional: permitir atualização de senha
         if (request.password() != null && !request.password().isBlank()) {
             existing.setPassword(passwordEncoder.encode(request.password()));
         }
@@ -155,7 +154,6 @@ public class CarWashRegistrationServiceImpl implements CarWashRegistrationServic
         }
     }
 
-    // Método auxiliar para criar erros de validação
     private ValidationError buildError(String field, String message, String errorCode) {
         return ValidationError.builder()
                 .field(field)

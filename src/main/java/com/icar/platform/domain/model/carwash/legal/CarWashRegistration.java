@@ -1,5 +1,6 @@
 package com.icar.platform.domain.model.carwash.legal;
 
+import com.icar.platform.domain.model.admin.Subscription;
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
 import com.icar.platform.domain.model.payment.gateway.CompanyMercadoPagoConfig;
 import jakarta.persistence.*;
@@ -10,6 +11,8 @@ import lombok.Setter;
 import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -70,6 +73,9 @@ public class CarWashRegistration {
 
     @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private CompanyMercadoPagoConfig mercadoPagoConfig;
+
+    @OneToMany(mappedBy = "carWashRegistration", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Subscription> subscriptions = new ArrayList<>();
 
     public UUID getProfileId() {
         return profile != null ? profile.getId() : null;

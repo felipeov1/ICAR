@@ -52,7 +52,6 @@ public interface CarWashAppointmentRepository extends JpaRepository<CarWashAppoi
             @Param("appointmentIdToIgnore") UUID appointmentIdToIgnore
     );
 
-
     Optional<CarWashAppointment> findByIdAndCustomerId(UUID appointmentId, UUID customerId);
 
     @Query(value = "SELECT * FROM car_wash_appointment a WHERE a.profile_id = :profileId " +
@@ -130,4 +129,15 @@ public interface CarWashAppointmentRepository extends JpaRepository<CarWashAppoi
             "AND r IS NULL " +
             "ORDER BY a.dateTime DESC")
     List<CarWashAppointment> findLatestCompletedAppointmentToReview(@Param("customerId") UUID customerId, Pageable pageable);
+
+    @Query("SELECT a FROM CarWashAppointment a WHERE a.status IN :statuses AND a.createdAt >= :startDate")
+    List<CarWashAppointment> findByStatusInAndCreatedAtAfter(@Param("statuses") List<AppointmentStatus> statuses, @Param("startDate") LocalDateTime startDate);
+
+    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+
+    List<CarWashAppointment> findByCreatedAtAfter(LocalDateTime startDate);
+
+    List<CarWashAppointment> findByStatusAndCreatedAtBetween(AppointmentStatus status, LocalDateTime startDate, LocalDateTime endDate);
+
+    long countByStatusInAndCreatedAtBetween(List<AppointmentStatus> statuses, LocalDateTime startDate, LocalDateTime endDate);
 }

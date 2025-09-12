@@ -1,5 +1,6 @@
 package com.icar.platform.infrastructure.security.filter;
 
+import com.icar.platform.infrastructure.security.service.AdminDetailsService;
 import com.icar.platform.infrastructure.security.service.CarWashDetailsService;
 import com.icar.platform.infrastructure.security.service.CustomerDetailsService;
 import com.icar.platform.infrastructure.security.utils.TokenGenerator;
@@ -8,16 +9,17 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.stereotype.Component;
 import org.flywaydb.core.internal.util.StringUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+
 @Component
 @NonNullApi
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -27,13 +29,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenGenerator tokenGenerator;
     private final CustomerDetailsService customerDetailsService;
     private final CarWashDetailsService carWashDetailsService;
+    private final AdminDetailsService adminDetailsService;
 
     public JwtAuthenticationFilter(TokenGenerator tokenGenerator,
                                    CustomerDetailsService customerDetailsService,
-                                   CarWashDetailsService carWashDetailsService) {
+                                   CarWashDetailsService carWashDetailsService,
+                                   AdminDetailsService adminDetailsService) {
         this.tokenGenerator = tokenGenerator;
         this.customerDetailsService = customerDetailsService;
         this.carWashDetailsService = carWashDetailsService;
+        this.adminDetailsService = adminDetailsService;
     }
 
     @Override
@@ -43,37 +48,43 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String jwt = getJwtFromRequest(request);
 
-            if (StringUtils.hasText(jwt) && tokenGenerator.validateToken(jwt, null)) {
+            if (StringUtils.hasText(jwt) && SecurityContextHolder.getContext().getAuthentication() == null) {
                 String subject = tokenGenerator.getSubjectFromToken(jwt);
                 String role = tokenGenerator.getRoleFromToken(jwt);
 
-                UserDetailsService userDetailsService = getUserDetailsService(role);
-                UserDetails userDetails = userDetailsService.loadUserByUsername(subject);
+                if (subject != null && role != null) {
+                    UserDetails userDetails = loadUserDetailsByRole(subject, role);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities());
+                    if (tokenGenerator.validateToken(jwt, userDetails)) {
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails,
+                                        null,
+                                        userDetails.getAuthorities());
 
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+                    }
+                }
             }
         } catch (Exception ex) {
-            logger.error("Authentication failed", ex);
+            logger.error("Authentication failed for JWT token", ex);
             SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private UserDetailsService getUserDetailsService(String role) {
-        if ("CARWASH".equalsIgnoreCase(role)) {
-            return carWashDetailsService;
-        }
-        return customerDetailsService;
+    private UserDetails loadUserDetailsByRole(String username, String role) {
+        return switch (role.toUpperCase()) {
+            case "ADMIN" -> adminDetailsService.loadUserByUsername(username);
+            case "CARWASH" -> carWashDetailsService.loadUserByUsername(username);
+            case "CUSTOMER" -> customerDetailsService.loadUserByUsername(username);
+            default -> throw new IllegalArgumentException("Role não suportada: " + role);
+        };
     }
 
+    @Nullable
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
@@ -82,3 +93,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 }
+

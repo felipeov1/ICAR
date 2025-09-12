@@ -89,7 +89,7 @@ public class ScheduleController {
             @PathVariable UUID profileId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(required = false, defaultValue = "false") boolean isAdminContext) { // NOVO PARÂMETRO
+            @RequestParam(required = false, defaultValue = "false") boolean isAdminContext) {
         return ResponseEntity.ok(scheduleService.getAvailableDates(profileId, startDate, endDate, isAdminContext));
     }
 }

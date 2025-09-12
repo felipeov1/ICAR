@@ -1,4 +1,4 @@
-package com.icar.platform.domain.model.ads;
+package com.icar.platform.domain.model.advertisement;
 
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
 import jakarta.persistence.*;
@@ -18,33 +18,26 @@ public class Advertisement {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "car_wash_profile_id")
     private CarWashProfile carWashProfile;
-
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String title;
-
-    @Column(nullable = false, length = 1000)
+    @Column(length = 1000, nullable = true)
     private String description;
-
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
-
-    @Column(name = "link_url", nullable = false)
+    @Column(name = "link_url", nullable = true)
     private String linkUrl;
-
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
-
     @Column(name = "is_platform_ad", nullable = false)
     private boolean isPlatformAd = false;
-
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
-
-    @Column(name = "expires_at", nullable = false)
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+    @Column(name = "expires_at", nullable = true)
     private LocalDateTime expiresAt;
 }

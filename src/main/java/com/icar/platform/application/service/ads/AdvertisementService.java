@@ -1,8 +1,9 @@
 package com.icar.platform.application.service.ads;
 
 import com.icar.platform.api.dto.request.ads.AdvertisementRequest;
+import com.icar.platform.api.dto.response.admin.PartnerSummaryResponse;
 import com.icar.platform.api.dto.response.ads.AdvertisementResponse;
-import com.icar.platform.domain.model.ads.Advertisement;
+import com.icar.platform.domain.model.advertisement.Advertisement;
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
 import com.icar.platform.domain.repository.ads.AdvertisementRepository;
 import com.icar.platform.domain.repository.carwash.profile.CarWashProfileRepository;
@@ -28,23 +29,41 @@ public class AdvertisementService {
     private final StorageService storageService;
     private final StorageProperties storageProperties;
 
+    @Transactional(readOnly = true)
+    public List<AdvertisementResponse> getAllAdvertisementsForAdmin() {
+        return advertisementRepository.findAllByIsDeletedFalse().stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public AdvertisementResponse createAdvertisement(AdvertisementRequest request, MultipartFile image) {
-        CarWashProfile profile = carWashProfileRepository.findById(request.getCarWashProfileId())
-                .orElseThrow(() -> new ResourceNotFoundException("CarWashProfile not found"));
-
-        String relativePath = "ads/" + profile.getId().toString() + "/adsphotos";
-        String imageUrl = storageService.store(image, relativePath);
-
         Advertisement ad = new Advertisement();
-        ad.setCarWashProfile(profile);
+
+        CarWashProfile profile = null;
+        String imageOwnerId = "platform";
+
+        if (request.getCarWashProfileId() != null) {
+            profile = carWashProfileRepository.findById(request.getCarWashProfileId())
+                    .orElseThrow(() -> new ResourceNotFoundException("CarWashProfile not found com ID: " + request.getCarWashProfileId()));
+            imageOwnerId = profile.getId().toString();
+            ad.setCarWashProfile(profile);
+            ad.setPlatformAd(false);
+        } else {
+            ad.setCarWashProfile(null);
+            ad.setPlatformAd(true);
+        }
+
+        String relativePath = "ads/" + imageOwnerId + "/adsphotos";
+        String savedPath = storageService.store(image, relativePath);
+        String dbPath = "uploads/" + savedPath;
+        ad.setImageUrl(dbPath);
+
         ad.setTitle(request.getTitle());
         ad.setDescription(request.getDescription());
         ad.setLinkUrl(request.getLinkUrl());
         ad.setExpiresAt(request.getExpiresAt());
         ad.setActive(request.isActive());
-        ad.setPlatformAd(request.isPlatformAd());
-        ad.setImageUrl(imageUrl);
 
         return toDto(advertisementRepository.save(ad));
     }
@@ -54,23 +73,46 @@ public class AdvertisementService {
         Advertisement ad = advertisementRepository.findById(adId)
                 .orElseThrow(() -> new ResourceNotFoundException("Advertisement not found"));
 
-        CarWashProfile profile = carWashProfileRepository.findById(request.getCarWashProfileId())
-                .orElseThrow(() -> new ResourceNotFoundException("CarWashProfile not found"));
-
-        if (image != null && !image.isEmpty()) {
-            String relativePath = "ads/" + profile.getId().toString() + "/adsphotos";
-            String newImageUrl = storageService.store(image, relativePath);
-            ad.setImageUrl(newImageUrl);
+        CarWashProfile profile = null;
+        String imageOwnerId = "platform";
+        if (ad.getCarWashProfile() != null) {
+            imageOwnerId = ad.getCarWashProfile().getId().toString();
         }
 
-        ad.setCarWashProfile(profile);
+        if (request.getCarWashProfileId() != null) {
+            profile = carWashProfileRepository.findById(request.getCarWashProfileId())
+                    .orElseThrow(() -> new ResourceNotFoundException("CarWashProfile not found"));
+            imageOwnerId = profile.getId().toString();
+            ad.setCarWashProfile(profile);
+            ad.setPlatformAd(false);
+        } else {
+            ad.setCarWashProfile(null);
+            ad.setPlatformAd(true);
+        }
+
+
+        if (image != null && !image.isEmpty()) {
+            storageService.delete(ad.getImageUrl());
+            String relativePath = "ads/" + imageOwnerId + "/adsphotos";
+            String savedPath = storageService.store(image, relativePath);
+            String dbPath = "uploads/" + savedPath;
+            ad.setImageUrl(dbPath);
+        }
+
         ad.setTitle(request.getTitle());
         ad.setDescription(request.getDescription());
         ad.setLinkUrl(request.getLinkUrl());
         ad.setExpiresAt(request.getExpiresAt());
         ad.setActive(request.isActive());
-        ad.setPlatformAd(request.isPlatformAd());
 
+        return toDto(advertisementRepository.save(ad));
+    }
+
+    @Transactional
+    public AdvertisementResponse toggleAdvertisementStatus(UUID adId, boolean isActive) {
+        Advertisement ad = advertisementRepository.findById(adId)
+                .orElseThrow(() -> new ResourceNotFoundException("Advertisement not found"));
+        ad.setActive(isActive);
         return toDto(advertisementRepository.save(ad));
     }
 
@@ -78,7 +120,7 @@ public class AdvertisementService {
     public void softDeleteAdvertisement(UUID adId) {
         Advertisement ad = advertisementRepository.findById(adId)
                 .orElseThrow(() -> new ResourceNotFoundException("Advertisement not found"));
-
+        ad.setDeleted(true);
         ad.setActive(false);
         advertisementRepository.save(ad);
     }
@@ -86,24 +128,30 @@ public class AdvertisementService {
     @Transactional(readOnly = true)
     public List<AdvertisementResponse> getActiveAdvertisements() {
         LocalDateTime now = LocalDateTime.now();
-        List<Advertisement> activeAds = advertisementRepository.findActivePaidAds(now);
-
-        if (activeAds.isEmpty()) {
-            activeAds = advertisementRepository.findActivePlatformAds();
-        }
-
-        return activeAds.stream()
+        return advertisementRepository.findActiveAdvertisements(now).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
 
     private AdvertisementResponse toDto(Advertisement ad) {
+        PartnerSummaryResponse partnerSummary = null;
+        if (ad.getCarWashProfile() != null) {
+            partnerSummary = new PartnerSummaryResponse(
+                    ad.getCarWashProfile().getId(),
+                    ad.getCarWashProfile().getName()
+            );
+        }
 
         return AdvertisementResponse.builder()
                 .id(ad.getId())
                 .title(ad.getTitle())
                 .description(ad.getDescription())
                 .link(ad.getLinkUrl())
+                .imageUrl(ad.getImageUrl())
+                .partner(partnerSummary)
+                .status(ad.isActive() ? "ACTIVE" : "INACTIVE")
+                .expiresAt(ad.getExpiresAt())
+                .startDate(ad.getCreatedAt())
                 .build();
     }
 }

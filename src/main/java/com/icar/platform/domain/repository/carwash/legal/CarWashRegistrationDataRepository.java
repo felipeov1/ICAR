@@ -4,6 +4,7 @@ import com.icar.platform.domain.model.carwash.legal.CarWashRegistration;
 import io.micrometer.common.lang.NonNull;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,4 +29,7 @@ public interface CarWashRegistrationDataRepository extends JpaRepository<CarWash
 
     Optional<CarWashRegistration> findByCnpj(String cnpj);
     Optional<CarWashRegistration> findByCpf(String cpf);
+
+    @Query("SELECT DISTINCT cr FROM CarWashRegistration cr LEFT JOIN FETCH cr.subscriptions s LEFT JOIN FETCH s.plan WHERE cr.deletedAt IS NULL")
+    List<CarWashRegistration> findAllWithSubscriptions();
 }
