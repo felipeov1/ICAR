@@ -15,17 +15,16 @@ jobs:
       - name: Checkout do código (Backend)
         uses: actions/checkout@v4
         with:
-          repository: felipeov1/icar-backend # Puxe o backend
-          token: ${{ secrets.GITHUB_TOKEN }} # Token padrão para repositório público
+          repository: felipeov1/icar-backend
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout do código (Frontend)
         uses: actions/checkout@v4
         with:
-          repository: felipeov1/icar-frontend # Puxe o frontend
-          path: ./frontend-dist # Diretório para o frontend
-          token: ${{ secrets.FRONTEND_REPO_TOKEN }} # Use o token para repo privado
+          repository: felipeov1/icar-frontend
+          path: ./frontend-dist
+          token: ${{ secrets.FRONTEND_REPO_TOKEN }}
 
-      # A parte do frontend é feita aqui para não sobrecarregar o servidor
       - name: Configurar Node.js (Frontend)
         uses: actions/setup-node@v4
         with:
@@ -41,26 +40,30 @@ jobs:
         run: npm run build
         working-directory: ./frontend-dist
 
-      # Envie o backend e o frontend para o servidor
       - name: Deploy Unificado no Servidor
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "./frontend-dist/dist/"    # <-- ORIGEM: A pasta no GitHub Runner
+          target: "/var/www/temp-deploy"    # <-- DESTINO: Uma pasta temporária no servidor
           script: |
-            echo "🚀 Iniciando deploy unificado no servidor..."
+            echo "🚀 Iniciando publicação e deploy no servidor..."
             
-            # --- Enviar e publicar frontend ---
-            echo "📂 Enviando e publicando build do Frontend..."
-            sudo rsync -av --delete ./frontend-dist/dist/ /var/www/icarplus.com.br/
-            sudo rsync -av --delete ./frontend-dist/dist/ /var/www/app-cliente/
-            sudo rsync -av --delete ./frontend-dist/dist/ /var/www/app-gestao/
+            # --- Publicar frontend a partir da pasta temporária ---
+            echo "📂 Publicando build do Frontend para os diretórios finais..."
+            sudo rsync -av --delete "/var/www/temp-deploy/" "/var/www/icarplus.com.br/"
+            sudo rsync -av --delete "/var/www/temp-deploy/" "/var/www/app-cliente/"
+            sudo rsync -av --delete "/var/www/temp-deploy/" "/var/www/app-gestao/"
             
             echo "🔐 Corrigindo permissões do Frontend..."
             sudo chown -R www-data:www-data /var/www/icarplus.com.br /var/www/app-cliente /var/www/app-gestao
             sudo chmod -R 755 /var/www/icarplus.com.br /var/www/app-cliente /var/www/app-gestao
             
+            echo "🧹 Limpando pasta temporária..."
+            rm -rf "/var/www/temp-deploy"
+
             # --- Executar deploy do Backend ---
             echo "☕ Executando script de deploy do Backend..."
             /opt/icarplus/backend/deploy.sh
