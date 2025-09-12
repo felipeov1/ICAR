@@ -1,5 +1,6 @@
 package com.icar.platform.api.mapper.appointment;
 
+import com.icar.platform.api.dto.response.admin.DashboardStatsResponse;
 import com.icar.platform.api.dto.response.appointment.AppointmentResponse;
 import com.icar.platform.api.dto.response.carwash.CompanyAppointmentResponse;
 import com.icar.platform.domain.model.appointment.CarWashAppointment;
@@ -7,13 +8,14 @@ import com.icar.platform.domain.model.carwash.legal.CarWashRegistration;
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
 import com.icar.platform.domain.model.customer.Customer;
 import com.icar.platform.domain.model.customer.CustomerAddress;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-08T12:06:11-0300",
+    date = "2025-09-11T09:51:48-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -89,6 +91,30 @@ public class AppointmentMapperImpl extends AppointmentMapper {
         mapCustomerInfoToCompanyResponse( entity, companyAppointmentResponse );
 
         return companyAppointmentResponse;
+    }
+
+    @Override
+    public DashboardStatsResponse.DetailItemDto toDetailItemDto(CarWashAppointment entity) {
+        if ( entity == null ) {
+            return null;
+        }
+
+        DashboardStatsResponse.DetailItemDto detailItemDto = new DashboardStatsResponse.DetailItemDto();
+
+        if ( entity.getId() != null ) {
+            detailItemDto.setId( entity.getId().toString() );
+        }
+        detailItemDto.setCustomerName( mapCustomerName( entity ) );
+        detailItemDto.setContactInfo( mapContactInfo( entity ) );
+        detailItemDto.setPartnerName( entityProfileName( entity ) );
+        if ( entity.getPaymentMethod() != null ) {
+            detailItemDto.setPaymentStatus( entity.getPaymentMethod().name() );
+        }
+        if ( entity.getDateTime() != null ) {
+            detailItemDto.setDate( DateTimeFormatter.ISO_LOCAL_DATE_TIME.format( entity.getDateTime() ) );
+        }
+
+        return detailItemDto;
     }
 
     private String entityProfileName(CarWashAppointment carWashAppointment) {

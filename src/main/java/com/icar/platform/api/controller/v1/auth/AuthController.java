@@ -100,7 +100,6 @@ public class AuthController {
 
     @PostMapping("/resend-confirmation")
     public ResponseEntity<?> resendConfirmationEmail(@RequestBody Map<String, String> request) {
-        // CORRIGIDO: A chamada agora é válida
         customerAuthService.resendConfirmationEmail(request.get("email"));
         return ResponseEntity.ok(Map.of("message", "Confirmation email resent successfully"));
     }

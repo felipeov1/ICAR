@@ -102,7 +102,7 @@ public class ScheduleManagementServiceImpl implements ScheduleManagementService 
         return generateAndFilterTimeSlots(profileId, date, serviceDurationMinutes, config, dayStartTime, dayEndTime, profileZoneId, appointmentIntervalMinutes, appointmentIdToIgnore, isAdminContext);
     }
 
-    private List<TimeSlotResponse> generateAndFilterTimeSlots(UUID profileId, LocalDate date, int serviceDurationMinutes, AppointmentConfig config, LocalTime startTime, LocalTime endTime, ZoneId zoneId, int appointmentIntervalMinutes, UUID appointmentIdToIgnore, boolean isAdminContext) { // NOVO PARÂMETRO
+    private List<TimeSlotResponse> generateAndFilterTimeSlots(UUID profileId, LocalDate date, int serviceDurationMinutes, AppointmentConfig config, LocalTime startTime, LocalTime endTime, ZoneId zoneId, int appointmentIntervalMinutes, UUID appointmentIdToIgnore, boolean isAdminContext) {
         final int GAP_MINUTES = config.getGapMinutes();
 
         LocalDateTime queryStart = date.atStartOfDay();

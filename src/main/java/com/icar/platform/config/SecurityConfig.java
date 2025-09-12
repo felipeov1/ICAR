@@ -43,6 +43,7 @@ public class SecurityConfig {
     public static final String[] PUBLIC_WHITELIST = {
             "/api/v1/auth/**",
             "/api/v1/carwash/auth/**",
+            "/api/v1/admin/auth/**",
             "/api/v1/profile/subdomain/**",
             "/api/v1/health",
             "/error",
@@ -80,6 +81,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .requestMatchers(PUBLIC_WHITELIST).permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -98,11 +100,13 @@ public class SecurityConfig {
                 "http://localhost:5174",
                 "http://app.localhost:5174",
                 "http://gestao.localhost:5174",
+                "http://admin.localhost:5174",
                 "http://*.localhost:5174",
                 "http://192.168.3.8:5174",
                 "http://localhost:5173",
                 "http://app.localhost:5173",
                 "http://gestao.localhost:5173",
+                "http://admin.localhost:5173",
                 "http://*.localhost:5173",
                 "http://192.168.3.8:5173",
                 "https://icarplus.com.br",

@@ -23,4 +23,6 @@ public class AdvertisementController {
     public ResponseEntity<List<AdvertisementResponse>> getActiveAdvertisements() {
         return ResponseEntity.ok(advertisementService.getActiveAdvertisements());
     }
+
+
 }

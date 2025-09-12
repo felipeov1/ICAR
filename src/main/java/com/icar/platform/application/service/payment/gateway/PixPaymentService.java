@@ -93,7 +93,7 @@ public class PixPaymentService {
 
             PaymentAdditionalInfoRequest additionalInfo = PaymentAdditionalInfoRequest.builder()
                     .items(items)
-                    .payer(PaymentAdditionalInfoPayerRequest.builder() // Incluir dados do pagador também aqui
+                    .payer(PaymentAdditionalInfoPayerRequest.builder()
                             .firstName(firstName)
                             .lastName(lastName)
                             .build())

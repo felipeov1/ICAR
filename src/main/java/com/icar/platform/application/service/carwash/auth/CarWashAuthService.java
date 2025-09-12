@@ -1,4 +1,3 @@
-// Crie este novo arquivo de INTERFACE
 package com.icar.platform.application.service.carwash.auth;
 
 import com.icar.platform.api.dto.request.auth.LoginRequest;

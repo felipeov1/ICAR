@@ -1,8 +1,8 @@
 package com.icar.platform.api.dto.response.carwash;
 
-import lombok.Data; // Adicione esta importação
-import lombok.NoArgsConstructor; // Adicione esta importação
-import lombok.AllArgsConstructor; // Adicione esta importação
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;

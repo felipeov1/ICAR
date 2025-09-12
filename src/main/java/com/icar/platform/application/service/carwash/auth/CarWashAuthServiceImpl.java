@@ -48,7 +48,7 @@ public class CarWashAuthServiceImpl implements CarWashAuthService {
         return new LoginResponse(accessToken, refreshToken, userDto);
     }
 
-    @Override // Agora está correto!
+    @Override
     public LoginResponse refreshToken(String refreshToken) {
         if (refreshToken == null || !tokenGenerator.validateToken(refreshToken, null)) {
             throw new BusinessException("Refresh token inválido ou expirado");

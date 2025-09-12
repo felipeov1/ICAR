@@ -2,7 +2,7 @@ package com.icar.platform.application.service.coupon;
 
 import com.icar.platform.api.dto.response.coupon.AppliedCouponResponse;
 import com.icar.platform.domain.model.coupon.AppliedCoupon;
-import com.icar.platform.domain.repository.coupon.AppliedCouponRepository;
+import com.icar.platform.domain.repository.admin.AppliedCouponRepository;
 import com.icar.platform.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

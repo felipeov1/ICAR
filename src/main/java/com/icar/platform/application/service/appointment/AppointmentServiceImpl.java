@@ -23,20 +23,19 @@ import com.icar.platform.domain.model.coupon.Coupon;
 import com.icar.platform.domain.model.customer.Customer;
 import com.icar.platform.domain.model.customer.CustomerAddress;
 import com.icar.platform.domain.model.payment.gateway.PaymentTransaction;
+import com.icar.platform.domain.repository.admin.AppliedCouponRepository;
 import com.icar.platform.domain.repository.appointment.CarWashAppointmentRepository;
 import com.icar.platform.domain.repository.carwash.offering.CarWashOfferingRepository;
 import com.icar.platform.domain.repository.carwash.profile.AppointmentConfigRepository;
 import com.icar.platform.domain.repository.carwash.profile.CarWashProfileRepository;
 import com.icar.platform.domain.repository.carwash.profile.CompanyCustomerRepository;
-import com.icar.platform.domain.repository.coupon.AppliedCouponRepository;
-import com.icar.platform.domain.repository.coupon.CouponRepository;
+import com.icar.platform.domain.repository.admin.CouponRepository;
 import com.icar.platform.domain.repository.customer.CustomerAddressRepository;
 import com.icar.platform.domain.repository.customer.CustomerRepository;
 import com.icar.platform.shared.exception.BusinessException;
 import com.icar.platform.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.splitmap.AbstractIterableGetMapDecorator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -90,7 +89,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         if (selectedOfferings.isEmpty() || selectedOfferings.size() != request.offeringIds().size()) {
             throw new ResourceNotFoundException("Um ou mais serviços selecionados são inválidos.");
         }
-        
+
 
         BigDecimal totalPrice = BigDecimal.ZERO;
         int totalTime = 0;
@@ -132,9 +131,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         if (request.couponCode() != null && !request.couponCode().isBlank()) {
-            if (paymentMethod != PaymentMethod.PLATFORM) {
-                throw new BusinessException("Cupons só podem ser aplicados em pagamentos na plataforma.");
-            }
             Coupon couponToApply = validateAndGetCoupon(request.couponCode(), profile.getId(), customerId, totalPrice);
             BigDecimal discount = calculateDiscount(couponToApply, totalPrice);
             BigDecimal finalPrice = totalPrice.subtract(discount).max(BigDecimal.ZERO);
@@ -147,10 +143,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             appliedCoupon.setDiscountApplied(discount);
             appliedCoupon.setFinalAmount(finalPrice);
             appliedCoupon.setAppliedAt(LocalDateTime.now(BRASILIA_ZONE_ID));
-
             appointment.getAppliedCoupons().add(appliedCoupon);
-            couponToApply.setCurrentUses(couponToApply.getCurrentUses() + 1);
-            couponRepository.save(couponToApply);
         }
 
         CarWashAppointment savedAppointment = appointmentRepository.save(appointment);
@@ -161,6 +154,112 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         return new AppointmentCreationResponse(appointmentMapper.toResponse(savedAppointment), null);
+    }
+
+    private void revertCouponUsage(CarWashAppointment appointment) {
+        if (appointment.getAppliedCoupons() != null && !appointment.getAppliedCoupons().isEmpty()) {
+            log.info("Revertendo uso de cupom para o agendamento cancelado/deletado: {}", appointment.getId());
+
+            boolean wasCouponCounted = appointment.getStatus() == AppointmentStatus.COMPLETED;
+
+            if (wasCouponCounted) {
+                for (AppliedCoupon appliedCoupon : appointment.getAppliedCoupons()) {
+                    Coupon coupon = appliedCoupon.getCoupon();
+                    if (coupon.getCurrentUses() > 0) {
+                        coupon.setCurrentUses(coupon.getCurrentUses() - 1);
+                        couponRepository.save(coupon);
+                        log.info("Uso do cupom {} revertido. Contagem atual: {}", coupon.getCode(), coupon.getCurrentUses());
+                    }
+                }
+            }
+
+            appliedCouponRepository.deleteAll(appointment.getAppliedCoupons());
+            appointment.getAppliedCoupons().clear();
+        }
+    }
+
+
+    @Override
+    @Transactional
+    public AppointmentResponse cancelAppointment(UUID appointmentId, UUID customerId) {
+        CarWashAppointment appointment = appointmentRepository.findByIdAndCustomerId(appointmentId, customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado."));
+        revertCouponUsage(appointment);
+
+        if (appointment.getStatus() == AppointmentStatus.PENDING_PAYMENT) {
+            appointment.setStatus(AppointmentStatus.CANCELED);
+            log.info("Agendamento {} (PENDING_PAYMENT) cancelado diretamente por desistência do usuário.", appointmentId);
+        } else if (appointment.getStatus() == AppointmentStatus.CONFIRMED) {
+            validateActionDeadline(appointment, "cancel");
+            if (appointment.getPaymentMethod() == PaymentMethod.PLATFORM) {
+                appointment.setStatus(AppointmentStatus.REFUND_PENDING);
+                log.info("Agendamento {} (CONFIRMED) movido para REFUND_PENDING.", appointmentId);
+            } else {
+                appointment.setStatus(AppointmentStatus.CANCELED);
+                log.info("Agendamento {} (CONFIRMED - ON_SITE) cancelado.", appointmentId);
+            }
+        } else {
+            throw new BusinessException("Este agendamento não pode ser cancelado pois seu status é '" + appointment.getStatus() + "'.");
+        }
+
+        appointment.setUpdatedAt(LocalDateTime.now(BRASILIA_ZONE_ID));
+        CarWashAppointment updatedAppointment = appointmentRepository.save(appointment);
+
+        if (appointment.getStatus() != AppointmentStatus.PENDING_PAYMENT) {
+            notificationService.createNotificationForCancelledAppointment(updatedAppointment);
+        }
+
+        return appointmentMapper.toResponse(updatedAppointment);
+    }
+
+    @Override
+    @Transactional
+    public AppointmentResponse cancelAppointmentByCompany(UUID appointmentId, UUID profileId) {
+        CarWashAppointment appointment = appointmentRepository.findByIdAndProfileId(appointmentId, profileId)
+                .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado ou não pertence a esta empresa."));
+
+        if (appointment.getStatus() == AppointmentStatus.CANCELED || appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            throw new BusinessException("Este agendamento já foi finalizado ou cancelado.");
+        }
+
+        revertCouponUsage(appointment);
+
+        if (appointment.getPaymentMethod() == PaymentMethod.PLATFORM) {
+            PaymentTransaction transaction = appointment.getPaymentTransaction();
+            if (transaction == null) {
+                appointment.setStatus(AppointmentStatus.CANCELED);
+                appointment.setUpdatedAt(LocalDateTime.now(BRASILIA_ZONE_ID));
+                appointmentRepository.save(appointment);
+            } else {
+                refundService.processRefundForAppointment(appointmentId, profileId);
+                appointment = appointmentRepository.findById(appointmentId).orElseThrow();
+            }
+        } else {
+            appointment.setStatus(AppointmentStatus.CANCELED);
+            appointment.setUpdatedAt(LocalDateTime.now(BRASILIA_ZONE_ID));
+            appointmentRepository.save(appointment);
+        }
+
+        notificationService.createNotificationForCancelledAppointment(appointment);
+        return appointmentMapper.toResponse(appointment);
+    }
+
+    @Override
+    @Transactional
+    public void deletePendingAppointment(UUID appointmentId, UUID customerId) {
+        log.info("Iniciando a deleção do agendamento pendente {} para o cliente {}", appointmentId, customerId);
+        CarWashAppointment appointment = appointmentRepository
+                .findByIdAndCustomerId(appointmentId, customerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado ou não pertence a este cliente."));
+
+        if (appointment.getStatus() != AppointmentStatus.PENDING_PAYMENT) {
+            throw new BusinessException("Ação não permitida: apenas agendamentos com pagamento pendente podem ser deletados.");
+        }
+
+        revertCouponUsage(appointment);
+
+        appointmentRepository.delete(appointment);
+        log.info("Agendamento pendente {} foi deletado com sucesso.", appointmentId);
     }
 
     private Coupon validateAndGetCoupon(String code, UUID profileId, UUID customerId, BigDecimal originalPrice) {
@@ -282,78 +381,27 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public AppointmentResponse cancelAppointment(UUID appointmentId, UUID customerId) {
-        CarWashAppointment appointment = appointmentRepository.findByIdAndCustomerId(appointmentId, customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado."));
-
-        if (appointment.getStatus() == AppointmentStatus.PENDING_PAYMENT) {
-            appointment.setStatus(AppointmentStatus.CANCELED);
-            log.info("Agendamento {} (PENDING_PAYMENT) cancelado diretamente por desistência do usuário.", appointmentId);
-
-        } else if (appointment.getStatus() == AppointmentStatus.CONFIRMED) {
-            validateActionDeadline(appointment, "cancel");
-
-            if (appointment.getPaymentMethod() == PaymentMethod.PLATFORM) {
-                appointment.setStatus(AppointmentStatus.REFUND_PENDING);
-                log.info("Agendamento {} (CONFIRMED) movido para REFUND_PENDING.", appointmentId);
-            } else {
-                appointment.setStatus(AppointmentStatus.CANCELED);
-                log.info("Agendamento {} (CONFIRMED - ON_SITE) cancelado.", appointmentId);
-            }
-        } else {
-            throw new BusinessException("Este agendamento não pode ser cancelado pois seu status é '" + appointment.getStatus() + "'.");
-        }
-
-        appointment.setUpdatedAt(LocalDateTime.now(BRASILIA_ZONE_ID));
-        CarWashAppointment updatedAppointment = appointmentRepository.save(appointment);
-
-        if (appointment.getStatus() != AppointmentStatus.PENDING_PAYMENT) {
-            notificationService.createNotificationForCancelledAppointment(updatedAppointment);
-        }
-
-        return appointmentMapper.toResponse(updatedAppointment);
-    }
-
-    @Override
-    @Transactional
-    public AppointmentResponse cancelAppointmentByCompany(UUID appointmentId, UUID profileId) {
-        CarWashAppointment appointment = appointmentRepository.findByIdAndProfileId(appointmentId, profileId)
-                .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado ou não pertence a esta empresa."));
-
-        if (appointment.getStatus() == AppointmentStatus.CANCELED || appointment.getStatus() == AppointmentStatus.COMPLETED) {
-            throw new BusinessException("Este agendamento já foi finalizado ou cancelado.");
-        }
-
-        if (appointment.getPaymentMethod() == PaymentMethod.PLATFORM) {
-            PaymentTransaction transaction = appointment.getPaymentTransaction();
-
-            if (transaction == null) {
-                appointment.setStatus(AppointmentStatus.CANCELED);
-                appointment.setUpdatedAt(LocalDateTime.now(BRASILIA_ZONE_ID));
-                appointmentRepository.save(appointment);
-            } else {
-                refundService.processRefundForAppointment(appointmentId, profileId);
-                appointment = appointmentRepository.findById(appointmentId).orElseThrow();
-            }
-        } else {
-            appointment.setStatus(AppointmentStatus.CANCELED);
-            appointment.setUpdatedAt(LocalDateTime.now(BRASILIA_ZONE_ID));
-            appointmentRepository.save(appointment);
-        }
-
-        notificationService.createNotificationForCancelledAppointment(appointment);
-
-        return appointmentMapper.toResponse(appointment);
-    }
-
-
-    @Override
-    @Transactional
     public AppointmentResponse completeAppointment(UUID appointmentId) {
         CarWashAppointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado"));
+
+        if (appointment.getStatus() != AppointmentStatus.CONFIRMED) {
+            throw new BusinessException("Apenas agendamentos confirmados podem ser finalizados.");
+        }
+
         appointment.setStatus(AppointmentStatus.COMPLETED);
         appointment.setUpdatedAt(LocalDateTime.now(BRASILIA_ZONE_ID));
+
+        if (appointment.getAppliedCoupons() != null && !appointment.getAppliedCoupons().isEmpty()) {
+            log.info("Contabilizando uso de cupom para agendamento finalizado: {}", appointmentId);
+            for (AppliedCoupon appliedCoupon : appointment.getAppliedCoupons()) {
+                Coupon coupon = appliedCoupon.getCoupon();
+                coupon.setCurrentUses(coupon.getCurrentUses() + 1);
+                couponRepository.save(coupon);
+                log.info("Uso do cupom {} contabilizado. Contagem atual: {}", coupon.getCode(), coupon.getCurrentUses());
+            }
+        }
+
         return appointmentMapper.toResponse(appointmentRepository.save(appointment));
     }
 
@@ -615,28 +663,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         notificationService.createNotificationForEditedAppointment(updatedAppointment);
 
         return appointmentMapper.toResponse(updatedAppointment);
-    }
-
-    @Override
-    @Transactional
-    public void deletePendingAppointment(UUID appointmentId, UUID customerId) {
-        log.info("Iniciando a deleção do agendamento pendente {} para o cliente {}", appointmentId, customerId);
-
-        CarWashAppointment appointment = appointmentRepository
-                .findByIdAndCustomerId(appointmentId, customerId)
-                .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado ou não pertence a este cliente."));
-
-        if (appointment.getStatus() != AppointmentStatus.PENDING_PAYMENT) {
-            throw new BusinessException("Ação não permitida: apenas agendamentos com pagamento pendente podem ser deletados.");
-        }
-
-        if (appointment.getAppliedCoupons() != null && !appointment.getAppliedCoupons().isEmpty()) {
-            appliedCouponRepository.deleteAll(appointment.getAppliedCoupons());
-            appointment.getAppliedCoupons().clear();
-        }
-
-        appointmentRepository.delete(appointment);
-        log.info("Agendamento pendente {} foi deletado com sucesso.", appointmentId);
     }
 
     @Override

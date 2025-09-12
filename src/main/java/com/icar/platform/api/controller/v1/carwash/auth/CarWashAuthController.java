@@ -4,7 +4,6 @@ import com.icar.platform.api.dto.request.auth.LoginRequest;
 import com.icar.platform.api.dto.request.auth.RefreshTokenRequest;
 import com.icar.platform.api.dto.request.carwash.auth.ChangePasswordRequest;
 import com.icar.platform.api.dto.response.auth.LoginResponse;
-// MUDANÇA AQUI: importe a INTERFACE, não a implementação
 import com.icar.platform.application.service.carwash.auth.CarWashAuthService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
