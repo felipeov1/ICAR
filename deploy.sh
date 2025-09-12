@@ -81,8 +81,7 @@ nohup java \
     -Dmercadopago.redirect-uri="https://api.icarplus.com.br/api/v1/mercado-pago/callback" \
     -Dstorage.base-url="https://api.icarplus.com.br" \
     -Dstorage.location="/var/www/icarplus/uploads" \
-    -jar /opt/icarplus/backend/target/plataform-0.0.1-SNAPSHOT.jar \
-    #--logging.level.root=INFO > "$APP_LOG_FILE" 2>&1 & 
+    -jar /opt/icarplus/backend/target/plataform-0.0.1-SNAPSHOT.jar > "$APP_LOG_FILE" 2>&1 &
 
 sleep 15
 NEW_PID=$(lsof -t -i:$APP_PORT || echo "")
