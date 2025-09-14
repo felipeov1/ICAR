@@ -65,6 +65,7 @@ public abstract class AppointmentMapper {
     @Mapping(target = "partnerName", source = "profile.name")
     @Mapping(target = "paymentStatus", source = "paymentMethod")
     @Mapping(target = "date", source = "dateTime")
+    @Mapping(target = "creationChannel", source = "creationChannel")
     public abstract DashboardStatsResponse.DetailItemDto toDetailItemDto(CarWashAppointment entity);
 
     @Named("mapCustomerName")

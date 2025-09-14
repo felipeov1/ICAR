@@ -65,6 +65,7 @@ public class PartnerService {
     public PartnerResponse updatePartner(UUID id, PartnerUpdateRequest request) {
         CarWashRegistration partner = partnerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Parceiro não encontrado."));
+
         partner.setTradeName(request.tradeName());
         partner.setOwnerName(request.ownerName());
         partner.setCnpj(request.cnpj());
@@ -73,7 +74,11 @@ public class PartnerService {
         partner.setZipCode(request.zipCode());
         partner.setCity(request.city());
         partner.setState(request.state());
+
+        partner.setCreatedAt(request.joinDate().atStartOfDay());
+
         createOrUpdateSubscription(partner, request.planId(), request.joinDate().atStartOfDay());
+
         CarWashRegistration updatedPartner = partnerRepository.save(partner);
         return partnerMapper.toPartnerResponse(updatedPartner);
     }

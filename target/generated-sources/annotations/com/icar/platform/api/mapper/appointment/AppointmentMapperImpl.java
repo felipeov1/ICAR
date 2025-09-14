@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-12T08:37:16+0000",
-    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.8 (Eclipse Adoptium)"
+    date = "2025-09-13T23:16:11-0300",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
 public class AppointmentMapperImpl extends AppointmentMapper {
@@ -112,6 +112,9 @@ public class AppointmentMapperImpl extends AppointmentMapper {
         }
         if ( entity.getDateTime() != null ) {
             detailItemDto.setDate( DateTimeFormatter.ISO_LOCAL_DATE_TIME.format( entity.getDateTime() ) );
+        }
+        if ( entity.getCreationChannel() != null ) {
+            detailItemDto.setCreationChannel( entity.getCreationChannel().name() );
         }
 
         return detailItemDto;

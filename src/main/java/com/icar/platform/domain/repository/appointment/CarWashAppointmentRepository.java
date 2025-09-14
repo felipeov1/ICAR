@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -140,4 +141,6 @@ public interface CarWashAppointmentRepository extends JpaRepository<CarWashAppoi
     List<CarWashAppointment> findByStatusAndCreatedAtBetween(AppointmentStatus status, LocalDateTime startDate, LocalDateTime endDate);
 
     long countByStatusInAndCreatedAtBetween(List<AppointmentStatus> statuses, LocalDateTime startDate, LocalDateTime endDate);
+    List<CarWashAppointment> findByDateTimeBetween(LocalDateTime start, LocalDateTime end);
+    List<CarWashAppointment> findByProfileIdAndStatusNotInOrderByDateTimeDesc(UUID profileId, Collection<AppointmentStatus> statuses);
 }

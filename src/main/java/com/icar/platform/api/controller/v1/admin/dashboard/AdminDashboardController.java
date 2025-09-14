@@ -5,10 +5,10 @@ import com.icar.platform.application.service.admin.dashboard.AdminDashboardServi
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/admin/dashboard")
@@ -22,6 +22,11 @@ public class AdminDashboardController {
     public ResponseEntity<DashboardStatsResponse> getDashboardStats(
             @RequestParam(defaultValue = "month") String period) {
         DashboardStatsResponse stats = dashboardService.getDashboardStats(period);
+        return ResponseEntity.ok(stats);
+    }
+    @GetMapping("/partners/{partnerId}/monthly-stats")
+    public ResponseEntity<List<DashboardStatsResponse.PartnerMonthlyStatsDto>> getPartnerMonthlyStats(@PathVariable UUID partnerId) {
+        List<DashboardStatsResponse.PartnerMonthlyStatsDto> stats = dashboardService.getPartnerMonthlyStats(partnerId);
         return ResponseEntity.ok(stats);
     }
 }

@@ -3,6 +3,7 @@ package com.icar.platform.api.dto.response.admin;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 public class DashboardStatsResponse {
@@ -12,6 +13,8 @@ public class DashboardStatsResponse {
     private UserStats users;
     private FunnelStats funnel;
     private HistoricalStatsData historicalStats;
+    private List<PartnerPerformanceDto> partnerPerformance;
+
 
     @Data
     public static class MrrStats {
@@ -19,6 +22,8 @@ public class DashboardStatsResponse {
         private BigDecimal newThisMonth;
         private int activeSubscriptions;
         private BigDecimal changeFromLastMonth;
+        private double changePercent;
+
     }
 
     @Data
@@ -27,6 +32,8 @@ public class DashboardStatsResponse {
         private BigDecimal marketplace;
         private BigDecimal manual;
         private double changePercent;
+        private BigDecimal changeFromLastMonth; 
+
     }
 
     @Data
@@ -84,6 +91,7 @@ public class DashboardStatsResponse {
         private String partnerName;
         private String paymentStatus;
         private String date;
+        private String creationChannel;
     }
 
     @Data
@@ -98,5 +106,22 @@ public class DashboardStatsResponse {
         private int totalAppointments;
         private BigDecimal gmv;
         private int newUsers;
+    }
+
+    @Data
+    public static class PartnerPerformanceDto {
+        private UUID partnerId;
+        private String partnerName;
+        private int totalAppointments;
+        private int marketplaceAppointments;
+        private int manualAppointments;
+    }
+
+    @Data
+    public static class PartnerMonthlyStatsDto {
+        private String month;
+        private int totalAppointments;
+        private int marketplaceAppointments;
+        private int manualAppointments;
     }
 }
