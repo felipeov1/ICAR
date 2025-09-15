@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Getter
@@ -42,7 +43,6 @@ public class AppliedCoupon {
     @Column(name = "discount_applied", nullable = false, precision = 10, scale = 2)
     private BigDecimal discountApplied;
 
-    @CreationTimestamp
     @Column(name = "applied_at", nullable = false, updatable = false)
-    private LocalDateTime appliedAt;
+    private ZonedDateTime appliedAt;
 }

@@ -122,13 +122,12 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
 
         Comparator<CarWashProfileResponse> marketplaceSort = Comparator
                 .comparingInt((CarWashProfileResponse company) -> {
-                    boolean isNewAndUnrated = company.reviews() == 0 && company.createdAt().isAfter(LocalDateTime.now().minusDays(30));
-                    return isNewAndUnrated ? 0 : 1;
+                    boolean isNewcomer = company.reviews() == 0 && company.createdAt().isAfter(LocalDateTime.now().minusDays(15));
+                    return isNewcomer ? 0 : 1;
                 })
-                .thenComparing(CarWashProfileResponse::createdAt, Comparator.reverseOrder())
                 .thenComparing(CarWashProfileResponse::rating, Comparator.nullsLast(Comparator.reverseOrder()))
                 .thenComparing(CarWashProfileResponse::reviews, Comparator.nullsLast(Comparator.reverseOrder()))
-                .thenComparing(CarWashProfileResponse::name);
+                .thenComparing(CarWashProfileResponse::createdAt);
 
         return profileRepository.findAll().stream()
                 .filter(profile -> !profile.getSubdomain().equals("test"))

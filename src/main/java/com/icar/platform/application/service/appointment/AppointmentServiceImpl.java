@@ -43,10 +43,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -142,7 +139,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             appliedCoupon.setOriginalAmount(totalPrice);
             appliedCoupon.setDiscountApplied(discount);
             appliedCoupon.setFinalAmount(finalPrice);
-            appliedCoupon.setAppliedAt(LocalDateTime.now(BRASILIA_ZONE_ID));
+            appliedCoupon.setAppliedAt(ZonedDateTime.now(BRASILIA_ZONE_ID));
             appointment.getAppliedCoupons().add(appliedCoupon);
         }
 
@@ -321,12 +318,13 @@ public class AppointmentServiceImpl implements AppointmentService {
 
 
     private void validateCoupon(Coupon coupon, UUID customerId, BigDecimal originalPrice) {
-        LocalDateTime now = LocalDateTime.now(BRASILIA_ZONE_ID);
-        if (coupon.getValidUntil().isBefore(now)) {
+        LocalDateTime nowInBrasilia = LocalDateTime.now(BRASILIA_ZONE_ID);
+
+        if (coupon.getValidUntil().isBefore(nowInBrasilia)) {
             throw new BusinessException("Este cupom está expirado.");
         }
 
-        if (coupon.getValidFrom().isAfter(now)) {
+        if (coupon.getValidFrom().isAfter(nowInBrasilia)) {
             throw new BusinessException("Este cupom ainda não é válido.");
         }
         if (coupon.getMaxUses() != null && coupon.getCurrentUses() >= coupon.getMaxUses()) {

@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,11 +26,16 @@ public interface AppliedCouponRepository extends JpaRepository<AppliedCoupon, UU
 
     long countByCouponIdAndCustomerId(UUID couponId, UUID customerId);
 
-    List<AppliedCoupon> findByAppliedAtBetween(LocalDateTime start, LocalDateTime end);
+    List<AppliedCoupon> findByAppliedAtBetween(ZonedDateTime start, ZonedDateTime end);
 
     @Query("SELECT COUNT(ac) FROM AppliedCoupon ac WHERE ac.coupon.id = :couponId AND ac.appointment.status = :status")
     int countByCouponIdAndAppointmentStatus(@Param("couponId") UUID couponId, @Param("status") AppointmentStatus status);
 
     @Query("SELECT ac FROM AppliedCoupon ac WHERE ac.appointment.profile.id = :partnerId AND ac.appliedAt BETWEEN :start AND :end")
-    List<AppliedCoupon> findByAppliedAtBetweenAndPartnerId(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("partnerId") UUID partnerId);
+    List<AppliedCoupon> findByAppliedAtBetweenAndPartnerId(@Param("start") ZonedDateTime start, @Param("end") ZonedDateTime end, @Param("partnerId") UUID partnerId);
+    @Query("SELECT ac FROM AppliedCoupon ac WHERE ac.appointment.updatedAt BETWEEN :start AND :end")
+    List<AppliedCoupon> findByAppointmentUpdatedAtBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
+    @Query("SELECT ac FROM AppliedCoupon ac WHERE ac.appointment.profile.id = :partnerId AND ac.appointment.updatedAt BETWEEN :start AND :end")
+    List<AppliedCoupon> findByAppointmentUpdatedAtBetweenAndPartnerId(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("partnerId") UUID partnerId);
 }

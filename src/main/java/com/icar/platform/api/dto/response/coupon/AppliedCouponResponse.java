@@ -14,5 +14,5 @@ public record AppliedCouponResponse(
         BigDecimal originalAmount,
         BigDecimal finalAmount,
         BigDecimal discountApplied,
-        LocalDateTime appliedAt
+        ZonedDateTime appliedAt
 ) {}
