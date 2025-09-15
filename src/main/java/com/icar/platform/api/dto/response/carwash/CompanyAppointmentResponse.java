@@ -21,11 +21,15 @@ public class CompanyAppointmentResponse {
     private String paymentMethod;
     private CustomerInfo customer;
     private List<ServiceInfo> services;
+    private String addressName;
     private String addressStreet;
     private String addressNumber;
+    private String addressNeighborhood;
     private String addressCityState;
+    private String addressInstructions;
     private BigDecimal originalPrice;
     private BigDecimal discountAmount;
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

@@ -33,6 +33,8 @@ public abstract class AppointmentMapper {
     @Mapping(target = "carWashPhone", source = "entity.profile.carWashRegistration.phone")
     @Mapping(target = "vehicleType", source = "entity.carType")
     @Mapping(target = "addressStreet", source = "entity.address.street")
+    @Mapping(target = "addressName", source = "entity.address.addressName")
+    @Mapping(target = "addressNeighborhood", source = "entity.address.neighborhood")
     @Mapping(target = "addressNumber", source = "entity.address.streetNumber")
     @Mapping(target = "addressCityState", expression = "java(entity.getAddress().getCity() + \"/\" + entity.getAddress().getState())")
     @Mapping(target = "addressInstructions", source = "entity.address.additionalInstructions")
@@ -51,6 +53,9 @@ public abstract class AppointmentMapper {
     @Mapping(target = "paymentMethod", expression = "java(entity.getPaymentMethod().name())")
     @Mapping(target = "vehicleType", source = "carType")
     @Mapping(target = "services", source = "entity", qualifiedByName = "mapCompanyServices")
+    @Mapping(target = "addressName", source = "entity.address.addressName")
+    @Mapping(target = "addressNeighborhood", source = "entity.address.neighborhood")
+    @Mapping(target = "addressInstructions", source = "entity.address.additionalInstructions")
     @Mapping(target = "addressStreet", source = "entity.address.street")
     @Mapping(target = "addressNumber", source = "entity.address.streetNumber")
     @Mapping(target = "addressCityState", expression = "java(entity.getAddress().getCity() + \"/\" + entity.getAddress().getState())")
@@ -58,6 +63,7 @@ public abstract class AppointmentMapper {
     @Mapping(target = "discountAmount", source = "entity", qualifiedByName = "mapDiscountAmount")
     @Mapping(target = "finalPrice", source = "entity", qualifiedByName = "mapFinalPrice")
     public abstract CompanyAppointmentResponse toCompanyResponse(CarWashAppointment entity);
+
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "customerName", source = "entity", qualifiedByName = "mapCustomerName")

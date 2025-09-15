@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-13T23:16:11-0300",
+    date = "2025-09-15T09:25:18-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -35,6 +35,8 @@ public class AppointmentMapperImpl extends AppointmentMapper {
         appointmentResponse.setCarWashPhone( entityProfileCarWashRegistrationPhone( entity ) );
         appointmentResponse.setVehicleType( entity.getCarType() );
         appointmentResponse.setAddressStreet( entityAddressStreet( entity ) );
+        appointmentResponse.setAddressName( entityAddressAddressName( entity ) );
+        appointmentResponse.setAddressNeighborhood( entityAddressNeighborhood( entity ) );
         appointmentResponse.setAddressNumber( entityAddressStreetNumber( entity ) );
         appointmentResponse.setAddressInstructions( entityAddressAdditionalInstructions( entity ) );
         if ( entity.getTotalDurationMinutes() != null ) {
@@ -72,6 +74,9 @@ public class AppointmentMapperImpl extends AppointmentMapper {
 
         companyAppointmentResponse.setVehicleType( entity.getCarType() );
         companyAppointmentResponse.setServices( mapCompanyServices( entity ) );
+        companyAppointmentResponse.setAddressName( entityAddressAddressName( entity ) );
+        companyAppointmentResponse.setAddressNeighborhood( entityAddressNeighborhood( entity ) );
+        companyAppointmentResponse.setAddressInstructions( entityAddressAdditionalInstructions( entity ) );
         companyAppointmentResponse.setAddressStreet( entityAddressStreet( entity ) );
         companyAppointmentResponse.setAddressNumber( entityAddressStreetNumber( entity ) );
         companyAppointmentResponse.setOriginalPrice( mapOriginalPrice( entity ) );
@@ -162,6 +167,22 @@ public class AppointmentMapperImpl extends AppointmentMapper {
             return null;
         }
         return address.getStreet();
+    }
+
+    private String entityAddressAddressName(CarWashAppointment carWashAppointment) {
+        CustomerAddress address = carWashAppointment.getAddress();
+        if ( address == null ) {
+            return null;
+        }
+        return address.getAddressName();
+    }
+
+    private String entityAddressNeighborhood(CarWashAppointment carWashAppointment) {
+        CustomerAddress address = carWashAppointment.getAddress();
+        if ( address == null ) {
+            return null;
+        }
+        return address.getNeighborhood();
     }
 
     private String entityAddressStreetNumber(CarWashAppointment carWashAppointment) {

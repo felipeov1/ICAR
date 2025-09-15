@@ -21,8 +21,10 @@ public class AppointmentResponse {
     private AppointmentStatus status;
     private String paymentMethod;
     private BigDecimal finalPrice;
+    private String addressName;
     private String addressStreet;
     private String addressNumber;
+    private String addressNeighborhood;
     private String addressCityState;
     private String addressInstructions;
     private Integer minCancelNoticeMinutes;
