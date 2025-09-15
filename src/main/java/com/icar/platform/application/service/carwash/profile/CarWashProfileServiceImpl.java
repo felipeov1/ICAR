@@ -131,7 +131,7 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
                 .thenComparing(CarWashProfileResponse::name);
 
         return profileRepository.findAll().stream()
-                .filter(profile -> !profile.getSubdomain().equals("nome-teste"))
+                .filter(profile -> !profile.getSubdomain().equals("test"))
                 .map(mapper::toDto)
                 .sorted(marketplaceSort)
                 .collect(Collectors.toList());
