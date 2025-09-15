@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
@@ -92,12 +93,14 @@ public class AdminReportService {
     }
 
     private CouponRecentUsageResponse toRecentUsageResponse(AppliedCoupon ac) {
+        LocalDateTime usageTime = ac.getAppointment().getUpdatedAt();
+
         return new CouponRecentUsageResponse(
                 ac.getId(),
                 ac.getCustomer().getFullName(),
                 ac.getCoupon().getCode(),
                 ac.getAppointment().getProfile().getCarWashRegistration().getTradeName(),
-                ac.getAppliedAt(),
+                usageTime,
                 ac.getDiscountApplied()
         );
     }
