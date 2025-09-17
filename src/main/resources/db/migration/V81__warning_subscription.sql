@@ -1,4 +1,4 @@
-CREATE TABLE dry_wash_subscriptions (
+CREATE TABLE IF NOT EXISTS dry_wash_subscriptions (
     id UUID PRIMARY KEY NOT NULL,
     customer_id UUID NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
