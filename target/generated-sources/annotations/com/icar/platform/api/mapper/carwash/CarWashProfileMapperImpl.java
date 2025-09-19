@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-16T21:13:52-0300",
+    date = "2025-09-18T15:05:48-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -66,8 +66,11 @@ public class CarWashProfileMapperImpl implements CarWashProfileMapper {
         if ( request.getLocations() != null ) {
             entity.setLocations( stringListToStringArray( request.getLocations() ) );
         }
-        if ( request.getObservations() != null ) {
-            entity.setObservations( request.getObservations() );
+        if ( request.getWetWashObservations() != null ) {
+            entity.setWetWashObservations( request.getWetWashObservations() );
+        }
+        if ( request.getDryWashObservations() != null ) {
+            entity.setDryWashObservations( request.getDryWashObservations() );
         }
     }
 
@@ -87,7 +90,8 @@ public class CarWashProfileMapperImpl implements CarWashProfileMapper {
         String subdomain = null;
         String whatsapp = null;
         String[] locations = null;
-        String observations = null;
+        String wetWashObservations = null;
+        String dryWashObservations = null;
 
         id = carWashProfile.getId();
         name = carWashProfile.getName();
@@ -105,14 +109,15 @@ public class CarWashProfileMapperImpl implements CarWashProfileMapper {
         if ( locations1 != null ) {
             locations = Arrays.copyOf( locations1, locations1.length );
         }
-        observations = carWashProfile.getObservations();
+        wetWashObservations = carWashProfile.getWetWashObservations();
+        dryWashObservations = carWashProfile.getDryWashObservations();
 
         boolean mercadoPagoConnected = carWashProfile.getCarWashRegistration() != null && carWashProfile.getCarWashRegistration().getMercadoPagoConfig() != null;
         String logo = carWashProfile.getLogo() != null ? "https://api.icarplus.com.br/uploads/" + carWashProfile.getLogo() : null;
         String coverPhoto = carWashProfile.getCoverPhoto() != null ? "https://api.icarplus.com.br/uploads/" + carWashProfile.getCoverPhoto() : null;
         String mercadoPagoPublicKey = carWashProfile.getCarWashRegistration() != null && carWashProfile.getCarWashRegistration().getMercadoPagoConfig() != null ? carWashProfile.getCarWashRegistration().getMercadoPagoConfig().getPublicKey() : null;
 
-        CarWashProfileResponse carWashProfileResponse = new CarWashProfileResponse( id, name, description, logo, rating, reviews, createdAt, modalities, coverPhoto, subdomain, whatsapp, locations, observations, mercadoPagoConnected, mercadoPagoPublicKey );
+        CarWashProfileResponse carWashProfileResponse = new CarWashProfileResponse( id, name, description, logo, rating, reviews, createdAt, modalities, coverPhoto, subdomain, whatsapp, locations, mercadoPagoConnected, mercadoPagoPublicKey, wetWashObservations, dryWashObservations );
 
         return carWashProfileResponse;
     }

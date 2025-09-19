@@ -108,8 +108,12 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
         if (request.getModalities() != null) {
             profile.setModalities(request.getModalities().toArray(new String[0]));
         }
-        if (request.getObservations() != null) {
-            profile.setObservations(request.getObservations());
+
+        if (request.getWetWashObservations() != null) {
+            profile.setWetWashObservations(request.getWetWashObservations());
+        }
+        if (request.getDryWashObservations() != null) {
+            profile.setDryWashObservations(request.getDryWashObservations());
         }
 
         CarWashProfile updatedProfile = profileRepository.save(profile);

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-16T21:13:52-0300",
+    date = "2025-09-18T15:05:48-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -30,6 +30,7 @@ public class CarWashOfferingMapperImpl implements CarWashOfferingMapper {
         carWashOffering.setName( dto.name() );
         carWashOffering.setDescription( dto.description() );
         carWashOffering.setServiceType( dto.serviceType() );
+        carWashOffering.setModality( dto.modality() );
         carWashOffering.setVehicleDetails( stringVehicleDetailRequestMapToStringVehicleOfferingDetailMap( dto.vehicleDetails() ) );
 
         carWashOffering.setActive( true );
@@ -48,6 +49,7 @@ public class CarWashOfferingMapperImpl implements CarWashOfferingMapper {
         String name = null;
         String description = null;
         String serviceType = null;
+        String modality = null;
         boolean active = false;
 
         vehicleDetails = stringVehicleOfferingDetailMapToStringVehicleDetailResponseMap( entity.getVehicleDetails() );
@@ -55,9 +57,10 @@ public class CarWashOfferingMapperImpl implements CarWashOfferingMapper {
         name = entity.getName();
         description = entity.getDescription();
         serviceType = entity.getServiceType();
+        modality = entity.getModality();
         active = entity.isActive();
 
-        CarWashOfferingResponse carWashOfferingResponse = new CarWashOfferingResponse( id, name, description, serviceType, active, vehicleDetails );
+        CarWashOfferingResponse carWashOfferingResponse = new CarWashOfferingResponse( id, name, description, serviceType, modality, active, vehicleDetails );
 
         return carWashOfferingResponse;
     }
@@ -76,6 +79,9 @@ public class CarWashOfferingMapperImpl implements CarWashOfferingMapper {
         }
         if ( dto.serviceType() != null ) {
             entity.setServiceType( dto.serviceType() );
+        }
+        if ( dto.modality() != null ) {
+            entity.setModality( dto.modality() );
         }
         if ( entity.getVehicleDetails() != null ) {
             Map<String, VehicleOfferingDetail> map = stringVehicleDetailRequestMapToStringVehicleOfferingDetailMap( dto.vehicleDetails() );

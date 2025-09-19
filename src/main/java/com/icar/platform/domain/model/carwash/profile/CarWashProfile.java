@@ -58,7 +58,14 @@ public class CarWashProfile {
     @Column(name = "locations", columnDefinition = "text[]")
     private String[] locations;
 
+    @Column(name = "wet_wash_observations", length = 500)
+    private String wetWashObservations;
+
+    @Column(name = "dry_wash_observations", length = 500)
+    private String dryWashObservations;
+
     @Column(length = 500)
+    @Deprecated
     private String observations;
 
     @Column(name = "is_onboarding_complete", nullable = false)

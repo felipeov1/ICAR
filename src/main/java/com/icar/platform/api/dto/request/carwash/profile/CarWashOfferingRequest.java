@@ -12,6 +12,8 @@ public record CarWashOfferingRequest(
         @NotBlank @Size(max = 100) String name,
         @Size(max = 500) String description,
         @NotBlank String serviceType,
+        String modality,
+
         @NotEmpty Map<String, VehicleDetailRequest> vehicleDetails
 ) {
     public record VehicleDetailRequest(
