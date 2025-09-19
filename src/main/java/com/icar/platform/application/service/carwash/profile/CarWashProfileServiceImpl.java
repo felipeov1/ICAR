@@ -122,8 +122,16 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
 
         Comparator<CarWashProfileResponse> marketplaceSort = Comparator
                 .comparingInt((CarWashProfileResponse company) -> {
+                    if ("gecko".equals(company.subdomain()) && company.reviews() == 0) {
+                        return 0;
+                    }
+
                     boolean isNewcomer = company.reviews() == 0 && company.createdAt().isAfter(LocalDateTime.now().minusDays(15));
-                    return isNewcomer ? 0 : 1;
+                    if (isNewcomer) {
+                        return 1;
+                    }
+
+                    return 2;
                 })
                 .thenComparing(CarWashProfileResponse::rating, Comparator.nullsLast(Comparator.reverseOrder()))
                 .thenComparing(CarWashProfileResponse::reviews, Comparator.nullsLast(Comparator.reverseOrder()))
