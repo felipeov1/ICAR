@@ -120,22 +120,35 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
     @Transactional(readOnly = true)
     public List<CarWashProfileResponse> findAllForMarketplace() {
 
+        final String topCompanySubdomain = "m7car";
+        final String secondCompanySubdomain = "gecko";
+
         Comparator<CarWashProfileResponse> marketplaceSort = Comparator
                 .comparingInt((CarWashProfileResponse company) -> {
-                    if ("gecko".equals(company.subdomain()) && company.reviews() == 0) {
-                        return 0;
-                    }
-
                     boolean isNewcomer = company.reviews() == 0 && company.createdAt().isAfter(LocalDateTime.now().minusDays(15));
-                    if (isNewcomer) {
-                        return 1;
+                    return isNewcomer ? 0 : 1;
+                })
+
+
+                .thenComparing((c1, c2) -> {
+                    String sub1 = c1.subdomain();
+                    String sub2 = c2.subdomain();
+
+                    boolean c1IsTop = topCompanySubdomain.equals(sub1);
+                    boolean c2IsTop = topCompanySubdomain.equals(sub2);
+                    boolean c1IsSecond = secondCompanySubdomain.equals(sub1);
+                    boolean c2IsSecond = secondCompanySubdomain.equals(sub2);
+
+                    if ((c1IsTop && c2IsSecond) || (c2IsTop && c1IsSecond)) {
+                        return c1IsTop ? -1 : 1;
                     }
 
-                    return 2;
+                    return 0;
                 })
+
                 .thenComparing(CarWashProfileResponse::rating, Comparator.nullsLast(Comparator.reverseOrder()))
                 .thenComparing(CarWashProfileResponse::reviews, Comparator.nullsLast(Comparator.reverseOrder()))
-                .thenComparing(CarWashProfileResponse::createdAt);
+                .thenComparing(CarWashProfileResponse::createdAt); // Desempate final pela data de criação
 
         return profileRepository.findAll().stream()
                 .filter(profile -> !profile.getSubdomain().equals("test") && !profile.getSubdomain().equals("rickydetail"))
