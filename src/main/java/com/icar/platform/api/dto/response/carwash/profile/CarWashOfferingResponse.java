@@ -9,6 +9,8 @@ public record CarWashOfferingResponse(
         String name,
         String description,
         String serviceType,
+        String modality,
+
         boolean active,
         Map<String, VehicleDetailResponse> vehicleDetails
 ) {

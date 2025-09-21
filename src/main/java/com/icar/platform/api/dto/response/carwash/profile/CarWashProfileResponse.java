@@ -17,7 +17,8 @@ public record CarWashProfileResponse(
         String subdomain,
         String whatsapp,
         String[] locations,
-        String observations,
         boolean mercadoPagoConnected,
-        String mercadoPagoPublicKey
+        String mercadoPagoPublicKey,
+        String wetWashObservations,
+        String dryWashObservations
 ) {}

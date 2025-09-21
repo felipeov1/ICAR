@@ -36,6 +36,9 @@ public class CarWashOffering {
     @Column(name = "service_type", nullable = false)
     private String serviceType;
 
+    @Column(name = "modality", length = 20)
+    private String modality;
+
     @Column(nullable = false)
     private boolean active = true;
 
