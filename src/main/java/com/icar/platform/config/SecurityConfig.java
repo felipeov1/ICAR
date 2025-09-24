@@ -41,17 +41,17 @@ public class SecurityConfig {
     };
 
     public static final String[] PUBLIC_WHITELIST = {
+            // Rotas de autenticação para todos os tipos de usuário
             "/api/v1/auth/**",
             "/api/v1/carwash/auth/**",
             "/api/v1/admin/auth/**",
-            "/api/v1/profile/subdomain/**",
+
+            // Rotas de utilidade pública
             "/api/v1/health",
             "/error",
-            "/carwash/**",
-            "/ads/**",
-            "/uploads/**",
+            "/uploads/**", // Se seus uploads forem de acesso público
             "/api/v1/notifications/mercado-pago",
-            "/api/v1/mercado-pago/**",
+            "/api/v1/mercado-pago/**"
     };
 
     @Bean
@@ -81,7 +81,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(SWAGGER_WHITELIST).permitAll()
                         .requestMatchers(PUBLIC_WHITELIST).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/marketplace/carwashes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/profile/subdomain/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/profile/*/vehicle-types").permitAll() // <-- CORRIGIDO de ** para *
+                        .requestMatchers(HttpMethod.GET, "/api/v1/profile/*/offerings").permitAll()     // <-- CORRIGIDO de ** para *
+                        .requestMatchers(HttpMethod.GET, "/api/v1/carwashes/*/reviews").permitAll()     // <-- CORRIGIDO de ** para *
+
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

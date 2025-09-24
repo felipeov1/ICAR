@@ -152,7 +152,7 @@ public class CarWashProfileServiceImpl implements CarWashProfileService {
 
                 .thenComparing(CarWashProfileResponse::rating, Comparator.nullsLast(Comparator.reverseOrder()))
                 .thenComparing(CarWashProfileResponse::reviews, Comparator.nullsLast(Comparator.reverseOrder()))
-                .thenComparing(CarWashProfileResponse::createdAt); // Desempate final pela data de criação
+                .thenComparing(CarWashProfileResponse::createdAt);
 
         return profileRepository.findAll().stream()
                 .filter(profile -> !profile.getSubdomain().equals("test") && !profile.getSubdomain().equals("rickydetail"))
