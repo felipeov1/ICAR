@@ -17,13 +17,13 @@ public record ManualAppointmentRequest(
     public record CustomerPayload(
             UUID id,
             @NotNull String name,
-            @NotNull String phone,
-            @NotNull String zipCode,
-            @NotNull String street,
-            @NotNull String number,
-            @NotNull String neighborhood,
-            @NotNull String city,
-            @NotNull String state,
+            String phone,
+            String zipCode,
+            String street,
+            String number,
+            String neighborhood,
+            String city,
+            String state,
             String additionalInstructions
     ) {}
 }

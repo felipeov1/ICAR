@@ -7,7 +7,6 @@ import com.icar.platform.domain.model.appointment.CarWashAppointment;
 import com.icar.platform.domain.model.carwash.legal.CarWashRegistration;
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
 import com.icar.platform.domain.model.customer.Customer;
-import com.icar.platform.domain.model.customer.CustomerAddress;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
@@ -15,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-21T20:14:50-0300",
+    date = "2025-09-26T10:39:39-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -31,14 +30,8 @@ public class AppointmentMapperImpl extends AppointmentMapper {
 
         appointmentResponse.setCarWashName( entityProfileName( entity ) );
         appointmentResponse.setCarwashId( entityProfileId( entity ) );
-        appointmentResponse.setAddressId( entityAddressId( entity ) );
         appointmentResponse.setCarWashPhone( entityProfileCarWashRegistrationPhone( entity ) );
         appointmentResponse.setVehicleType( entity.getCarType() );
-        appointmentResponse.setAddressStreet( entityAddressStreet( entity ) );
-        appointmentResponse.setAddressName( entityAddressAddressName( entity ) );
-        appointmentResponse.setAddressNeighborhood( entityAddressNeighborhood( entity ) );
-        appointmentResponse.setAddressNumber( entityAddressStreetNumber( entity ) );
-        appointmentResponse.setAddressInstructions( entityAddressAdditionalInstructions( entity ) );
         if ( entity.getTotalDurationMinutes() != null ) {
             appointmentResponse.setTotalDurationMinutes( entity.getTotalDurationMinutes() );
         }
@@ -57,8 +50,7 @@ public class AppointmentMapperImpl extends AppointmentMapper {
         }
         appointmentResponse.setCustomer( customerToCustomerInfo( entity.getCustomer() ) );
 
-        appointmentResponse.setAddressCityState( entity.getAddress().getCity() + "/" + entity.getAddress().getState() );
-
+        mapAddressInfoToResponse( entity, appointmentResponse );
         mapCustomerInfoToResponse( entity, appointmentResponse );
 
         return appointmentResponse;
@@ -74,11 +66,6 @@ public class AppointmentMapperImpl extends AppointmentMapper {
 
         companyAppointmentResponse.setVehicleType( entity.getCarType() );
         companyAppointmentResponse.setServices( mapCompanyServices( entity ) );
-        companyAppointmentResponse.setAddressName( entityAddressAddressName( entity ) );
-        companyAppointmentResponse.setAddressNeighborhood( entityAddressNeighborhood( entity ) );
-        companyAppointmentResponse.setAddressInstructions( entityAddressAdditionalInstructions( entity ) );
-        companyAppointmentResponse.setAddressStreet( entityAddressStreet( entity ) );
-        companyAppointmentResponse.setAddressNumber( entityAddressStreetNumber( entity ) );
         companyAppointmentResponse.setOriginalPrice( mapOriginalPrice( entity ) );
         companyAppointmentResponse.setDiscountAmount( mapDiscountAmount( entity ) );
         companyAppointmentResponse.setFinalPrice( mapFinalPrice( entity ) );
@@ -91,8 +78,8 @@ public class AppointmentMapperImpl extends AppointmentMapper {
 
         companyAppointmentResponse.setStatus( entity.getStatus().name() );
         companyAppointmentResponse.setPaymentMethod( entity.getPaymentMethod().name() );
-        companyAppointmentResponse.setAddressCityState( entity.getAddress().getCity() + "/" + entity.getAddress().getState() );
 
+        mapAddressInfoToCompanyResponse( entity, companyAppointmentResponse );
         mapCustomerInfoToCompanyResponse( entity, companyAppointmentResponse );
 
         return companyAppointmentResponse;
@@ -141,14 +128,6 @@ public class AppointmentMapperImpl extends AppointmentMapper {
         return profile.getId();
     }
 
-    private UUID entityAddressId(CarWashAppointment carWashAppointment) {
-        CustomerAddress address = carWashAppointment.getAddress();
-        if ( address == null ) {
-            return null;
-        }
-        return address.getId();
-    }
-
     private String entityProfileCarWashRegistrationPhone(CarWashAppointment carWashAppointment) {
         CarWashProfile profile = carWashAppointment.getProfile();
         if ( profile == null ) {
@@ -159,46 +138,6 @@ public class AppointmentMapperImpl extends AppointmentMapper {
             return null;
         }
         return carWashRegistration.getPhone();
-    }
-
-    private String entityAddressStreet(CarWashAppointment carWashAppointment) {
-        CustomerAddress address = carWashAppointment.getAddress();
-        if ( address == null ) {
-            return null;
-        }
-        return address.getStreet();
-    }
-
-    private String entityAddressAddressName(CarWashAppointment carWashAppointment) {
-        CustomerAddress address = carWashAppointment.getAddress();
-        if ( address == null ) {
-            return null;
-        }
-        return address.getAddressName();
-    }
-
-    private String entityAddressNeighborhood(CarWashAppointment carWashAppointment) {
-        CustomerAddress address = carWashAppointment.getAddress();
-        if ( address == null ) {
-            return null;
-        }
-        return address.getNeighborhood();
-    }
-
-    private String entityAddressStreetNumber(CarWashAppointment carWashAppointment) {
-        CustomerAddress address = carWashAppointment.getAddress();
-        if ( address == null ) {
-            return null;
-        }
-        return address.getStreetNumber();
-    }
-
-    private String entityAddressAdditionalInstructions(CarWashAppointment carWashAppointment) {
-        CustomerAddress address = carWashAppointment.getAddress();
-        if ( address == null ) {
-            return null;
-        }
-        return address.getAdditionalInstructions();
     }
 
     protected AppointmentResponse.CustomerInfo customerToCustomerInfo(Customer customer) {

@@ -9,6 +9,7 @@ import com.icar.platform.domain.model.carwash.offering.VehicleOfferingDetail;
 import com.icar.platform.domain.model.carwash.profile.AppointmentConfig;
 import com.icar.platform.domain.model.carwash.profile.CompanyCustomer;
 import com.icar.platform.domain.model.customer.Customer;
+import com.icar.platform.domain.model.customer.CustomerAddress;
 import com.icar.platform.domain.repository.carwash.profile.AppointmentConfigRepository;
 import com.icar.platform.domain.repository.carwash.profile.ReviewRepository;
 import org.mapstruct.*;
@@ -29,15 +30,8 @@ public abstract class AppointmentMapper {
 
     @Mapping(target = "carWashName", source = "entity.profile.name")
     @Mapping(target = "carwashId", source = "entity.profile.id")
-    @Mapping(target = "addressId", source = "address.id")
     @Mapping(target = "carWashPhone", source = "entity.profile.carWashRegistration.phone")
     @Mapping(target = "vehicleType", source = "entity.carType")
-    @Mapping(target = "addressStreet", source = "entity.address.street")
-    @Mapping(target = "addressName", source = "entity.address.addressName")
-    @Mapping(target = "addressNeighborhood", source = "entity.address.neighborhood")
-    @Mapping(target = "addressNumber", source = "entity.address.streetNumber")
-    @Mapping(target = "addressCityState", expression = "java(entity.getAddress().getCity() + \"/\" + entity.getAddress().getState())")
-    @Mapping(target = "addressInstructions", source = "entity.address.additionalInstructions")
     @Mapping(target = "totalDurationMinutes", source = "entity.totalDurationMinutes")
     @Mapping(target = "minCancelNoticeMinutes", source = "entity", qualifiedByName = "getMinCancelNotice")
     @Mapping(target = "minEditNoticeMinutes", source = "entity", qualifiedByName = "getMinEditNotice")
@@ -53,12 +47,6 @@ public abstract class AppointmentMapper {
     @Mapping(target = "paymentMethod", expression = "java(entity.getPaymentMethod().name())")
     @Mapping(target = "vehicleType", source = "carType")
     @Mapping(target = "services", source = "entity", qualifiedByName = "mapCompanyServices")
-    @Mapping(target = "addressName", source = "entity.address.addressName")
-    @Mapping(target = "addressNeighborhood", source = "entity.address.neighborhood")
-    @Mapping(target = "addressInstructions", source = "entity.address.additionalInstructions")
-    @Mapping(target = "addressStreet", source = "entity.address.street")
-    @Mapping(target = "addressNumber", source = "entity.address.streetNumber")
-    @Mapping(target = "addressCityState", expression = "java(entity.getAddress().getCity() + \"/\" + entity.getAddress().getState())")
     @Mapping(target = "originalPrice", source = "entity", qualifiedByName = "mapOriginalPrice")
     @Mapping(target = "discountAmount", source = "entity", qualifiedByName = "mapDiscountAmount")
     @Mapping(target = "finalPrice", source = "entity", qualifiedByName = "mapFinalPrice")
@@ -107,7 +95,7 @@ public abstract class AppointmentMapper {
     @Named("mapDiscountAmount")
     public BigDecimal mapDiscountAmount(CarWashAppointment appointment) {
         if (appointment.getAppliedCoupons() != null && !appointment.getAppliedCoupons().isEmpty()) {
-            return appointment.getAppliedCoupons().iterator().next().getDiscountApplied();
+            return appointment.getAppliedCoupons().getFirst().getDiscountApplied();
         }
         return BigDecimal.ZERO;
     }
@@ -213,6 +201,33 @@ public abstract class AppointmentMapper {
                     );
                 })
                 .collect(Collectors.toList());
+    }
+
+    @AfterMapping
+    protected void mapAddressInfoToResponse(CarWashAppointment entity, @MappingTarget AppointmentResponse response) {
+        CustomerAddress address = entity.getAddress();
+        if (address != null) {
+            response.setAddressId(address.getId());
+            response.setAddressStreet(address.getStreet());
+            response.setAddressName(address.getAddressName());
+            response.setAddressNeighborhood(address.getNeighborhood());
+            response.setAddressNumber(address.getStreetNumber());
+            response.setAddressCityState(address.getCity() + "/" + address.getState());
+            response.setAddressInstructions(address.getAdditionalInstructions());
+        }
+    }
+
+    @AfterMapping
+    protected void mapAddressInfoToCompanyResponse(CarWashAppointment entity, @MappingTarget CompanyAppointmentResponse response) {
+        CustomerAddress address = entity.getAddress();
+        if (address != null) {
+            response.setAddressName(address.getAddressName());
+            response.setAddressNeighborhood(address.getNeighborhood());
+            response.setAddressInstructions(address.getAdditionalInstructions());
+            response.setAddressStreet(address.getStreet());
+            response.setAddressNumber(address.getStreetNumber());
+            response.setAddressCityState(address.getCity() + "/" + address.getState());
+        }
     }
 
     @AfterMapping

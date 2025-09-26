@@ -596,14 +596,19 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         validateAdminAppointmentTime(request.startTime(), profileId, totalTime, null);
 
-        CustomerAddress address = getCustomerAddress(companyCustomer);
-        address = addressRepository.save(address);
 
         CarWashAppointment appointment = new CarWashAppointment();
+
+        if (companyCustomer.getStreet() != null && !companyCustomer.getStreet().isBlank()) {
+            CustomerAddress address = getCustomerAddress(companyCustomer);
+            address = addressRepository.save(address);
+            appointment.setAddress(address);
+        } else {
+            appointment.setAddress(null);
+        }
         appointment.setCustomer(null);
         appointment.setCompanyCustomer(companyCustomer);
         appointment.setProfile(profile);
-        appointment.setAddress(address);
         appointment.setDateTime(request.startTime());
         appointment.setCarType(vehicleType);
         appointment.setStatus(AppointmentStatus.CONFIRMED);

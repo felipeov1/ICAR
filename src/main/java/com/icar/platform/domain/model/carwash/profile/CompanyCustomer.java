@@ -27,7 +27,7 @@ public class CompanyCustomer {
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column(nullable = false)
+    @Column
     private String phone;
 
     @Column(name = "zip_code")

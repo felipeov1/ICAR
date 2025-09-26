@@ -52,7 +52,7 @@ public class CarWashAppointment {
     private String carType;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id", nullable = false)
+    @JoinColumn(name = "address_id", nullable = true)
     private CustomerAddress address;
 
     @Column(nullable = false)

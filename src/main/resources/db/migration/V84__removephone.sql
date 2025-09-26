@@ -1,0 +1,1 @@
+ALTER TABLE company_customer ALTER COLUMN phone DROP NOT NULL;
