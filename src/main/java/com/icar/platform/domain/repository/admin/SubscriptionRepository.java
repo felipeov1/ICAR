@@ -29,4 +29,5 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
 
     @EntityGraph(attributePaths = {"plan"})
     List<Subscription> findByStatusAndStartDateBetween(SubscriptionStatus status, LocalDateTime startDate, LocalDateTime endDate);
+    List<Subscription> findByStatusAndStartDateBefore(SubscriptionStatus status, LocalDateTime endDate);
 }

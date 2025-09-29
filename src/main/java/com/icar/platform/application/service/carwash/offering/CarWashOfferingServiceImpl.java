@@ -54,7 +54,16 @@ public class CarWashOfferingServiceImpl implements CarWashOfferingService {
 
         validateVehicleDetails(request.vehicleDetails());
 
-        mapper.updateEntity(request, offering);
+        offering.setName(request.name());
+        offering.setDescription(request.description());
+        offering.setServiceType(request.serviceType());
+        offering.setModality(request.modality());
+        offering.setDirtLevelRecommendation(request.dirtLevelRecommendation()); // <-- AQUI
+
+        offering.getVehicleDetails().clear();
+        request.vehicleDetails().forEach((key, value) ->
+                offering.getVehicleDetails().put(key, mapper.toVehicleDetailEntity(value))
+        );
 
         CarWashOffering updated = offeringRepository.save(offering);
         return mapper.toDto(updated);

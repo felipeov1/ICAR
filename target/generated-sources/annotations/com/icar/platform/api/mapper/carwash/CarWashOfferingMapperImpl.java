@@ -2,6 +2,7 @@ package com.icar.platform.api.mapper.carwash;
 
 import com.icar.platform.api.dto.request.carwash.profile.CarWashOfferingRequest;
 import com.icar.platform.api.dto.response.carwash.profile.CarWashOfferingResponse;
+import com.icar.platform.domain.enums.DirtLevel;
 import com.icar.platform.domain.model.carwash.offering.CarWashOffering;
 import com.icar.platform.domain.model.carwash.offering.VehicleOfferingDetail;
 import java.math.BigDecimal;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-09-21T20:14:49-0300",
+    date = "2025-09-29T15:05:03-0300",
     comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.7 (Microsoft)"
 )
 @Component
@@ -27,6 +28,7 @@ public class CarWashOfferingMapperImpl implements CarWashOfferingMapper {
 
         CarWashOffering carWashOffering = new CarWashOffering();
 
+        carWashOffering.setDirtLevelRecommendation( dto.dirtLevelRecommendation() );
         carWashOffering.setName( dto.name() );
         carWashOffering.setDescription( dto.description() );
         carWashOffering.setServiceType( dto.serviceType() );
@@ -45,6 +47,7 @@ public class CarWashOfferingMapperImpl implements CarWashOfferingMapper {
         }
 
         Map<String, CarWashOfferingResponse.VehicleDetailResponse> vehicleDetails = null;
+        DirtLevel dirtLevelRecommendation = null;
         UUID id = null;
         String name = null;
         String description = null;
@@ -53,6 +56,7 @@ public class CarWashOfferingMapperImpl implements CarWashOfferingMapper {
         boolean active = false;
 
         vehicleDetails = stringVehicleOfferingDetailMapToStringVehicleDetailResponseMap( entity.getVehicleDetails() );
+        dirtLevelRecommendation = entity.getDirtLevelRecommendation();
         id = entity.getId();
         name = entity.getName();
         description = entity.getDescription();
@@ -60,7 +64,7 @@ public class CarWashOfferingMapperImpl implements CarWashOfferingMapper {
         modality = entity.getModality();
         active = entity.isActive();
 
-        CarWashOfferingResponse carWashOfferingResponse = new CarWashOfferingResponse( id, name, description, serviceType, modality, active, vehicleDetails );
+        CarWashOfferingResponse carWashOfferingResponse = new CarWashOfferingResponse( id, name, description, serviceType, modality, active, dirtLevelRecommendation, vehicleDetails );
 
         return carWashOfferingResponse;
     }
@@ -71,6 +75,9 @@ public class CarWashOfferingMapperImpl implements CarWashOfferingMapper {
             return;
         }
 
+        if ( dto.dirtLevelRecommendation() != null ) {
+            entity.setDirtLevelRecommendation( dto.dirtLevelRecommendation() );
+        }
         if ( dto.name() != null ) {
             entity.setName( dto.name() );
         }
