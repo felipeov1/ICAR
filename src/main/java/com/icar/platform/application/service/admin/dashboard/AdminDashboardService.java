@@ -41,12 +41,20 @@ public class AdminDashboardService {
     private static final ZoneId BRASILIA_ZONE_ID = ZoneId.of("America/Sao_Paulo");
 
     @Transactional(readOnly = true)
-    public DashboardStatsResponse getDashboardStats(String period) {
-        LocalDateTime startDate = getStartDateFromPeriod(period);
+    public DashboardStatsResponse getDashboardStats(String month) {
+        YearMonth selectedYearMonth;
+        try {
+            selectedYearMonth = YearMonth.parse(month);
+        } catch (Exception e) {
+            selectedYearMonth = YearMonth.now(BRASILIA_ZONE_ID);
+        }
+
+        LocalDateTime startDate = selectedYearMonth.atDay(1).atStartOfDay();
         LocalDateTime endDate = startDate.with(TemporalAdjusters.lastDayOfMonth()).withHour(23).withMinute(59).withSecond(59);
 
-        YearMonth currentMonth = YearMonth.from(startDate);
-        YearMonth previousMonth = currentMonth.minusMonths(1);
+        YearMonth previousMonth = selectedYearMonth.minusMonths(1);
+        LocalDateTime previousMonthEndDate = previousMonth.atEndOfMonth().atTime(23, 59, 59);
+
 
         Optional<MonthlyPlatformStats> previousMonthStats = monthlyStatsRepository.findByYearAndMonth(previousMonth.getYear(), previousMonth.getMonthValue());
 
@@ -58,15 +66,66 @@ public class AdminDashboardService {
 
         DashboardStatsResponse response = new DashboardStatsResponse();
         response.setFunnel(buildFunnelStats(allAppointmentsInPeriod));
-        response.setUsers(buildUserStats(startDate, previousMonthStats));
+        response.setUsers(buildUserStats(startDate, endDate, previousMonthEndDate, previousMonthStats));
         response.setGmv(buildGmvStats(completedAppointmentsInPeriod, previousMonthStats));
-        List<CarWashAppointment> allAppointmentsCreatedInPeriod = appointmentRepository.findByCreatedAtAfter(startDate);
+        List<CarWashAppointment> allAppointmentsCreatedInPeriod = appointmentRepository.findByCreatedAtBetween(startDate, endDate);
         response.setAppointments(buildAppointmentStats(allAppointmentsCreatedInPeriod, completedAppointmentsInPeriod, startDate, previousMonthStats));
-        response.setMrr(buildMrrStats(startDate, previousMonthStats));
+        response.setMrr(buildMrrStats(startDate, endDate, previousMonthStats));
         response.setPartnerPerformance(buildPartnerPerformanceStats(allAppointmentsInPeriod));
         response.setHistoricalStats(new DashboardStatsResponse.HistoricalStatsData());
 
         return response;
+    }
+
+
+    private DashboardStatsResponse.MrrStats buildMrrStats(LocalDateTime periodStartDate, LocalDateTime periodEndDate, Optional<MonthlyPlatformStats> previousMonthStats) {
+        List<Subscription> activeSubscriptionsInPeriod = subscriptionRepository.findByStatusAndStartDateBefore(SubscriptionStatus.ACTIVE, periodEndDate);
+        BigDecimal totalMrr = activeSubscriptionsInPeriod.stream()
+                .map(sub -> calculateMonthlyValue(sub.getPlan()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        List<Subscription> newSubscriptionsThisMonth = subscriptionRepository.findByStatusAndStartDateBetween(SubscriptionStatus.ACTIVE, periodStartDate, periodEndDate);
+        BigDecimal newMrrThisMonth = newSubscriptionsThisMonth.stream()
+                .map(sub -> calculateMonthlyValue(sub.getPlan()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalMrrLastMonth = previousMonthStats.map(MonthlyPlatformStats::getMrrTotal).orElse(BigDecimal.ZERO);
+        BigDecimal changeFromLastMonth = totalMrr.subtract(totalMrrLastMonth);
+
+        double changePercent = calculatePercentageChange(totalMrrLastMonth.doubleValue(), totalMrr.doubleValue());
+
+        DashboardStatsResponse.MrrStats mrrStats = new DashboardStatsResponse.MrrStats();
+        mrrStats.setTotal(totalMrr);
+        mrrStats.setNewThisMonth(newMrrThisMonth);
+        mrrStats.setActiveSubscriptions(activeSubscriptionsInPeriod.size());
+        mrrStats.setChangeFromLastMonth(changeFromLastMonth);
+        mrrStats.setChangePercent(changePercent);
+
+        return mrrStats;
+    }
+
+    private DashboardStatsResponse.UserStats buildUserStats(LocalDateTime currentPeriodStart, LocalDateTime currentPeriodEnd, LocalDateTime previousPeriodEnd, Optional<MonthlyPlatformStats> previousMonthStats) {
+        long newUsersThisPeriod = customerRepository.countByCreatedAtBetween(currentPeriodStart, currentPeriodEnd);
+        long totalUsersInPeriod = customerRepository.countByCreatedAtBefore(currentPeriodEnd);
+
+        long newUsersLastPeriod = previousMonthStats.map(MonthlyPlatformStats::getNewUsers).orElse(0);
+        long totalUsersAtStartOfPeriod = totalUsersInPeriod - newUsersThisPeriod;
+
+        double newUsersChangePercent = calculatePercentageChange(newUsersLastPeriod, newUsersThisPeriod);
+        double totalUsersChangePercent = calculatePercentageChange(totalUsersAtStartOfPeriod, totalUsersInPeriod);
+
+        DashboardStatsResponse.UserStats userStats = new DashboardStatsResponse.UserStats();
+        DashboardStatsResponse.UserStats.StatValue totalStat = new DashboardStatsResponse.UserStats.StatValue();
+        totalStat.setValue((int) totalUsersInPeriod);
+        totalStat.setChangePercent(totalUsersChangePercent);
+        userStats.setTotal(totalStat);
+
+        DashboardStatsResponse.UserStats.StatValue newThisMonthStat = new DashboardStatsResponse.UserStats.StatValue();
+        newThisMonthStat.setValue((int) newUsersThisPeriod);
+        newThisMonthStat.setChangePercent(newUsersChangePercent);
+        userStats.setNewThisMonth(newThisMonthStat);
+
+        return userStats;
     }
 
     @Transactional(readOnly = true)
@@ -80,11 +139,11 @@ public class AdminDashboardService {
 
         List<DashboardStatsResponse.PartnerMonthlyStatsDto> monthlyStats = groupedByMonth.entrySet().stream()
                 .map(entry -> {
-                    YearMonth month = entry.getKey();
+                    YearMonth monthKey = entry.getKey();
                     List<CarWashAppointment> monthAppointments = entry.getValue();
 
                     DashboardStatsResponse.PartnerMonthlyStatsDto dto = new DashboardStatsResponse.PartnerMonthlyStatsDto();
-                    dto.setMonth(month.toString());
+                    dto.setMonth(monthKey.toString());
                     dto.setTotalAppointments(monthAppointments.size());
                     dto.setMarketplaceAppointments((int) monthAppointments.stream()
                             .filter(a -> a.getCreationChannel() == CreationChannel.MARKETPLACE).count());
@@ -126,32 +185,6 @@ public class AdminDashboardService {
                 .collect(Collectors.toList());
     }
 
-    private DashboardStatsResponse.MrrStats buildMrrStats(LocalDateTime periodStartDate, Optional<MonthlyPlatformStats> previousMonthStats) {
-        List<Subscription> activeSubscriptions = subscriptionRepository.findAllByStatus(SubscriptionStatus.ACTIVE);
-        BigDecimal totalMrr = activeSubscriptions.stream()
-                .map(sub -> calculateMonthlyValue(sub.getPlan()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        List<Subscription> newSubscriptionsThisMonth = subscriptionRepository.findByStatusAndStartDateAfter(SubscriptionStatus.ACTIVE, periodStartDate);
-        BigDecimal newMrrThisMonth = newSubscriptionsThisMonth.stream()
-                .map(sub -> calculateMonthlyValue(sub.getPlan()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal totalMrrLastMonth = previousMonthStats.map(MonthlyPlatformStats::getMrrTotal).orElse(BigDecimal.ZERO);
-        BigDecimal changeFromLastMonth = totalMrr.subtract(totalMrrLastMonth);
-
-        double changePercent = calculatePercentageChange(totalMrrLastMonth.doubleValue(), totalMrr.doubleValue());
-
-        DashboardStatsResponse.MrrStats mrrStats = new DashboardStatsResponse.MrrStats();
-        mrrStats.setTotal(totalMrr);
-        mrrStats.setNewThisMonth(newMrrThisMonth);
-        mrrStats.setActiveSubscriptions(activeSubscriptions.size());
-        mrrStats.setChangeFromLastMonth(changeFromLastMonth);
-        mrrStats.setChangePercent(changePercent);
-
-        return mrrStats;
-    }
-
     private DashboardStatsResponse.AppointmentStats buildAppointmentStats(
             List<CarWashAppointment> allAppointments,
             List<CarWashAppointment> completedAppointments,
@@ -161,9 +194,7 @@ public class AdminDashboardService {
         DashboardStatsResponse.AppointmentStats stats = new DashboardStatsResponse.AppointmentStats();
 
         LocalDateTime startOfDay = LocalDate.now(BRASILIA_ZONE_ID).atStartOfDay();
-        long todayCount = allAppointments.stream()
-                .filter(a -> a.getCreatedAt().isAfter(startOfDay))
-                .count();
+        long todayCount = appointmentRepository.countByCreatedAtBetween(startOfDay, LocalDateTime.now(BRASILIA_ZONE_ID));
         long yesterdayCount = appointmentRepository.countByCreatedAtBetween(startOfDay.minusDays(1), startOfDay);
 
         DashboardStatsResponse.AppointmentStats.StatValue todayStat = new DashboardStatsResponse.AppointmentStats.StatValue();
@@ -222,30 +253,6 @@ public class AdminDashboardService {
         return gmvStats;
     }
 
-    private DashboardStatsResponse.UserStats buildUserStats(LocalDateTime currentPeriodStart, Optional<MonthlyPlatformStats> previousMonthStats) {
-        long newUsersThisPeriod = customerRepository.countByCreatedAtAfter(currentPeriodStart);
-        long totalUsers = customerRepository.count();
-
-        long newUsersLastPeriod = previousMonthStats.map(MonthlyPlatformStats::getNewUsers).orElse(0);
-        long totalUsersAtStartOfPeriod = totalUsers - newUsersThisPeriod;
-
-        double newUsersChangePercent = calculatePercentageChange(newUsersLastPeriod, newUsersThisPeriod);
-        double totalUsersChangePercent = calculatePercentageChange(totalUsersAtStartOfPeriod, totalUsers);
-
-        DashboardStatsResponse.UserStats userStats = new DashboardStatsResponse.UserStats();
-        DashboardStatsResponse.UserStats.StatValue totalStat = new DashboardStatsResponse.UserStats.StatValue();
-        totalStat.setValue((int) totalUsers);
-        totalStat.setChangePercent(totalUsersChangePercent);
-        userStats.setTotal(totalStat);
-
-        DashboardStatsResponse.UserStats.StatValue newThisMonthStat = new DashboardStatsResponse.UserStats.StatValue();
-        newThisMonthStat.setValue((int) newUsersThisPeriod);
-        newThisMonthStat.setChangePercent(newUsersChangePercent);
-        userStats.setNewThisMonth(newThisMonthStat);
-
-        return userStats;
-    }
-
     private DashboardStatsResponse.FunnelStats buildFunnelStats(List<CarWashAppointment> appointments) {
         DashboardStatsResponse.FunnelStats funnel = new DashboardStatsResponse.FunnelStats();
         List<CarWashAppointment> pending = appointments.stream().filter(a -> a.getStatus() == AppointmentStatus.CONFIRMED).collect(Collectors.toList());
@@ -265,15 +272,6 @@ public class AdminDashboardService {
         stage.setManual((int) appointments.stream().filter(a -> a.getCreationChannel() == CreationChannel.MANUAL).count());
         stage.setDetails(appointments.stream().map(appointmentMapper::toDetailItemDto).collect(Collectors.toList()));
         return stage;
-    }
-
-    private LocalDateTime getStartDateFromPeriod(String period) {
-        LocalDate now = LocalDate.now(BRASILIA_ZONE_ID);
-        return switch (period.toLowerCase()) {
-            case "week" -> now.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.SUNDAY)).atStartOfDay();
-            case "year" -> now.with(TemporalAdjusters.firstDayOfYear()).atStartOfDay();
-            default -> now.with(TemporalAdjusters.firstDayOfMonth()).atStartOfDay();
-        };
     }
 
     private double calculatePercentageChange(long oldValue, long newValue) {

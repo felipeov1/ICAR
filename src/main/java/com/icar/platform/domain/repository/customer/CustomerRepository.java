@@ -15,6 +15,6 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     Optional<Customer> findByEmail(String email);
 
     long countByCreatedAtAfter(LocalDateTime startDate);
-    long countByCreatedAtBefore(LocalDateTime endDate);
     long countByCreatedAtBetween(LocalDateTime startDate, LocalDateTime endDate);
+    long countByCreatedAtBefore(LocalDateTime endDate);
 }

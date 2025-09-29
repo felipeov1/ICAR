@@ -1,5 +1,6 @@
 package com.icar.platform.domain.model.carwash.offering;
 
+import com.icar.platform.domain.enums.DirtLevel;
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -60,4 +61,8 @@ public class CarWashOffering {
     )
     @MapKeyColumn(name = "vehicle_type", length = 100)
     private Map<String, VehicleOfferingDetail> vehicleDetails;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "dirt_level_recommendation", nullable = true)
+    private DirtLevel dirtLevelRecommendation;
 }

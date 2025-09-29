@@ -20,10 +20,11 @@ public class AdminDashboardController {
 
     @GetMapping("/stats")
     public ResponseEntity<DashboardStatsResponse> getDashboardStats(
-            @RequestParam(defaultValue = "month") String period) {
-        DashboardStatsResponse stats = dashboardService.getDashboardStats(period);
+            @RequestParam("month") String month) {
+        DashboardStatsResponse stats = dashboardService.getDashboardStats(month);
         return ResponseEntity.ok(stats);
     }
+
     @GetMapping("/partners/{partnerId}/monthly-stats")
     public ResponseEntity<List<DashboardStatsResponse.PartnerMonthlyStatsDto>> getPartnerMonthlyStats(@PathVariable UUID partnerId) {
         List<DashboardStatsResponse.PartnerMonthlyStatsDto> stats = dashboardService.getPartnerMonthlyStats(partnerId);

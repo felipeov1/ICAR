@@ -1,6 +1,8 @@
 package com.icar.platform.domain.repository.appointment;
 
 import com.icar.platform.domain.enums.AppointmentStatus;
+import com.icar.platform.domain.enums.SubscriptionStatus;
+import com.icar.platform.domain.model.admin.Subscription;
 import com.icar.platform.domain.model.appointment.CarWashAppointment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -143,4 +145,5 @@ public interface CarWashAppointmentRepository extends JpaRepository<CarWashAppoi
     long countByStatusInAndCreatedAtBetween(List<AppointmentStatus> statuses, LocalDateTime startDate, LocalDateTime endDate);
     List<CarWashAppointment> findByDateTimeBetween(LocalDateTime start, LocalDateTime end);
     List<CarWashAppointment> findByProfileIdAndStatusNotInOrderByDateTimeDesc(UUID profileId, Collection<AppointmentStatus> statuses);
+    List<CarWashAppointment> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

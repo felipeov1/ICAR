@@ -1,5 +1,6 @@
 package com.icar.platform.api.dto.request.carwash.profile;
 
+import com.icar.platform.domain.enums.DirtLevel;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +14,7 @@ public record CarWashOfferingRequest(
         @Size(max = 500) String description,
         @NotBlank String serviceType,
         String modality,
+        DirtLevel dirtLevelRecommendation,
 
         @NotEmpty Map<String, VehicleDetailRequest> vehicleDetails
 ) {
