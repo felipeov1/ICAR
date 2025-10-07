@@ -116,13 +116,20 @@ public class SecurityConfig {
                 "http://admin.localhost:5173",
                 "http://*.localhost:5173",
                 "http://192.168.3.8:5173",
+
+                "https://localhost:5173",
+                "https://app.localhost:5173",
+                "https://gestao.localhost:5173",
+                "https://admin.localhost:5173",
+                "https://*.localhost:5173",
+                "https://192.168.3.8:5173",
+
                 "https://icarplus.com.br",
                 "https://www.icarplus.com.br",
                 "https://app.icarplus.com.br",
                 "https://gestao.icarplus.com.br",
                 "https://*.icarplus.com.br"
         ));
-
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
