@@ -5,7 +5,9 @@ import com.icar.platform.api.mapper.notification.NotificationMapper;
 import com.icar.platform.domain.enums.AppointmentStatus;
 import com.icar.platform.domain.model.appointment.CarWashAppointment;
 import com.icar.platform.domain.model.notification.Notification;
+import com.icar.platform.domain.model.notification.PushSubscription;
 import com.icar.platform.domain.repository.notification.NotificationRepository;
+import com.icar.platform.domain.repository.notification.PushSubscriptionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -22,6 +25,8 @@ import java.util.UUID;
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final PushSubscriptionRepository pushSubscriptionRepository;
+    private final WebPushService webPushService;
     private final NotificationMapper notificationMapper;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM 'às' HH:mm");
 
@@ -35,6 +40,10 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setAppointmentTime(appointment.getDateTime().format(FORMATTER));
         notification.setCreatedAt(Instant.now());
         notificationRepository.save(notification);
+
+        String title = "Novo Agendamento!";
+        String body = notification.getText() + " " + notification.getAppointmentTime();
+        sendPushNotificationToProfile(appointment.getProfile().getId(), title, body);
     }
 
     @Override
@@ -43,18 +52,24 @@ public class NotificationServiceImpl implements NotificationService {
         Notification notification = new Notification();
         notification.setProfile(appointment.getProfile());
 
+        String pushTitle;
         if (appointment.getStatus() == AppointmentStatus.REFUND_PENDING) {
             notification.setType("REFUND_REQUIRED");
             notification.setText("Ação necessária: Cancelamento com reembolso para");
             notification.setAppointmentTime(appointment.getDateTime().format(FORMATTER) + ". Efetue o estorno.");
+            pushTitle = "Reembolso Necessário";
         } else {
             notification.setType("CANCELLATION");
             notification.setText("O agendamento para");
             notification.setAppointmentTime(appointment.getDateTime().format(FORMATTER) + " foi cancelado.");
+            pushTitle = "Agendamento Cancelado";
         }
 
         notification.setCreatedAt(Instant.now());
         notificationRepository.save(notification);
+
+        String pushBody = notification.getText() + " " + notification.getAppointmentTime();
+        sendPushNotificationToProfile(appointment.getProfile().getId(), pushTitle, pushBody);
     }
 
     @Override
@@ -67,7 +82,24 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setAppointmentTime(appointment.getDateTime().format(FORMATTER) + " foi alterado.");
         notification.setCreatedAt(Instant.now());
         notificationRepository.save(notification);
+
+        String title = "Agendamento Alterado";
+        String body = notification.getText() + " " + notification.getAppointmentTime();
+        sendPushNotificationToProfile(appointment.getProfile().getId(), title, body);
     }
+
+    private void sendPushNotificationToProfile(UUID profileId, String title, String body) {
+        List<PushSubscription> subscriptions = pushSubscriptionRepository.findByCarWashProfileId(profileId);
+
+        for (PushSubscription sub : subscriptions) {
+            try {
+                webPushService.sendNotification(sub, title, body);
+            } catch (Exception e) {
+                System.err.println("Erro ao enviar push para endpoint: " + sub.getEndpoint() + ". Causa: " + e.getMessage());
+            }
+        }
+    }
+
 
     @Override
     @Transactional(readOnly = true)
