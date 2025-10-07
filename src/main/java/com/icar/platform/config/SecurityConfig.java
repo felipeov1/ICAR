@@ -86,7 +86,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/profile/*/vehicle-types").permitAll() // <-- CORRIGIDO de ** para *
                         .requestMatchers(HttpMethod.GET, "/api/v1/profile/*/offerings").permitAll()     // <-- CORRIGIDO de ** para *
                         .requestMatchers(HttpMethod.GET, "/api/v1/carwashes/*/reviews").permitAll()     // <-- CORRIGIDO de ** para *
-                        .requestMatchers("/api/v1/push/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/push/**").authenticated()
 
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
