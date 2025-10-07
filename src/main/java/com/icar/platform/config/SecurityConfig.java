@@ -83,17 +83,16 @@ public class SecurityConfig {
                         .requestMatchers(PUBLIC_WHITELIST).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/marketplace/carwashes").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/profile/subdomain/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/profile/*/vehicle-types").permitAll() // <-- CORRIGIDO de ** para *
-                        .requestMatchers(HttpMethod.GET, "/api/v1/profile/*/offerings").permitAll()     // <-- CORRIGIDO de ** para *
-                        .requestMatchers(HttpMethod.GET, "/api/v1/carwashes/*/reviews").permitAll()     // <-- CORRIGIDO de ** para *
+                        .requestMatchers(HttpMethod.GET, "/api/v1/profile/*/vehicle-types").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/profile/*/offerings").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/carwashes/*/reviews").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/push/**").authenticated()
-
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider())
+                // A LINHA ABAIXO FOI REMOVIDA. O JwtAuthenticationFilter já faz o trabalho.
+                // .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
 
