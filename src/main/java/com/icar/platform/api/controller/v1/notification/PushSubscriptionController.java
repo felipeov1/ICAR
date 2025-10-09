@@ -36,7 +36,10 @@ public class PushSubscriptionController {
     }
 
     @PostMapping("/unsubscribe")
-    public ResponseEntity<Void> unsubscribe(@RequestBody PushSubscriptionRequest request) {
+    public ResponseEntity<Void> unsubscribe(
+            @RequestBody PushSubscriptionRequest request,
+            @AuthenticationPrincipal UserDetails loggedUser) {
+
         pushSubscriptionService.unsubscribe(request.getEndpoint());
         return ResponseEntity.ok().build();
     }
