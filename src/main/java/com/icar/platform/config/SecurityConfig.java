@@ -50,8 +50,6 @@ public class SecurityConfig {
             "/uploads/**",
             "/api/v1/notifications/mercado-pago",
             "/api/v1/mercado-pago/**",
-            "/api/v1/push/subscribe",
-            "/api/v1/push/unsubscribe"
     };
 
     @Bean
@@ -92,8 +90,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // A LINHA ABAIXO FOI REMOVIDA. O JwtAuthenticationFilter já faz o trabalho.
-                // .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
 
