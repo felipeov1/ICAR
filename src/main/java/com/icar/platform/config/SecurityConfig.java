@@ -41,17 +41,17 @@ public class SecurityConfig {
     };
 
     public static final String[] PUBLIC_WHITELIST = {
-            // Rotas de autenticação para todos os tipos de usuário
             "/api/v1/auth/**",
             "/api/v1/carwash/auth/**",
             "/api/v1/admin/auth/**",
 
-            // Rotas de utilidade pública
             "/api/v1/health",
             "/error",
-            "/uploads/**", // Se seus uploads forem de acesso público
+            "/uploads/**",
             "/api/v1/notifications/mercado-pago",
-            "/api/v1/mercado-pago/**"
+            "/api/v1/mercado-pago/**",
+            "/api/v1/push/subscribe",
+            "/api/v1/push/unsubscribe"
     };
 
     @Bean
@@ -86,6 +86,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/profile/*/vehicle-types").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/profile/*/offerings").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/carwashes/*/reviews").permitAll()
+                        .requestMatchers("/api/v1/push/subscribe", "/api/v1/push/unsubscribe").authenticated()
                         .requestMatchers("/api/v1/push/**").authenticated()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
