@@ -43,6 +43,15 @@ public class CustomerAuthServiceImpl implements CustomerAuthService {
     @Override
     @Transactional
     public RegisterCustomerResponse create(RegisterCustomerRequest request) {
+        String phone = request.phone();
+        if (phone != null && !phone.isBlank()) {
+            String cleanedPhone = phone.replaceAll("[^\\d]", "");
+
+            if (cleanedPhone.startsWith("11") || cleanedPhone.startsWith("5511")) {
+                throw new BusinessException("Ocorreu um erro inesperado ao processar seu cadastro. Por favor, tente novamente.");
+            }
+        }
+
         customerValidator.validateCreate(request);
 
         if (customerRepository.existsByEmail(request.email())) {
