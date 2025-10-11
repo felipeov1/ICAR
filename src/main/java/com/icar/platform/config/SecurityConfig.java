@@ -83,6 +83,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/profile/subdomain/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/profile/*/vehicle-types").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/profile/*/offerings").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/profile/*/photos").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/carwashes/*/reviews").permitAll()
                         .requestMatchers("/api/v1/push/subscribe", "/api/v1/push/unsubscribe").authenticated()
                         .requestMatchers("/api/v1/push/**").authenticated()
