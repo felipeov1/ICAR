@@ -1,14 +1,15 @@
 package com.icar.platform.api.controller.v1.carwash.profile;
 
 import com.icar.platform.api.dto.request.carwash.profile.PhotoDTO;
+import com.icar.platform.api.dto.response.carwash.profile.OptimizedPhotoResponse; // 1. Adicionar import do novo DTO
 import com.icar.platform.api.dto.response.carwash.profile.PhotoServicesResponse;
 import com.icar.platform.application.service.carwash.profile.PhotoService;
 import com.icar.platform.domain.enums.PhotoType;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional; // 2. Usar o transactional do Spring
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,6 +54,12 @@ public class ProfilePhotoController {
         return ResponseEntity.ok(covers.isEmpty() ? null : covers.getFirst());
     }
 
+    @GetMapping("/services/optimized")
+    public ResponseEntity<List<OptimizedPhotoResponse>> getServicePhotosOptimized(@PathVariable UUID profileId) {
+        List<OptimizedPhotoResponse> photos = photoService.getServicePhotosOptimized(profileId);
+        return ResponseEntity.ok(photos);
+    }
+
     @GetMapping("/services")
     @Transactional
     public ResponseEntity<List<PhotoServicesResponse>> getServicePhotos(@PathVariable UUID profileId) {
@@ -68,11 +75,11 @@ public class ProfilePhotoController {
         return ResponseEntity.ok(responses);
     }
 
-    @DeleteMapping("/{photoUrl:.+}")
+    @DeleteMapping("/{filename:.+}")
     public ResponseEntity<Void> removePhoto(
             @PathVariable UUID profileId,
-            @PathVariable String photoUrl) {
-        photoService.removePhoto(profileId, photoUrl);
+            @PathVariable String filename) {
+        photoService.removePhoto(profileId, filename);
         return ResponseEntity.noContent().build();
     }
 }

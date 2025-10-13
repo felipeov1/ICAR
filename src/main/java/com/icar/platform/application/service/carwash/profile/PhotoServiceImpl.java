@@ -1,6 +1,7 @@
 package com.icar.platform.application.service.carwash.profile;
 
 import com.icar.platform.api.dto.request.carwash.profile.PhotoDTO;
+import com.icar.platform.api.dto.response.carwash.profile.OptimizedPhotoResponse;
 import com.icar.platform.api.dto.response.carwash.profile.PhotoServicesResponse;
 import com.icar.platform.domain.enums.PhotoType;
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,20 +34,18 @@ public class PhotoServiceImpl implements PhotoService {
     public List<PhotoServicesResponse> addServicePhotos(UUID carWashId, List<MultipartFile> files) {
         CarWashProfile profile = getProfileByCarWashId(carWashId);
 
-        List<PhotoServicesResponse> responses = files.stream()
-                .map(file -> {
-                    String photoUrl = storageService.store(file, getPhotoPath(carWashId, PhotoType.SERVICE));
-                    profile.getPhotos().add(photoUrl);
-                    return new PhotoServicesResponse(
-                            photoUrl,
-                            "Service photo uploaded successfully",
-                            LocalDateTime.now()
-                    );
-                })
-                .toList();
+        files.forEach(file -> {
+            Map<String, String> paths = storageService.storeAndCreateThumbnail(file, getPhotoPath(carWashId, PhotoType.SERVICE));
+
+            String originalPath = paths.get("original");
+            profile.getPhotos().add(originalPath);
+        });
 
         profileRepository.save(profile);
-        return responses;
+
+        return profile.getPhotos().stream()
+                .map(url -> new PhotoServicesResponse(buildFullUrl(url), "Uploaded", LocalDateTime.now()))
+                .toList();
     }
 
     @Override
@@ -67,23 +67,25 @@ public class PhotoServiceImpl implements PhotoService {
     @Transactional
     public void addPhoto(UUID carWashId, MultipartFile file, PhotoType type) {
         CarWashProfile profile = getProfileByCarWashId(carWashId);
-        String photoUrl = storageService.store(file, getPhotoPath(carWashId, type));
 
         switch (type) {
             case LOGO:
+                String logoUrl = storageService.store(file, getPhotoPath(carWashId, type));
                 if (profile.getLogo() != null) {
                     storageService.delete(profile.getLogo());
                 }
-                profile.setLogo(photoUrl);
+                profile.setLogo(logoUrl);
                 break;
             case COVER:
+                String coverUrl = storageService.store(file, getPhotoPath(carWashId, type));
                 if (profile.getCoverPhoto() != null) {
                     storageService.delete(profile.getCoverPhoto());
                 }
-                profile.setCoverPhoto(photoUrl);
+                profile.setCoverPhoto(coverUrl);
                 break;
             case SERVICE:
-                profile.getPhotos().add(photoUrl);
+                Map<String, String> paths = storageService.storeAndCreateThumbnail(file, getPhotoPath(carWashId, type));
+                profile.getPhotos().add(paths.get("original"));
                 break;
         }
 
@@ -121,26 +123,58 @@ public class PhotoServiceImpl implements PhotoService {
         }
     }
 
-    @Override
-    @Transactional
-    public void removePhoto(UUID carWashId, String photoUrlFromRequest) {
+    @Transactional(readOnly = true)
+    public List<OptimizedPhotoResponse> getServicePhotosOptimized(UUID carWashId) {
         CarWashProfile profile = getProfileByCarWashId(carWashId);
         Hibernate.initialize(profile.getPhotos());
 
-        String filenameFromRequest = photoUrlFromRequest.substring(photoUrlFromRequest.lastIndexOf('/') + 1);
+        return profile.getPhotos().stream()
+                .map(originalRelativePath -> {
+                    String thumbRelativePath;
 
-        java.util.Optional<String> fullPathToRemove = profile.getPhotos().stream()
+                    if (originalRelativePath != null && originalRelativePath.contains("_original")) {
+                        thumbRelativePath = generateThumbnailPath(originalRelativePath);
+                    } else {
+                        thumbRelativePath = originalRelativePath;
+                    }
+
+                    return new OptimizedPhotoResponse(
+                            buildFullUrl(originalRelativePath),
+                            buildFullUrl(thumbRelativePath),
+                            "Foto do serviço"
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void removePhoto(UUID carWashId, String filenameFromRequest) {
+        CarWashProfile profile = getProfileByCarWashId(carWashId);
+        Hibernate.initialize(profile.getPhotos());
+
+        String originalPathToRemove = profile.getPhotos().stream()
                 .filter(dbPath -> dbPath.endsWith(filenameFromRequest))
-                .findFirst();
-        if (fullPathToRemove.isPresent()) {
-            String path = fullPathToRemove.get();
-            profile.getPhotos().remove(path);
-            storageService.delete(path);
-        } else {
-            throw new ResourceNotFoundException("Photo not found in profile's list for filename: " + filenameFromRequest);
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Photo not found for filename: " + filenameFromRequest));
+
+        if (originalPathToRemove.contains("_original")) {
+            String thumbnailPathToDelete = generateThumbnailPath(originalPathToRemove);
+            storageService.delete(thumbnailPathToDelete);
         }
 
+        profile.getPhotos().remove(originalPathToRemove);
+        storageService.delete(originalPathToRemove);
+
         profileRepository.save(profile);
+    }
+
+    private String generateThumbnailPath(String originalPath) {
+        if (originalPath == null) return null;
+        int lastDot = originalPath.lastIndexOf('.');
+        if (lastDot == -1) return originalPath;
+        String baseName = originalPath.substring(0, lastDot);
+        return baseName.replace("_original", "_thumb") + ".webp";
     }
 
     private CarWashProfile getProfileByCarWashId(UUID profileId) {
@@ -154,6 +188,4 @@ public class PhotoServiceImpl implements PhotoService {
         }
         return storageProperties.getBaseUrl() + "/uploads/" + relativePath;
     }
-
-
 }
