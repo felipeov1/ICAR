@@ -55,7 +55,7 @@ public class FileSystemStorageService implements StorageService {
             Thumbnails.of(file.getInputStream())
                     .size(400, 400)
                     .outputFormat("webp")
-                    .outputQuality(0.85)
+                    .outputQuality(0.70)
                     .toOutputStream(thumbOutput);
             Files.copy(new ByteArrayInputStream(thumbOutput.toByteArray()), thumbnailLocation);
 
@@ -74,7 +74,7 @@ public class FileSystemStorageService implements StorageService {
     public String store(MultipartFile file, String relativePath) {
         return storeAndCreateThumbnail(file, relativePath).get("original");
     }
-    
+
     @Override
     public void delete(String filePath) {
         try {
