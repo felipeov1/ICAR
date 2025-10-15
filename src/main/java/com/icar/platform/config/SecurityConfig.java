@@ -1,6 +1,7 @@
 package com.icar.platform.config;
 
 import com.icar.platform.infrastructure.security.filter.JwtAuthenticationFilter;
+import com.icar.platform.infrastructure.security.oauth.OAuth2AuthenticationSuccessHandler;
 import com.icar.platform.infrastructure.security.service.CustomerDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +19,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -34,6 +37,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomerDetailsService customerDetailsService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
     private static final String[] SWAGGER_WHITELIST = {
             "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**", "/webjars/**",
@@ -44,7 +48,8 @@ public class SecurityConfig {
             "/api/v1/auth/**",
             "/api/v1/carwash/auth/**",
             "/api/v1/admin/auth/**",
-
+            "/login/**",
+            "/oauth2/**",
             "/api/v1/health",
             "/error",
             "/uploads/**",
@@ -63,6 +68,11 @@ public class SecurityConfig {
     @Bean
     public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return new SimpleUrlAuthenticationFailureHandler("/entrar?error=oauth_failed");
     }
 
     @Bean
@@ -91,8 +101,14 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(endpoint -> endpoint.baseUri("/oauth2/authorization"))
+                        .redirectionEndpoint(endpoint -> endpoint.baseUri("/login/oauth2/code/*"))
+                        .successHandler(oAuth2AuthenticationSuccessHandler)
+                        .failureHandler(authenticationFailureHandler())
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -100,39 +116,15 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
         configuration.setAllowedOriginPatterns(Arrays.asList(
-                "http://localhost:5174",
-                "http://app.localhost:5174",
-                "http://gestao.localhost:5174",
-                "http://admin.localhost:5174",
-                "http://*.localhost:5174",
-                "http://192.168.3.8:5174",
-                "http://localhost:5173",
-                "http://app.localhost:5173",
-                "http://gestao.localhost:5173",
-                "http://admin.localhost:5173",
-                "http://*.localhost:5173",
-                "http://192.168.3.8:5173",
-
-                "https://localhost:5173",
-                "https://app.localhost:5173",
-                "https://gestao.localhost:5173",
-                "https://admin.localhost:5173",
-                "https://*.localhost:5173",
-                "https://192.168.3.8:5173",
-
-                "https://icarplus.com.br",
-                "https://www.icarplus.com.br",
-                "https://app.icarplus.com.br",
-                "https://gestao.icarplus.com.br",
-                "https://*.icarplus.com.br"
+                "http://localhost:5173", "http://*.localhost:5173", "http://192.168.3.8:5173",
+                "https://localhost:5173", "https://*.localhost:5173", "https://192.168.3.8:5173",
+                "https://icarplus.com.br", "https://*.icarplus.com.br"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

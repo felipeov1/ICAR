@@ -1,5 +1,6 @@
 package com.icar.platform.domain.model.customer;
 
+import com.icar.platform.domain.enums.AuthProvider;
 import com.icar.platform.domain.enums.UserStatus;
 import com.icar.platform.domain.model.email.EmailVerification;
 import jakarta.persistence.*;
@@ -31,10 +32,10 @@ public class Customer {
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 
-    @Column(nullable = false, length = 15)
+    @Column(length = 15)
     private String phone;
 
-    @Column(nullable = false, length = 255)
+    @Column(length = 255)
     private String password;
 
     @Column(name = "identification_type", length = 10)
@@ -49,6 +50,11 @@ public class Customer {
 
     @Column(name = "email_verified")
     private boolean emailVerified;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "auth_provider", nullable = false)
+    private AuthProvider authProvider;
+
 
     @CreationTimestamp
     @Column(name = "created_at")
