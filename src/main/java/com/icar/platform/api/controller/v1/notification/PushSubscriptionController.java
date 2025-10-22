@@ -31,7 +31,7 @@ public class PushSubscriptionController {
 
         UUID profileId = carWash.getProfileId();
 
-        pushSubscriptionService.subscribe(profileId, request);
+        pushSubscriptionService.subscribeCarWash(profileId, request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

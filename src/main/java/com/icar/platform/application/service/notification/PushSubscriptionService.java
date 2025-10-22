@@ -4,6 +4,9 @@ import com.icar.platform.api.dto.request.notification.PushSubscriptionRequest;
 import java.util.UUID;
 
 public interface PushSubscriptionService {
-    void subscribe(UUID profileId, PushSubscriptionRequest request);
+    void subscribeCarWash(UUID profileId, PushSubscriptionRequest request);
+
+    void subscribeAdmin(PushSubscriptionRequest request);
+
     void unsubscribe(String endpoint);
 }

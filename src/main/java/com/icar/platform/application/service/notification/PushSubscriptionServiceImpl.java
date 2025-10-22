@@ -1,6 +1,7 @@
 package com.icar.platform.application.service.notification;
 
 import com.icar.platform.api.dto.request.notification.PushSubscriptionRequest;
+import com.icar.platform.domain.enums.SubscriptionType;
 import com.icar.platform.domain.model.carwash.profile.CarWashProfile;
 import com.icar.platform.domain.model.notification.PushSubscription;
 import com.icar.platform.domain.repository.carwash.profile.CarWashProfileRepository;
@@ -16,16 +17,30 @@ import java.util.UUID;
 public class PushSubscriptionServiceImpl implements PushSubscriptionService {
 
     private final PushSubscriptionRepository pushSubscriptionRepository;
-    private final CarWashProfileRepository carWashProfileRepository; // Repositório para buscar o perfil
+    private final CarWashProfileRepository carWashProfileRepository;
 
     @Override
     @Transactional
-    public void subscribe(UUID profileId, PushSubscriptionRequest request) {
+    public void subscribeCarWash(UUID profileId, PushSubscriptionRequest request) {
         CarWashProfile profile = carWashProfileRepository.findById(profileId)
-                .orElseThrow(() -> new RuntimeException("Perfil não encontrado")); // Ou uma exceção customizada
+                .orElseThrow(() -> new RuntimeException("Perfil não encontrado"));
 
         PushSubscription subscription = new PushSubscription();
         subscription.setCarWashProfile(profile);
+        subscription.setSubscriptionType(SubscriptionType.CARWASH);
+        subscription.setEndpoint(request.getEndpoint());
+        subscription.setP256dh(request.getKeys().getP256dh());
+        subscription.setAuth(request.getKeys().getAuth());
+
+        pushSubscriptionRepository.save(subscription);
+    }
+
+    @Override
+    @Transactional
+    public void subscribeAdmin(PushSubscriptionRequest request) {
+        PushSubscription subscription = new PushSubscription();
+        subscription.setCarWashProfile(null);
+        subscription.setSubscriptionType(SubscriptionType.ADMIN);
         subscription.setEndpoint(request.getEndpoint());
         subscription.setP256dh(request.getKeys().getP256dh());
         subscription.setAuth(request.getKeys().getAuth());
