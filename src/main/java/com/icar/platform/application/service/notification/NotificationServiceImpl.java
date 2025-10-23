@@ -47,7 +47,7 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setCreatedAt(Instant.now());
         notificationRepository.save(notification);
 
-        String title = "Novo Agendamento! \uD83D\uDE9C";
+        String title = "Novo Agendamento!";
         String body = notification.getText() + " " + notification.getAppointmentTime();
         sendPushNotificationToProfile(appointment.getProfile().getId(), title, body);
 
