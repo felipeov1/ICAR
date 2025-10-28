@@ -7,5 +7,6 @@ public record RegisterCustomerRequest(
         @NotBlank String fullName,
         @NotBlank @Email String email,
         @NotBlank @Pattern(regexp = "^\\+?[0-9]{10,15}$") String phone,
-        @NotBlank String password
+        @NotBlank String password,
+        String authProvider
 ) {}

@@ -6,6 +6,7 @@ import com.icar.platform.api.dto.response.auth.EmailVerificationResponse;
 import com.icar.platform.api.dto.response.customer.AccessTokenResponse;
 import com.icar.platform.api.mapper.customer.CustomerMapper;
 import com.icar.platform.application.service.email.EmailService;
+import com.icar.platform.domain.enums.AuthProvider;
 import com.icar.platform.domain.enums.UserStatus;
 import com.icar.platform.domain.model.customer.Customer;
 import com.icar.platform.domain.model.email.EmailVerification;
@@ -68,6 +69,17 @@ public class CustomerAuthServiceImpl implements CustomerAuthService {
         Customer customer = customerMapper.toEntity(request);
         customer.setPassword(passwordEncoder.encode(request.password()));
         customer.setStatus(UserStatus.PENDING);
+
+        AuthProvider provider = AuthProvider.LOCAL;
+
+        if (request.authProvider() != null && !request.authProvider().isBlank()) {
+            try {
+                provider = AuthProvider.valueOf(request.authProvider().toUpperCase());
+            } catch (IllegalArgumentException e) {
+            }
+        }
+
+        customer.setAuthProvider(provider);
 
         Customer saved = customerRepository.save(customer);
 
